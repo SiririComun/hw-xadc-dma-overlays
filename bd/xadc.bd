@@ -2740,13 +2740,13 @@
           "axi_mem_intercon/S00_ACLK",
           "axi_mem_intercon/M00_ACLK",
           "axi_mem_intercon/ACLK",
-          "tlast_generator_0/aclk",
           "xadc_wiz_0/s_axis_aclk",
           "axi_timer_0/s_axi_aclk",
           "axi_smc/aclk",
           "processing_system7_0/M_AXI_GP0_ACLK",
           "processing_system7_0/S_AXI_HP0_ACLK",
-          "rst_ps7_0_100M/slowest_sync_clk"
+          "rst_ps7_0_100M/slowest_sync_clk",
+          "tlast_generator_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -2763,9 +2763,9 @@
           "axi_mem_intercon/S00_ARESETN",
           "axi_mem_intercon/M00_ARESETN",
           "axi_mem_intercon/ARESETN",
-          "tlast_generator_0/aresetn",
           "axi_timer_0/s_axi_aresetn",
-          "axi_smc/aresetn"
+          "axi_smc/aresetn",
+          "tlast_generator_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
