@@ -12,7 +12,27 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
+
 entity xadc_wrapper is
+  generic (
+    -- Hog-specific versioning generics (passed by Hog as 32-bit hex vectors) [1.4]
+    GLOBAL_DATE         : std_logic_vector(31 downto 0) := x"00000000";
+    GLOBAL_TIME         : std_logic_vector(31 downto 0) := x"00000000";
+    GLOBAL_VER          : std_logic_vector(31 downto 0) := x"00000000";
+    GLOBAL_SHA          : std_logic_vector(31 downto 0) := x"00000000";
+    TOP_SHA             : std_logic_vector(31 downto 0) := x"00000000";
+    TOP_VER             : std_logic_vector(31 downto 0) := x"00000000";
+    HOG_SHA             : std_logic_vector(31 downto 0) := x"00000000";
+    HOG_VER             : std_logic_vector(31 downto 0) := x"00000000";
+    CON_VER             : std_logic_vector(31 downto 0) := x"00000000";
+    CON_SHA             : std_logic_vector(31 downto 0) := x"00000000";
+    XIL_DEFAULTLIB_VER  : std_logic_vector(31 downto 0) := x"00000000";
+    XIL_DEFAULTLIB_SHA  : std_logic_vector(31 downto 0) := x"00000000";
+    IPS_VER             : std_logic_vector(31 downto 0) := x"00000000";
+    IPS_SHA             : std_logic_vector(31 downto 0) := x"00000000";
+    OTHERS_VER          : std_logic_vector(31 downto 0) := x"00000000";
+    OTHERS_SHA          : std_logic_vector(31 downto 0) := x"00000000"
+  );
   port (
     DDR_addr : inout STD_LOGIC_VECTOR ( 14 downto 0 );
     DDR_ba : inout STD_LOGIC_VECTOR ( 2 downto 0 );
