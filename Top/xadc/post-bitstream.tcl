@@ -28,15 +28,15 @@ set hwh_dest [file join $dest_dir "xadc.hwh"]
 # Copy and rename the compiled bitstream (.bit)
 if {[file exists $bit_src]} {
     file copy -force $bit_src $bit_dest
-    send_msg_id "Hog:PostBitstream" "INFO" "Successfully copied compiled bitstream to: $bit_dest"
+    send_msg_id "Hog-1" "INFO" "Successfully copied compiled bitstream to: $bit_dest"
 } else {
-    send_msg_id "Hog:PostBitstream" "ERROR" "Could not find source bitstream at: $bit_src"
+    send_msg_id "Hog-2" "ERROR" "Could not find source bitstream at: $bit_src"
 }
 
 # Copy and rename the hardware handoff metadata (.hwh)
 if {[file exists $hwh_src]} {
     file copy -force $hwh_src $hwh_dest
-    send_msg_id "Hog:PostBitstream" "INFO" "Successfully copied hardware handoff metadata to: $hwh_dest"
+    send_msg_id "Hog-3" "INFO" "Successfully copied hardware handoff metadata to: $hwh_dest"
 } else {
-    send_msg_id "Hog:PostBitstream" "ERROR" "Could not find source hardware handoff metadata at: $hwh_src"
+    send_msg_id "Hog-4" "ERROR" "Could not find source hardware handoff metadata at: $hwh_src"
 }
