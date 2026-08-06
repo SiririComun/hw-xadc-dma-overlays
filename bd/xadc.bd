@@ -3,7 +3,6 @@
     "design_info": {
       "boundary_crc": "0xDB9C1F30356301FA",
       "device": "xc7z020clg400-1",
-      "gen_directory": ".",
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",

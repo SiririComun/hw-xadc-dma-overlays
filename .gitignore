@@ -101,3 +101,29 @@ _info
 **.qdb
 **.qpg
 **.qtl
+
+cat << 'EOF' >> .gitignore
+
+# Ignore Vivado block design generated targets
+bd/hdl/
+bd/hw_handoff/
+bd/ip/
+bd/ipshared/
+bd/sim/
+bd/synth/
+bd/*.bda
+bd/*.bmj
+bd/*.bxml
+bd/*_bmstub.v
+bd/*_ooc.xdc
+bd/*_stub.v
+bd/*_stub.vhdl
+
+# Ignore standard Vivado logs and workspace folders
+vivado.log
+vivado.jou
+.Xil/
+Projects/
+SimulationLib/
+bin/
+EOF
