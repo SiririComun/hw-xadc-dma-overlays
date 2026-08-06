@@ -11,7 +11,8 @@ set repo_root [file normalize [file join $script_dir ".." ".."]]
 
 # Define source paths of Vivado output products
 set bit_src  [file join $repo_root "Projects" "xadc" "xadc.runs" "impl_1" "xadc_wrapper.bit"]
-set hwh_src  [file join $repo_root "Projects" "xadc" "xadc.gen" "sources_1" "bd" "xadc" "hw_handoff" "xadc.hwh"]
+# CORRECTED: Point to the actual generated location in the source directory [1.5]
+set hwh_src  [file join $repo_root "bd" "hw_handoff" "xadc.hwh"]
 
 # Define target destination directory inside your PYNQ Python package [1.5]
 set dest_dir [file join $repo_root "python_package" "src" "pynq_ad3_xadc" "overlays"]
