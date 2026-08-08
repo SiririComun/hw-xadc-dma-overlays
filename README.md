@@ -114,4 +114,5 @@ This repository is designed to support multiple FPGA boards simultaneously using
 ---
 
 ## 📄 License
-Distributed under the MIT License.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
