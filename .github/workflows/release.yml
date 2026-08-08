@@ -1,0 +1,40 @@
+name: Hardware Overlay Release Automation
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers automatically whenever you push a tag like v1.0.1, v1.1.0, etc.
+
+jobs:
+  publish-release-artifacts:
+    name: Upload Overlay Assets to GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Grants permission to create GitHub Releases
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify Binaries Exist
+        run: |
+          if [ ! -d "bin" ]; then
+            echo "Error: bin/ directory missing."
+            exit 1
+          fi
+          echo "Found release binaries:"
+          ls -la bin/
+
+      - name: Create GitHub Release & Upload Artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/*.bit
+            bin/*.hwh
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
