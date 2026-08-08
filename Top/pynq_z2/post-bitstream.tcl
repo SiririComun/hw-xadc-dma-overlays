@@ -23,8 +23,8 @@ if {![file exists $dest_dir]} {
 }
 
 # Define target renamed filenames for PYNQ compatibility
-set bit_dest [file join $dest_dir "xadc.bit"]
-set hwh_dest [file join $dest_dir "xadc.hwh"]
+set bit_dest [file join $dest_dir "pynq_z2.bit"]
+set hwh_dest [file join $dest_dir "pynq_z2.hwh"]
 
 # Copy and rename the compiled bitstream (.bit)
 if {[file exists $bit_src]} {
