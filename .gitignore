@@ -104,21 +104,6 @@ _info
 
 cat << 'EOF' >> .gitignore
 
-# Ignore Vivado block design generated targets
-bd/hdl/
-bd/hw_handoff/
-bd/ip/
-bd/ipshared/
-bd/sim/
-bd/synth/
-bd/*.bda
-bd/*.bmj
-bd/*.bxml
-bd/*_bmstub.v
-bd/*_ooc.xdc
-bd/*_stub.v
-bd/*_stub.vhdl
-
 # Ignore standard Vivado logs and workspace folders
 vivado.log
 vivado.jou
@@ -128,3 +113,21 @@ SimulationLib/
 bin/
 EOF
 bd/ui/
+*.log
+*.jou
+*.str
+*.rst
+.write_bitstream.error.rst
+
+# Vivado Block Design generated outputs (Keep only src/bd/xadc.bd)
+src/bd/hdl/
+src/bd/hw_handoff/
+src/bd/ip/
+src/bd/ipshared/
+src/bd/sim/
+src/bd/synth/
+src/bd/*.bda
+src/bd/*.bmj
+src/bd/*.bxml
+src/bd/*_bmstub.v
+src/bd/*_ooc.xdc
