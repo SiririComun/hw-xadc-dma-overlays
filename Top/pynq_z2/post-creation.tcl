@@ -1,10 +1,9 @@
 # ==============================================================================
-# Hog Post-Creation Hook & Vivado GUI Custom Button
+# Hog Post-Creation Hook & Vivado GUI Custom Command
 # ==============================================================================
 
-# 1. Define the procedure to export the BD layout to context/
-proc export_bd_to_context {} {
-    # Dynamically find repo root from the active Vivado project directory
+# 1. Define the self-contained export command for the GUI button
+set export_cmd {
     set prj_dir   [get_property DIRECTORY [current_project]]
     set repo_root [file normalize [file join $prj_dir ".." ".."]]
     set dest_dir  [file join $repo_root "context"]
@@ -20,33 +19,34 @@ proc export_bd_to_context {} {
             set pdf_dest [file join $dest_dir "${bd_name}.pdf"]
             
             # Ensure the Block Design is open
-            open_bd_design $bd
+            open_bd_design $bd -quiet
             
-            # Export the diagram as a landscape PDF
-            write_bd_layout -format pdf -orientation landscape -force $pdf_dest
-            
-            send_msg_id "Hog-PDF" "INFO" "Exported Block Design PDF to: $pdf_dest"
+            # Export to PDF with upright orientation
+            if {[catch {write_bd_layout -format pdf -orientation portrait -force $pdf_dest} err_msg]} {
+                send_msg_id "Hog-101" "INFO" "PDF export skipped in batch mode. Open Vivado GUI to export."
+            } else {
+                send_msg_id "Hog-100" "INFO" "Exported Block Design PDF to: $pdf_dest"
+            }
         }
     } else {
-        send_msg_id "Hog-PDF" "WARNING" "No Block Design (.bd) found in the open project."
+        send_msg_id "Hog-102" "WARNING" "No Block Design (.bd) found in the open project."
     }
 }
 
-# 2. Execute automatically during project creation
-export_bd_to_context
-
-# 3. Register a GUI Custom Button & Menu Item in the Vivado IDE
-if {[info exists ::env(DISPLAY)] || [get_param -quiet gui.displayMode] ne ""} {
-    # Remove old instance if it exists to avoid duplication
-    remove_gui_custom_commands -quiet "ExportBDPDF"
+# 2. Register the GUI custom command
+if {[info commands create_gui_custom_command] ne ""} {
+    catch { remove_gui_custom_commands "ExportBDPDF" }
 
     create_gui_custom_command \
         -name "ExportBDPDF" \
         -menu_name "Export BD to Context PDF" \
         -description "Exports the current Block Design diagram to context/*.pdf" \
         -show_on_toolbar \
-        -run_proc true \
-        -command "export_bd_to_context"
+        -run_proc false \
+        -command $export_cmd
 
-    send_msg_id "Hog-PDF" "INFO" "Custom GUI button registered: Tools -> Custom Commands -> Export BD to Context PDF"
+    send_msg_id "Hog-103" "INFO" "Custom GUI button registered: Tools -> Custom Commands -> Export BD to Context PDF"
 }
+
+# 3. Try running immediately if project creation happens in GUI mode
+catch { eval $export_cmd }
