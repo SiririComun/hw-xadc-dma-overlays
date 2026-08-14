@@ -3123,7 +3123,7 @@
             "value": "1"
           },
           "M_HAS_TREADY": {
-            "value": "0"
+            "value": "1"
           },
           "M_HAS_TSTRB": {
             "value": "0"
@@ -3147,7 +3147,7 @@
             "value": "1"
           },
           "S_HAS_TREADY": {
-            "value": "0"
+            "value": "1"
           },
           "S_HAS_TSTRB": {
             "value": "0"

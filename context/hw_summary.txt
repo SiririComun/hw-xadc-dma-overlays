@@ -4,11 +4,13 @@ Git Context & Branch Info:
 Current Branch: feat/pl-fft
 Branch Tracking Status:
   feat/hw-trigger 2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
-* feat/pl-fft     cc7047e feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design
+* feat/pl-fft     a4fb242 [origin/feat/pl-fft] fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame
   master          1f92634 [origin/master] docs(context): capture branch status and commit graph in HW context summary
 
 Git Commit Graph & History:
-* cc7047e  (HEAD -> feat/pl-fft) - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
+* a4fb242  (HEAD -> feat/pl-fft, tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
+* 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
+* cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
 * 1f92634  (origin/master, origin/HEAD, master) - 2026-08-14 : docs(context): capture branch status and commit graph in HW context summary (SiririComun)
 * 2ae5a3d  (tag: v1.1.0, origin/feat/hw-trigger, feat/hw-trigger) - 2026-08-14 : docs: update README with axis_trigger_unit architecture and v1.1.0 release details (SiririComun)
 * a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
@@ -20,9 +22,7 @@ Git Commit Graph & History:
 * 0cadbeb  - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
 * 9eb9f1e  - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)
 * d46ba76  - 2026-08-07 : docs: add MIT license and update README link (SiririComun)
-* c5102fc  - 2026-08-07 : docs: add comprehensive README with memory map and multi-board guidelines (SiririComun)
-* d647429  (tag: v1.0.2) - 2026-08-07 : ci: fix workflow indentation and release token (SiririComun)
-* 4267c7b  (tag: v1.0.1) - 2026-08-07 : feat: updated hardware overlay (SiririComun)```
+* c5102fc  - 2026-08-07 : docs: add comprehensive README with memory map and multi-board guidelines (SiririComun)```
 
 release.yml:
 
@@ -2435,7 +2435,7 @@ xadc.bd:
         "inst_hier_path": "tlast_generator_0",
         "parameters": {
           "PACKET_SIZE": {
-            "value": "16384"
+            "value": "2048"
           }
         },
         "reference_info": {
@@ -3322,7 +3322,7 @@ xadc.bd:
             "value": "1"
           },
           "M_HAS_TREADY": {
-            "value": "0"
+            "value": "1"
           },
           "M_HAS_TSTRB": {
             "value": "0"
@@ -3346,7 +3346,7 @@ xadc.bd:
             "value": "1"
           },
           "S_HAS_TREADY": {
-            "value": "0"
+            "value": "1"
           },
           "S_HAS_TSTRB": {
             "value": "0"
