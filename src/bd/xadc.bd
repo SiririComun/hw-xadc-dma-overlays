@@ -2965,6 +2965,9 @@
           },
           "S_TUSER_WIDTH": {
             "value": "0"
+          },
+          "TDATA_REMAP": {
+            "value": "16'b0000000000000000, ~tdata[15], tdata[14:0]"
           }
         },
         "interface_ports": {
