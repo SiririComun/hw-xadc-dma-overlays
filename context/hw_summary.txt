@@ -1,6 +1,25 @@
 hw repository context:
 
-Files structure: 
+Git Commit History:
+
+```log
+0cadbeb - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
+9eb9f1e - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)
+d46ba76 - 2026-08-07 : docs: add MIT license and update README link (SiririComun)
+c5102fc - 2026-08-07 : docs: add comprehensive README with memory map and multi-board guidelines (SiririComun)
+d647429 - 2026-08-07 : ci: fix workflow indentation and release token (SiririComun)
+4267c7b - 2026-08-07 : feat: updated hardware overlay (SiririComun)
+7e89771 - 2026-08-07 : fix(hw): update .gitignore for BD outputs and resolve post-bitstream paths dynamically (SiririComun)
+09d960a - 2026-08-07 : refactor(hw): restructure Top folder to pynq_z2 and update output binaries (SiririComun)
+30cdeb8 - 2026-08-07 : Track compiled bitstream and hardware handoff binaries in bin/ (SiririComun)
+ab5e1a2 - 2026-08-07 : Reorganize repository to clean hardware layout and update Hog post-bitstream copier (SiririComun)
+3001ba0 - 2026-08-06 : Conclude Phase 1: Configure gitignores, track python package, and commit compiled hardware overlays (SiririComun)
+cf32638 - 2026-08-05 : Fix hardware handoff source path in post-bitstream hook script (SiririComun)
+3abc979 - 2026-08-05 : Fix message ID syntax in post-bitstream hook script (SiririComun)
+19e3899 - 2026-08-05 : Add automated post-bitstream handoff hook script (SiririComun)
+a37552d - 2026-08-05 : Configure top-level VHDL wrapper with Hog versioning generics (SiririComun)```
+
+Files structure:
 
 ```log
 .
@@ -9,7 +28,8 @@ Files structure:
 │   └── pynq_z2.hwh
 ├── context
 │   ├── generate_hw_summary.sh
-│   └── hw_summary.txt
+│   ├── hw_summary.txt
+│   └── xadc.pdf
 ├── LICENSE
 ├── README.md
 ├── SimulationLib
@@ -36,7 +56,7 @@ Files structure:
         ├── post-bitstream.tcl
         └── post-creation.tcl
 
-11 directories, 21 files
+11 directories, 22 files
 ```
 
 hog.conf:
@@ -49,6 +69,62 @@ hog.conf:
 PART = xc7z020clg400-1
 TARGET_LANGUAGE = VHDL
 ```
+
+post-creation.tcl:
+
+```tcl
+# ==============================================================================
+# Hog Post-Creation Hook & Vivado GUI Custom Command
+# ==============================================================================
+
+# 1. Define the self-contained export command for the GUI button
+set export_cmd {
+    set prj_dir   [get_property DIRECTORY [current_project]]
+    set repo_root [file normalize [file join $prj_dir ".." ".."]]
+    set dest_dir  [file join $repo_root "context"]
+
+    if {![file exists $dest_dir]} {
+        file mkdir $dest_dir
+    }
+
+    set bd_files [get_files *.bd]
+    if {[llength $bd_files] > 0} {
+        foreach bd $bd_files {
+            set bd_name [file rootname [file tail $bd]]
+            set pdf_dest [file join $dest_dir "${bd_name}.pdf"]
+            
+            # Ensure the Block Design is open
+            open_bd_design $bd -quiet
+            
+            # Export to PDF with upright orientation
+            if {[catch {write_bd_layout -format pdf -orientation portrait -force $pdf_dest} err_msg]} {
+                send_msg_id "Hog-101" "INFO" "PDF export skipped in batch mode. Open Vivado GUI to export."
+            } else {
+                send_msg_id "Hog-100" "INFO" "Exported Block Design PDF to: $pdf_dest"
+            }
+        }
+    } else {
+        send_msg_id "Hog-102" "WARNING" "No Block Design (.bd) found in the open project."
+    }
+}
+
+# 2. Register the GUI custom command
+if {[info commands create_gui_custom_command] ne ""} {
+    catch { remove_gui_custom_commands "ExportBDPDF" }
+
+    create_gui_custom_command \
+        -name "ExportBDPDF" \
+        -menu_name "Export BD to Context PDF" \
+        -description "Exports the current Block Design diagram to context/*.pdf" \
+        -show_on_toolbar \
+        -run_proc false \
+        -command $export_cmd
+
+    send_msg_id "Hog-103" "INFO" "Custom GUI button registered: Tools -> Custom Commands -> Export BD to Context PDF"
+}
+
+# 3. Try running immediately if project creation happens in GUI mode
+catch { eval $export_cmd }```
 
 post-bitstream.tcl:
 
@@ -3130,15 +3206,15 @@ end STRUCTURE;
 
 generate_hw_summary.sh:
 
-```context/generate_hw_summary.sh
+```bash
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: context/generate_hw_summary.sh
 # Target: hw-xadc-dma-overlays
-# Purpose: Dump ONLY the exact HW files and structure into context/hw_summary.txt
+# Purpose: Dump Git history, structure, and exact HW files into context/hw_summary.txt
 # ==============================================================================
 
-# Dynamically locate the context directory and repository root
+# Dynamically locate context directory and repository root
 CONTEXT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${CONTEXT_DIR}/.." && pwd)"
 OUTPUT_FILE="${CONTEXT_DIR}/hw_summary.txt"
@@ -3146,19 +3222,30 @@ OUTPUT_FILE="${CONTEXT_DIR}/hw_summary.txt"
 echo "Generating concise HW summary into: ${OUTPUT_FILE}..."
 > "${OUTPUT_FILE}"
 
-# Change execution context to repository root so all relative paths remain consistent
 cd "${REPO_ROOT}" || exit 1
 
-# 1. Header & Directory Tree
+# 1. Header & Git Commit History
 cat << 'EOF' >> "${OUTPUT_FILE}"
 hw repository context:
 
-Files structure: 
+Git Commit History:
 
 ```log
 EOF
 
-# Tree output matching your clean structure
+if command -v git &> /dev/null && git rev-parse --is-inside-work-tree &> /dev/null; then
+    git log --pretty=format:"%h - %cd : %s (%an)" --date=short -n 15 >> "${OUTPUT_FILE}"
+fi
+
+cat << 'EOF' >> "${OUTPUT_FILE}"
+```
+
+Files structure:
+
+```log
+EOF
+
+# 2. Directory Tree
 if command -v tree &> /dev/null; then
     tree -I '.git|Projects|Hog|.Xil|*.runs|*.gen|*.cache|*.hw|*.ip_user_files|ip|ipshared|sim|synth|hw_handoff' >> "${OUTPUT_FILE}"
 fi
@@ -3168,9 +3255,10 @@ cat << 'EOF' >> "${OUTPUT_FILE}"
 
 EOF
 
-# 2. Exact list of targeted files and their markdown syntax
+# 3. Exact list of targeted files and their markdown syntax
 TARGET_FILES=(
     "Top/pynq_z2/hog.conf:conf"
+    "Top/pynq_z2/post-creation.tcl:tcl"
     "Top/pynq_z2/post-bitstream.tcl:tcl"
     "Top/pynq_z2/list/ips.src:src"
     "Top/pynq_z2/list/others.src:src"
@@ -3178,10 +3266,10 @@ TARGET_FILES=(
     "src/bd/xadc.bd:bd"
     "src/hdl/tlast_generator.vhd:vhd"
     "src/hdl/xadc_wrapper.vhd:vhd"
-    "context/generate_hw_summary.sh"
+    "context/generate_hw_summary.sh:bash"
 )
 
-# 3. Append each file in the exact format
+# 4. Append each file
 for item in "${TARGET_FILES[@]}"; do
     filepath="${item%%:*}"
     syntax="${item##*:}"
@@ -3202,5 +3290,6 @@ for item in "${TARGET_FILES[@]}"; do
     fi
 done
 
-echo "Done! Summary generated in: ${OUTPUT_FILE}"```
+echo "Done! HW context generated in: ${OUTPUT_FILE}"
+```
 
