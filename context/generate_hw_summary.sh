@@ -57,6 +57,7 @@ TARGET_FILES=(
     "src/bd/xadc.bd:bd"
     "src/hdl/tlast_generator.vhd:vhd"
     "src/hdl/xadc_wrapper.vhd:vhd"
+    "src/hdl/axis_trigger_unit.vhd"
     "context/generate_hw_summary.sh:bash"
 )
 
