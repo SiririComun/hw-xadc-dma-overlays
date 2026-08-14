@@ -3,6 +3,7 @@ hw repository context:
 Git Commit History:
 
 ```log
+a2f56d0 - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
 ee2712d - 2026-08-13 : build(overlay): compile bitstream and update hardware handoff for pynq_z2 (SiririComun)
 61b5a2b - 2026-08-13 : feat(bd) (SiririComun)
 da05477 - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)
@@ -16,8 +17,7 @@ d647429 - 2026-08-07 : ci: fix workflow indentation and release token (SiririCom
 4267c7b - 2026-08-07 : feat: updated hardware overlay (SiririComun)
 7e89771 - 2026-08-07 : fix(hw): update .gitignore for BD outputs and resolve post-bitstream paths dynamically (SiririComun)
 09d960a - 2026-08-07 : refactor(hw): restructure Top folder to pynq_z2 and update output binaries (SiririComun)
-30cdeb8 - 2026-08-07 : Track compiled bitstream and hardware handoff binaries in bin/ (SiririComun)
-ab5e1a2 - 2026-08-07 : Reorganize repository to clean hardware layout and update Hog post-bitstream copier (SiririComun)```
+30cdeb8 - 2026-08-07 : Track compiled bitstream and hardware handoff binaries in bin/ (SiririComun)```
 
 Files structure:
 
