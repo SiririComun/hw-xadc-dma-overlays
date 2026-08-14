@@ -2236,7 +2236,7 @@
         "inst_hier_path": "tlast_generator_0",
         "parameters": {
           "PACKET_SIZE": {
-            "value": "16384"
+            "value": "2048"
           }
         },
         "reference_info": {
