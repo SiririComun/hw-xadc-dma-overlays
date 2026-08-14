@@ -1,116 +1,27 @@
-hw repository context:
-
-Git Commit History:
+Git Context & Branch Info:
 
 ```log
-a2f56d0 - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
-ee2712d - 2026-08-13 : build(overlay): compile bitstream and update hardware handoff for pynq_z2 (SiririComun)
-61b5a2b - 2026-08-13 : feat(bd) (SiririComun)
-da05477 - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)
-2334702 - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)
-263c4e1 - 2026-08-13 : docs(context): update HW context summary, generation script, and BD diagram PDF (SiririComun)
-0cadbeb - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
-9eb9f1e - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)
-d46ba76 - 2026-08-07 : docs: add MIT license and update README link (SiririComun)
-c5102fc - 2026-08-07 : docs: add comprehensive README with memory map and multi-board guidelines (SiririComun)
-d647429 - 2026-08-07 : ci: fix workflow indentation and release token (SiririComun)
-4267c7b - 2026-08-07 : feat: updated hardware overlay (SiririComun)
-7e89771 - 2026-08-07 : fix(hw): update .gitignore for BD outputs and resolve post-bitstream paths dynamically (SiririComun)
-09d960a - 2026-08-07 : refactor(hw): restructure Top folder to pynq_z2 and update output binaries (SiririComun)
-30cdeb8 - 2026-08-07 : Track compiled bitstream and hardware handoff binaries in bin/ (SiririComun)```
+Current Branch: master
+Branch Tracking Status:
+  feat/hw-trigger 2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
+* master          2ae5a3d [origin/master] docs: update README with axis_trigger_unit architecture and v1.1.0 release details
 
-Files structure:
-
-```log
-.
-├── bin
-│   ├── pynq_z2.bit
-│   ├── pynq_z2.hwh
-│   └── pynq_z2-v1.0.3-61B5A2B
-│       ├── diff_sim_list_and_conf.txt
-│       ├── pynq_z2-v1.0.3-61B5A2B.bit
-│       ├── pynq_z2-v1.0.3-61B5A2B.xsa
-│       ├── reports
-│       │   ├── hierarchical_utilization.txt
-│       │   ├── impl_1.log
-│       │   ├── route_report_utilization_0.rpt
-│       │   ├── synth_1.log
-│       │   ├── xadc_axi_dma_0_0_synth_1.log
-│       │   ├── xadc_axi_dma_0_0_utilization_synth.rpt
-│       │   ├── xadc_axi_mem_intercon_imp_auto_pc_0_synth_1.log
-│       │   ├── xadc_axi_mem_intercon_imp_auto_pc_0_utilization_synth.rpt
-│       │   ├── xadc_axi_mem_intercon_imp_auto_us_0_synth_1.log
-│       │   ├── xadc_axi_mem_intercon_imp_auto_us_0_utilization_synth.rpt
-│       │   ├── xadc_axi_smc_0_synth_1.log
-│       │   ├── xadc_axi_smc_0_utilization_synth.rpt
-│       │   ├── xadc_axis_trigger_unit_0_0_synth_1.log
-│       │   ├── xadc_axis_trigger_unit_0_0_utilization_synth.rpt
-│       │   ├── xadc_axi_timer_0_0_synth_1.log
-│       │   ├── xadc_axi_timer_0_0_utilization_synth.rpt
-│       │   ├── xadc_processing_system7_0_0_synth_1.log
-│       │   ├── xadc_processing_system7_0_0_utilization_synth.rpt
-│       │   ├── xadc_rst_ps7_0_100M_0_synth_1.log
-│       │   ├── xadc_rst_ps7_0_100M_0_utilization_synth.rpt
-│       │   ├── xadc_tlast_generator_0_0_synth_1.log
-│       │   ├── xadc_tlast_generator_0_0_utilization_synth.rpt
-│       │   ├── xadc_wrapper_bus_skew_routed.rpt
-│       │   ├── xadc_wrapper_clock_utilization_routed.rpt
-│       │   ├── xadc_wrapper_control_sets_placed.rpt
-│       │   ├── xadc_wrapper_drc_opted.rpt
-│       │   ├── xadc_wrapper_drc_routed.rpt
-│       │   ├── xadc_wrapper_io_placed.rpt
-│       │   ├── xadc_wrapper_methodology_drc_routed.rpt
-│       │   ├── xadc_wrapper_power_routed.rpt
-│       │   ├── xadc_wrapper_route_status.rpt
-│       │   ├── xadc_wrapper_timing_summary_routed_1.rpt
-│       │   ├── xadc_wrapper_timing_summary_routed.rpt
-│       │   ├── xadc_wrapper_utilization_placed.rpt
-│       │   ├── xadc_wrapper_utilization_synth.rpt
-│       │   ├── xadc_xadc_wiz_0_0_synth_1.log
-│       │   └── xadc_xadc_wiz_0_0_utilization_synth.rpt
-│       └── utilization.txt
-├── context
-│   ├── generate_hw_summary.sh
-│   ├── hw_summary.txt
-│   └── xadc.pdf
-├── .github
-│   └── workflows
-│       └── release.yml
-├── .gitignore
-├── .gitmodules
-├── LICENSE
-├── README.md
-├── SimulationLib
-├── src
-│   ├── bd
-│   │   ├── hdl
-│   │   │   └── xadc_wrapper.vhd
-│   │   ├── ui
-│   │   │   └── bd_7ef62a28.ui
-│   │   ├── xadc.bd
-│   │   ├── xadc.bda
-│   │   ├── xadc.bmj
-│   │   ├── xadc_bmstub.v
-│   │   ├── xadc.bxml
-│   │   └── xadc_ooc.xdc
-│   └── hdl
-│       ├── axis_trigger_unit.vhd
-│       ├── tlast_generator.vhd
-│       └── xadc_wrapper.vhd
-├── Top
-│   └── pynq_z2
-│       ├── hog.conf
-│       ├── list
-│       │   ├── ips.src
-│       │   ├── others.src
-│       │   └── xil_defaultlib.src
-│       ├── post-bitstream.tcl
-│       └── post-creation.tcl
-├── vivado.jou
-└── vivado.log
-
-16 directories, 70 files
-```
+Git Commit Graph & History:
+* 2ae5a3d  (HEAD -> master, tag: v1.1.0, origin/master, origin/feat/hw-trigger, origin/HEAD, feat/hw-trigger) - 2026-08-14 : docs: update README with axis_trigger_unit architecture and v1.1.0 release details (SiririComun)
+* a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
+* ee2712d  (tag: v1.1.0-rc1) - 2026-08-13 : build(overlay): compile bitstream and update hardware handoff for pynq_z2 (SiririComun)
+* 61b5a2b  - 2026-08-13 : feat(bd) (SiririComun)
+* da05477  - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)
+* 2334702  - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)
+* 263c4e1  - 2026-08-13 : docs(context): update HW context summary, generation script, and BD diagram PDF (SiririComun)
+* 0cadbeb  - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
+* 9eb9f1e  - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)
+* d46ba76  - 2026-08-07 : docs: add MIT license and update README link (SiririComun)
+* c5102fc  - 2026-08-07 : docs: add comprehensive README with memory map and multi-board guidelines (SiririComun)
+* d647429  (tag: v1.0.2) - 2026-08-07 : ci: fix workflow indentation and release token (SiririComun)
+* 4267c7b  (tag: v1.0.1) - 2026-08-07 : feat: updated hardware overlay (SiririComun)
+* 7e89771  (tag: v1.0.0) - 2026-08-07 : fix(hw): update .gitignore for BD outputs and resolve post-bitstream paths dynamically (SiririComun)
+* 09d960a  - 2026-08-07 : refactor(hw): restructure Top folder to pynq_z2 and update output binaries (SiririComun)```
 
 release.yml:
 
@@ -4076,30 +3987,20 @@ echo "Generating concise HW summary into: ${OUTPUT_FILE}..."
 
 cd "${REPO_ROOT}" || exit 1
 
-# 1. Header & Git Commit History
+# 1. Header, Branch Status & Git History
 cat << 'EOF' >> "${OUTPUT_FILE}"
-hw repository context:
-
-Git Commit History:
+Git Context & Branch Info:
 
 ```log
 EOF
 
 if command -v git &> /dev/null && git rev-parse --is-inside-work-tree &> /dev/null; then
-    git log --pretty=format:"%h - %cd : %s (%an)" --date=short -n 15 >> "${OUTPUT_FILE}"
-fi
-
-cat << 'EOF' >> "${OUTPUT_FILE}"
-```
-
-Files structure:
-
-```log
-EOF
-
-# 2. Directory Tree
-if command -v tree &> /dev/null; then
-    tree -a -I '.git|Projects|Hog|.Xil|*.runs|*.gen|*.cache|*.hw|*.ip_user_files|ip|ipshared|sim|synth|hw_handoff' >> "${OUTPUT_FILE}"
+    echo "Current Branch: $(git branch --show-current)" >> "${OUTPUT_FILE}"
+    echo "Branch Tracking Status:" >> "${OUTPUT_FILE}"
+    git branch -vv >> "${OUTPUT_FILE}"
+    echo "" >> "${OUTPUT_FILE}"
+    echo "Git Commit Graph & History:" >> "${OUTPUT_FILE}"
+    git log --graph --pretty=format:"%h %d - %cd : %s (%an)" --date=short -n 15 >> "${OUTPUT_FILE}"
 fi
 
 cat << 'EOF' >> "${OUTPUT_FILE}"
