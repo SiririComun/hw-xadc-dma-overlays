@@ -38,7 +38,7 @@ EOF
 
 # 2. Directory Tree
 if command -v tree &> /dev/null; then
-    tree -I '.git|Projects|Hog|.Xil|*.runs|*.gen|*.cache|*.hw|*.ip_user_files|ip|ipshared|sim|synth|hw_handoff' >> "${OUTPUT_FILE}"
+    tree -a -I '.git|Projects|Hog|.Xil|*.runs|*.gen|*.cache|*.hw|*.ip_user_files|ip|ipshared|sim|synth|hw_handoff' >> "${OUTPUT_FILE}"
 fi
 
 cat << 'EOF' >> "${OUTPUT_FILE}"
@@ -48,6 +48,7 @@ EOF
 
 # 3. Exact list of targeted files and their markdown syntax
 TARGET_FILES=(
+    ".github/workflows/release.yml:yaml"
     "Top/pynq_z2/hog.conf:conf"
     "Top/pynq_z2/post-creation.tcl:tcl"
     "Top/pynq_z2/post-bitstream.tcl:tcl"
@@ -57,7 +58,7 @@ TARGET_FILES=(
     "src/bd/xadc.bd:bd"
     "src/hdl/tlast_generator.vhd:vhd"
     "src/hdl/xadc_wrapper.vhd:vhd"
-    "src/hdl/axis_trigger_unit.vhd"
+    "src/hdl/axis_trigger_unit.vhd:vhd"
     "context/generate_hw_summary.sh:bash"
 )
 
