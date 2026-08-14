@@ -3,6 +3,8 @@ hw repository context:
 Git Commit History:
 
 ```log
+61b5a2b - 2026-08-13 : feat(bd) (SiririComun)
+da05477 - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)
 2334702 - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)
 263c4e1 - 2026-08-13 : docs(context): update HW context summary, generation script, and BD diagram PDF (SiririComun)
 0cadbeb - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
@@ -15,9 +17,7 @@ d647429 - 2026-08-07 : ci: fix workflow indentation and release token (SiririCom
 09d960a - 2026-08-07 : refactor(hw): restructure Top folder to pynq_z2 and update output binaries (SiririComun)
 30cdeb8 - 2026-08-07 : Track compiled bitstream and hardware handoff binaries in bin/ (SiririComun)
 ab5e1a2 - 2026-08-07 : Reorganize repository to clean hardware layout and update Hog post-bitstream copier (SiririComun)
-3001ba0 - 2026-08-06 : Conclude Phase 1: Configure gitignores, track python package, and commit compiled hardware overlays (SiririComun)
-cf32638 - 2026-08-05 : Fix hardware handoff source path in post-bitstream hook script (SiririComun)
-3abc979 - 2026-08-05 : Fix message ID syntax in post-bitstream hook script (SiririComun)```
+3001ba0 - 2026-08-06 : Conclude Phase 1: Configure gitignores, track python package, and commit compiled hardware overlays (SiririComun)```
 
 Files structure:
 
@@ -25,7 +25,50 @@ Files structure:
 .
 ├── bin
 │   ├── pynq_z2.bit
-│   └── pynq_z2.hwh
+│   ├── pynq_z2.hwh
+│   └── pynq_z2-v1.0.3-61B5A2B
+│       ├── diff_sim_list_and_conf.txt
+│       ├── pynq_z2-v1.0.3-61B5A2B.bit
+│       ├── pynq_z2-v1.0.3-61B5A2B.xsa
+│       ├── reports
+│       │   ├── hierarchical_utilization.txt
+│       │   ├── impl_1.log
+│       │   ├── route_report_utilization_0.rpt
+│       │   ├── synth_1.log
+│       │   ├── xadc_axi_dma_0_0_synth_1.log
+│       │   ├── xadc_axi_dma_0_0_utilization_synth.rpt
+│       │   ├── xadc_axi_mem_intercon_imp_auto_pc_0_synth_1.log
+│       │   ├── xadc_axi_mem_intercon_imp_auto_pc_0_utilization_synth.rpt
+│       │   ├── xadc_axi_mem_intercon_imp_auto_us_0_synth_1.log
+│       │   ├── xadc_axi_mem_intercon_imp_auto_us_0_utilization_synth.rpt
+│       │   ├── xadc_axi_smc_0_synth_1.log
+│       │   ├── xadc_axi_smc_0_utilization_synth.rpt
+│       │   ├── xadc_axis_trigger_unit_0_0_synth_1.log
+│       │   ├── xadc_axis_trigger_unit_0_0_utilization_synth.rpt
+│       │   ├── xadc_axi_timer_0_0_synth_1.log
+│       │   ├── xadc_axi_timer_0_0_utilization_synth.rpt
+│       │   ├── xadc_processing_system7_0_0_synth_1.log
+│       │   ├── xadc_processing_system7_0_0_utilization_synth.rpt
+│       │   ├── xadc_rst_ps7_0_100M_0_synth_1.log
+│       │   ├── xadc_rst_ps7_0_100M_0_utilization_synth.rpt
+│       │   ├── xadc_tlast_generator_0_0_synth_1.log
+│       │   ├── xadc_tlast_generator_0_0_utilization_synth.rpt
+│       │   ├── xadc_wrapper_bus_skew_routed.rpt
+│       │   ├── xadc_wrapper_clock_utilization_routed.rpt
+│       │   ├── xadc_wrapper_control_sets_placed.rpt
+│       │   ├── xadc_wrapper_drc_opted.rpt
+│       │   ├── xadc_wrapper_drc_routed.rpt
+│       │   ├── xadc_wrapper_io_placed.rpt
+│       │   ├── xadc_wrapper_methodology_drc_routed.rpt
+│       │   ├── xadc_wrapper_power_routed.rpt
+│       │   ├── xadc_wrapper_route_status.rpt
+│       │   ├── xadc_wrapper_timing_summary_routed_1.rpt
+│       │   ├── xadc_wrapper_timing_summary_routed.rpt
+│       │   ├── xadc_wrapper_utilization_placed.rpt
+│       │   ├── xadc_wrapper_utilization_synth.rpt
+│       │   ├── xadc_xadc_wiz_0_0_synth_1.log
+│       │   └── xadc_xadc_wiz_0_0_utilization_synth.rpt
+│       └── utilization.txt
 ├── context
 │   ├── generate_hw_summary.sh
 │   ├── hw_summary.txt
@@ -49,17 +92,19 @@ Files structure:
 │       ├── axis_trigger_unit.vhd
 │       ├── tlast_generator.vhd
 │       └── xadc_wrapper.vhd
-└── Top
-    └── pynq_z2
-        ├── hog.conf
-        ├── list
-        │   ├── ips.src
-        │   ├── others.src
-        │   └── xil_defaultlib.src
-        ├── post-bitstream.tcl
-        └── post-creation.tcl
+├── Top
+│   └── pynq_z2
+│       ├── hog.conf
+│       ├── list
+│       │   ├── ips.src
+│       │   ├── others.src
+│       │   └── xil_defaultlib.src
+│       ├── post-bitstream.tcl
+│       └── post-creation.tcl
+├── vivado.jou
+└── vivado.log
 
-12 directories, 24 files
+14 directories, 67 files
 ```
 
 hog.conf:
@@ -209,7 +254,8 @@ xadc.bd:
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.2.2"
+      "tool_version": "2024.2.2",
+      "validated": "true"
     },
     "design_tree": {
       "processing_system7_0": "",
@@ -2277,6 +2323,14 @@ xadc.bd:
             "mode": "Slave",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              }
+            },
             "bridges": [
               "M00_AXI",
               "M01_AXI",
@@ -2287,22 +2341,102 @@ xadc.bd:
           "M00_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
-            "vlnv": "xilinx.com:interface:aximm_rtl:1.0"
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
           },
           "M01_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
-            "vlnv": "xilinx.com:interface:aximm_rtl:1.0"
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
           },
           "M02_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
-            "vlnv": "xilinx.com:interface:aximm_rtl:1.0"
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
           },
           "M03_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
-            "vlnv": "xilinx.com:interface:aximm_rtl:1.0"
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "NUM_READ_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "8"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0"
+              }
+            }
           }
         }
       },
@@ -2844,6 +2978,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "0",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -2899,6 +3041,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "0",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -2930,6 +3080,10 @@ xadc.bd:
               "PROTOCOL": {
                 "value": "AXI4LITE",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
               },
               "ID_WIDTH": {
                 "value": "0",
@@ -3014,6 +3168,26 @@ xadc.bd:
               "MAX_BURST_LENGTH": {
                 "value": "1",
                 "value_src": "auto"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
               }
             },
             "memory_map_ref": "s_axi",
@@ -3127,6 +3301,14 @@ xadc.bd:
               "ASSOCIATED_RESET": {
                 "value": "aresetn",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             }
           },
