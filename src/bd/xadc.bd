@@ -2873,7 +2873,7 @@
             "value": "0"
           },
           "HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "HAS_TREADY": {
             "value": "1"
@@ -2922,7 +2922,7 @@
             "value": "0"
           },
           "M_HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "M_HAS_TREADY": {
             "value": "1"
@@ -2946,7 +2946,7 @@
             "value": "0"
           },
           "S_HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "S_HAS_TREADY": {
             "value": "1"
@@ -2968,6 +2968,9 @@
           },
           "TDATA_REMAP": {
             "value": "16'b0000000000000000, ~tdata[15], tdata[14:0]"
+          },
+          "TLAST_REMAP": {
+            "value": "tlast[0]"
           }
         },
         "interface_ports": {
@@ -3309,7 +3312,7 @@
       "axis_broadcaster_0_M00_AXIS": {
         "interface_ports": [
           "axis_broadcaster_0/M00_AXIS",
-          "tlast_generator_0/s_axis"
+          "axi_dma_0/S_AXIS_S2MM"
         ]
       },
       "axis_broadcaster_0_M01_AXIS": {
@@ -3333,7 +3336,7 @@
       "axis_trigger_unit_0_m_axis": {
         "interface_ports": [
           "axis_trigger_unit_0/m_axis",
-          "axis_broadcaster_0/S_AXIS"
+          "tlast_generator_0/s_axis"
         ]
       },
       "cordic_0_M_AXIS_DOUT": {
@@ -3369,7 +3372,7 @@
       "tlast_generator_0_m_axis": {
         "interface_ports": [
           "tlast_generator_0/m_axis",
-          "axi_dma_0/S_AXIS_S2MM"
+          "axis_broadcaster_0/S_AXIS"
         ]
       },
       "xadc_wiz_0_M_AXIS": {

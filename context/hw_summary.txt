@@ -4,11 +4,12 @@ Git Context & Branch Info:
 Current Branch: feat/pl-fft
 Branch Tracking Status:
   feat/hw-trigger 2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
-* feat/pl-fft     56e7bf0 [origin/feat/pl-fft] fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1
+* feat/pl-fft     dc0f654 [origin/feat/pl-fft] fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT
   master          1f92634 [origin/master] docs(context): capture branch status and commit graph in HW context summary
 
 Git Commit Graph & History:
-* 56e7bf0  (HEAD -> feat/pl-fft, tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)
+* dc0f654  (HEAD -> feat/pl-fft, tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-14 : fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT (SiririComun)
+* 56e7bf0  - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)
 * a4fb242  - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
 * 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
 * cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
@@ -21,8 +22,7 @@ Git Commit Graph & History:
 * 2334702  - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)
 * 263c4e1  - 2026-08-13 : docs(context): update HW context summary, generation script, and BD diagram PDF (SiririComun)
 * 0cadbeb  - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)
-* 9eb9f1e  - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)
-* d46ba76  - 2026-08-07 : docs: add MIT license and update README link (SiririComun)```
+* 9eb9f1e  - 2026-08-13 : feat(hog): add post-creation hook for BD PDF export and context tooling (SiririComun)```
 
 release.yml:
 
@@ -3072,7 +3072,7 @@ xadc.bd:
             "value": "0"
           },
           "HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "HAS_TREADY": {
             "value": "1"
@@ -3121,7 +3121,7 @@ xadc.bd:
             "value": "0"
           },
           "M_HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "M_HAS_TREADY": {
             "value": "1"
@@ -3145,7 +3145,7 @@ xadc.bd:
             "value": "0"
           },
           "S_HAS_TLAST": {
-            "value": "0"
+            "value": "1"
           },
           "S_HAS_TREADY": {
             "value": "1"
@@ -3167,6 +3167,9 @@ xadc.bd:
           },
           "TDATA_REMAP": {
             "value": "16'b0000000000000000, ~tdata[15], tdata[14:0]"
+          },
+          "TLAST_REMAP": {
+            "value": "tlast[0]"
           }
         },
         "interface_ports": {
@@ -3508,7 +3511,7 @@ xadc.bd:
       "axis_broadcaster_0_M00_AXIS": {
         "interface_ports": [
           "axis_broadcaster_0/M00_AXIS",
-          "tlast_generator_0/s_axis"
+          "axi_dma_0/S_AXIS_S2MM"
         ]
       },
       "axis_broadcaster_0_M01_AXIS": {
@@ -3532,7 +3535,7 @@ xadc.bd:
       "axis_trigger_unit_0_m_axis": {
         "interface_ports": [
           "axis_trigger_unit_0/m_axis",
-          "axis_broadcaster_0/S_AXIS"
+          "tlast_generator_0/s_axis"
         ]
       },
       "cordic_0_M_AXIS_DOUT": {
@@ -3568,7 +3571,7 @@ xadc.bd:
       "tlast_generator_0_m_axis": {
         "interface_ports": [
           "tlast_generator_0/m_axis",
-          "axi_dma_0/S_AXIS_S2MM"
+          "axis_broadcaster_0/S_AXIS"
         ]
       },
       "xadc_wiz_0_M_AXIS": {
