@@ -23,10 +23,10 @@
       "xfft_0": "",
       "cordic_0": "",
       "axi_dma_1": "",
-      "xlconstant_0": "",
       "xlconstant_1": "",
       "axis_subset_converter_1": "",
-      "axi_smc_1": ""
+      "axi_smc_1": "",
+      "xlconstant_0": ""
     },
     "interface_ports": {
       "DDR": {
@@ -3006,7 +3006,7 @@
             "value": "natural_order"
           },
           "scaling_options": {
-            "value": "scaled"
+            "value": "block_floating_point"
           },
           "target_clock_frequency": {
             "value": "100"
@@ -3093,18 +3093,6 @@
               "range": "4G",
               "width": "32"
             }
-          }
-        }
-      },
-      "xlconstant_0": {
-        "vlnv": "xilinx.com:ip:xlconstant:1.1",
-        "ip_revision": "9",
-        "xci_name": "xadc_xlconstant_0_0",
-        "xci_path": "ip/xadc_xlconstant_0_0/xadc_xlconstant_0_0.xci",
-        "inst_hier_path": "xlconstant_0",
-        "parameters": {
-          "CONST_WIDTH": {
-            "value": "16"
           }
         }
       },
@@ -3250,6 +3238,18 @@
                 "value": "0"
               }
             }
+          }
+        }
+      },
+      "xlconstant_0": {
+        "vlnv": "xilinx.com:ip:xlconstant:1.1",
+        "ip_revision": "9",
+        "xci_name": "xadc_xlconstant_0_0",
+        "xci_path": "ip/xadc_xlconstant_0_0/xadc_xlconstant_0_0.xci",
+        "inst_hier_path": "xlconstant_0",
+        "parameters": {
+          "CONST_WIDTH": {
+            "value": "8"
           }
         }
       }
