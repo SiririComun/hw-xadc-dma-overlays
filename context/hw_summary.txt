@@ -1,28 +1,30 @@
 Git Context & Branch Info:
 
 ```log
-Current Branch: feat/pl-fft
+Current Branch: master
 Branch Tracking Status:
   feat/hw-trigger 2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
-* feat/pl-fft     f2d7493 [origin/feat/pl-fft] fix(bd): propagate TLAST through axis_subset_converter_0 to FFT core
-  master          1f92634 [origin/master] docs(context): capture branch status and commit graph in HW context summary
+  feat/pl-fft     66a4697 [origin/feat/pl-fft] fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus
+* master          1fadb9c [origin/master] merge: feat(bd) integrate 2048-point PL FFT engine and dedicated FFT DMA
 
 Git Commit Graph & History:
-* f2d7493  (HEAD -> feat/pl-fft, tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-14 : fix(bd): propagate TLAST through axis_subset_converter_0 to FFT core (SiririComun)
-* dc0f654  - 2026-08-14 : fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT (SiririComun)
-* 56e7bf0  - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)
-* a4fb242  - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
-* 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
-* cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
-* 1f92634  (origin/master, origin/HEAD, master) - 2026-08-14 : docs(context): capture branch status and commit graph in HW context summary (SiririComun)
+*   1fadb9c  (HEAD -> master, tag: v1.2.0, origin/master, origin/HEAD) - 2026-08-15 : merge: feat(bd) integrate 2048-point PL FFT engine and dedicated FFT DMA (SiririComun)
+|\  
+| * 66a4697  (tag: v1.2.0-rc1, origin/feat/pl-fft, feat/pl-fft) - 2026-08-15 : fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus (SiririComun)
+| * f2d7493  - 2026-08-14 : fix(bd): propagate TLAST through axis_subset_converter_0 to FFT core (SiririComun)
+| * dc0f654  - 2026-08-14 : fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT (SiririComun)
+| * 56e7bf0  - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)
+| * a4fb242  - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
+| * 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
+| * cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
+|/  
+* 1f92634  - 2026-08-14 : docs(context): capture branch status and commit graph in HW context summary (SiririComun)
 * 2ae5a3d  (tag: v1.1.0, origin/feat/hw-trigger, feat/hw-trigger) - 2026-08-14 : docs: update README with axis_trigger_unit architecture and v1.1.0 release details (SiririComun)
 * a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
 * ee2712d  (tag: v1.1.0-rc1) - 2026-08-13 : build(overlay): compile bitstream and update hardware handoff for pynq_z2 (SiririComun)
 * 61b5a2b  - 2026-08-13 : feat(bd) (SiririComun)
 * da05477  - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)
-* 2334702  - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)
-* 263c4e1  - 2026-08-13 : docs(context): update HW context summary, generation script, and BD diagram PDF (SiririComun)
-* 0cadbeb  - 2026-08-13 : fix(hog): fix post-creation hook execution in GUI mode and add BD diagram PDF (SiririComun)```
+* 2334702  - 2026-08-13 : feat(hdl): add axis_trigger_unit core for hardware-level edge triggering (SiririComun)```
 
 release.yml:
 
@@ -73,11 +75,13 @@ post-creation.tcl:
 
 ```tcl
 # ==============================================================================
-# Hog Post-Creation Hook & Vivado GUI Custom Command
+# Hog Post-Creation Hook & Vivado GUI Custom Commands (PDF & SVG Exporters)
 # ==============================================================================
 
-# 1. Define the self-contained export command for the GUI button
-set export_cmd {
+# ------------------------------------------------------------------------------
+# 1. Command: Export BD to context/*.pdf
+# ------------------------------------------------------------------------------
+set export_pdf_cmd {
     set prj_dir   [get_property DIRECTORY [current_project]]
     set repo_root [file normalize [file join $prj_dir ".." ".."]]
     set dest_dir  [file join $repo_root "context"]
@@ -92,10 +96,8 @@ set export_cmd {
             set bd_name [file rootname [file tail $bd]]
             set pdf_dest [file join $dest_dir "${bd_name}.pdf"]
             
-            # Ensure the Block Design is open
             open_bd_design $bd -quiet
             
-            # Export to PDF with upright orientation
             if {[catch {write_bd_layout -format pdf -orientation portrait -force $pdf_dest} err_msg]} {
                 send_msg_id "Hog-101" "INFO" "PDF export skipped in batch mode. Open Vivado GUI to export."
             } else {
@@ -107,23 +109,69 @@ set export_cmd {
     }
 }
 
-# 2. Register the GUI custom command
-if {[info commands create_gui_custom_command] ne ""} {
-    catch { remove_gui_custom_commands "ExportBDPDF" }
+# ------------------------------------------------------------------------------
+# 2. Command: Export BD to docs/images/*_bd.svg
+# ------------------------------------------------------------------------------
+set export_svg_cmd {
+    set prj_dir   [get_property DIRECTORY [current_project]]
+    set repo_root [file normalize [file join $prj_dir ".." ".."]]
+    set dest_dir  [file join $repo_root "docs" "images"]
 
+    if {![file exists $dest_dir]} {
+        file mkdir $dest_dir
+    }
+
+    set bd_files [get_files *.bd]
+    if {[llength $bd_files] > 0} {
+        foreach bd $bd_files {
+            set bd_name [file rootname [file tail $bd]]
+            set svg_dest [file join $dest_dir "${bd_name}_bd.svg"]
+            
+            open_bd_design $bd -quiet
+            
+            if {[catch {write_bd_layout -format svg -force $svg_dest} err_msg]} {
+                send_msg_id "Hog-105" "INFO" "SVG export skipped in batch mode. Open Vivado GUI to export."
+            } else {
+                send_msg_id "Hog-104" "INFO" "Exported Block Design SVG to: $svg_dest"
+            }
+        }
+    } else {
+        send_msg_id "Hog-102" "WARNING" "No Block Design (.bd) found in the open project."
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 3. Register GUI Custom Commands on the Vivado Toolbar
+# ------------------------------------------------------------------------------
+if {[info commands create_gui_custom_command] ne ""} {
+    # PDF Button
+    catch { remove_gui_custom_commands "ExportBDPDF" }
     create_gui_custom_command \
         -name "ExportBDPDF" \
         -menu_name "Export BD to Context PDF" \
         -description "Exports the current Block Design diagram to context/*.pdf" \
         -show_on_toolbar \
         -run_proc false \
-        -command $export_cmd
+        -command $export_pdf_cmd
 
-    send_msg_id "Hog-103" "INFO" "Custom GUI button registered: Tools -> Custom Commands -> Export BD to Context PDF"
+    # SVG Button
+    catch { remove_gui_custom_commands "ExportBDSVG" }
+    create_gui_custom_command \
+        -name "ExportBDSVG" \
+        -menu_name "Export BD to Docs SVG" \
+        -description "Exports the current Block Design diagram to docs/images/*_bd.svg" \
+        -show_on_toolbar \
+        -run_proc false \
+        -command $export_svg_cmd
+
+    send_msg_id "Hog-103" "INFO" "Custom GUI buttons registered: Tools -> Custom Commands -> Export BD to Context PDF / Docs SVG"
 }
 
-# 3. Try running immediately if project creation happens in GUI mode
-catch { eval $export_cmd }```
+# ------------------------------------------------------------------------------
+# 4. Run immediately on project open if in GUI mode
+# ------------------------------------------------------------------------------
+catch { eval $export_pdf_cmd }
+catch { eval $export_svg_cmd }```
 
 post-bitstream.tcl:
 

@@ -131,4 +131,3 @@ src/bd/*.bmj
 src/bd/*.bxml
 src/bd/*_bmstub.v
 src/bd/*_ooc.xdc
-src/bd/ui/
