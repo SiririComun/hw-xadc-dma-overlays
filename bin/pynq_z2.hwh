@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Sat Aug 15 12:29:41 2026" VIVADOVERSION="2024.2.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Sun Aug 16 13:21:34 2026" VIVADOVERSION="2024.2.2">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="xadc" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -119,6 +119,16 @@
         <CONNECTION INSTANCE="xadc_wiz_0" PORT="vauxp1"/>
       </CONNECTIONS>
     </PORT>
+    <PORT DIR="I" NAME="Vaux9_0_v_n" SIGIS="undef" SIGNAME="xadc_wiz_0_vauxn9">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="xadc_wiz_0" PORT="vauxn9"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="I" NAME="Vaux9_0_v_p" SIGIS="undef" SIGNAME="xadc_wiz_0_vauxp9">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="xadc_wiz_0" PORT="vauxp9"/>
+      </CONNECTIONS>
+    </PORT>
     <PORT DIR="I" NAME="Vp_Vn_0_v_n" SIGIS="undef" SIGNAME="xadc_wiz_0_vn_in">
       <CONNECTIONS>
         <CONNECTION INSTANCE="xadc_wiz_0" PORT="vn_in"/>
@@ -186,6 +196,12 @@
       <PORTMAPS>
         <PORTMAP LOGICAL="V_N" PHYSICAL="Vp_Vn_0_v_n"/>
         <PORTMAP LOGICAL="V_P" PHYSICAL="Vp_Vn_0_v_p"/>
+      </PORTMAPS>
+    </BUSINTERFACE>
+    <BUSINTERFACE BUSNAME="External_Interface_Vaux9_0" NAME="Vaux9_0" TYPE="TARGET">
+      <PORTMAPS>
+        <PORTMAP LOGICAL="V_N" PHYSICAL="Vaux9_0_v_n"/>
+        <PORTMAP LOGICAL="V_P" PHYSICAL="Vaux9_0_v_p"/>
       </PORTMAPS>
     </BUSINTERFACE>
   </EXTERNALINTERFACES>
@@ -2620,15 +2636,15 @@
         <PERIPHERAL INSTANCE="processing_system7_0"/>
       </PERIPHERALS>
     </MODULE>
-    <MODULE BD="xadc_axi_smc_0" BDTYPE="SBD" COREREVISION="26" DRIVERMODE="CORE" FULLNAME="/axi_smc_0" HWVERSION="1.0" INSTANCE="axi_smc_0" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="xadc_axi_smc_0" VLNV="xilinx.com:ip:smartconnect:1.0">
+    <MODULE BD="xadc_axi_smc_0_0" BDTYPE="SBD" COREREVISION="26" DRIVERMODE="CORE" FULLNAME="/axi_smc_0" HWVERSION="1.0" INSTANCE="axi_smc_0" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="xadc_axi_smc_0_0" VLNV="xilinx.com:ip:smartconnect:1.0">
       <DOCUMENTS>
         <DOCUMENT SOURCE="http://www.xilinx.com/cgi-bin/docs/ipdoc?c=smartconnect;v=v1_0;d=pg247-smartconnect.pdf"/>
       </DOCUMENTS>
       <PARAMETERS>
         <PARAMETER NAME="HAS_RESET" VALUE="1"/>
-        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="xadc_axi_smc_0"/>
+        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="xadc_axi_smc_0_0"/>
         <PARAMETER NAME="ADVANCED_PROPERTIES" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="xadc_axi_smc_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="xadc_axi_smc_0_0"/>
         <PARAMETER NAME="HAS_ARESETN" VALUE="1"/>
         <PARAMETER NAME="NUM_CLKS" VALUE="1"/>
         <PARAMETER NAME="NUM_MI" VALUE="5"/>
@@ -3598,15 +3614,15 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE BD="xadc_smartconnect_0_0" BDTYPE="SBD" COREREVISION="26" DRIVERMODE="CORE" FULLNAME="/axi_smc_1" HWVERSION="1.0" INSTANCE="axi_smc_1" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="xadc_smartconnect_0_0" VLNV="xilinx.com:ip:smartconnect:1.0">
+    <MODULE BD="xadc_axi_smc_1_0" BDTYPE="SBD" COREREVISION="26" DRIVERMODE="CORE" FULLNAME="/axi_smc_1" HWVERSION="1.0" INSTANCE="axi_smc_1" IPTYPE="BUS" IS_ENABLE="1" MODCLASS="BUS" MODTYPE="smartconnect" SIM_BD="xadc_axi_smc_1_0" VLNV="xilinx.com:ip:smartconnect:1.0">
       <DOCUMENTS>
         <DOCUMENT SOURCE="http://www.xilinx.com/cgi-bin/docs/ipdoc?c=smartconnect;v=v1_0;d=pg247-smartconnect.pdf"/>
       </DOCUMENTS>
       <PARAMETERS>
         <PARAMETER NAME="HAS_RESET" VALUE="1"/>
-        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="xadc_smartconnect_0_0"/>
+        <PARAMETER NAME="TLM_COMPONENT_NAME" VALUE="xadc_axi_smc_1_0"/>
         <PARAMETER NAME="ADVANCED_PROPERTIES" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="xadc_smartconnect_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="xadc_axi_smc_1_0"/>
         <PARAMETER NAME="HAS_ARESETN" VALUE="1"/>
         <PARAMETER NAME="NUM_CLKS" VALUE="1"/>
         <PARAMETER NAME="NUM_MI" VALUE="1"/>
@@ -4911,7 +4927,7 @@
         <PARAMETER NAME="C_S_AXIS_TDEST_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_S_AXIS_TID_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_S_AXIS_TUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="xadc_axis_subset_converter_0_2"/>
+        <PARAMETER NAME="Component_Name" VALUE="xadc_axis_subset_converter_1_0"/>
         <PARAMETER NAME="DEFAULT_TLAST" VALUE="0"/>
         <PARAMETER NAME="HAS_ACLKEN" VALUE="0"/>
         <PARAMETER NAME="M_HAS_TKEEP" VALUE="0"/>
@@ -5038,7 +5054,7 @@
       <PARAMETERS>
         <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="5"/>
         <PARAMETER NAME="C_S_AXI_DATA_WIDTH" VALUE="32"/>
-        <PARAMETER NAME="Component_Name" VALUE="xadc_axis_trigger_unit_0_0"/>
+        <PARAMETER NAME="Component_Name" VALUE="xadc_axis_trigger_unit_0_1"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
         <PARAMETER NAME="C_BASEADDR" VALUE="0x43C10000"/>
         <PARAMETER NAME="C_HIGHADDR" VALUE="0x43C1FFFF"/>
@@ -6481,8 +6497,6 @@
             <CONNECTION INSTANCE="processing_system7_0" PORT="M_AXI_GP0_ACLK"/>
             <CONNECTION INSTANCE="processing_system7_0" PORT="S_AXI_HP0_ACLK"/>
             <CONNECTION INSTANCE="rst_ps7_0_100M" PORT="slowest_sync_clk"/>
-            <CONNECTION INSTANCE="tlast_generator_0" PORT="aclk"/>
-            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_subset_converter_1" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_subset_converter_0" PORT="aclk"/>
@@ -6491,6 +6505,8 @@
             <CONNECTION INSTANCE="axi_dma_1" PORT="s_axi_lite_aclk"/>
             <CONNECTION INSTANCE="axi_dma_1" PORT="m_axi_s2mm_aclk"/>
             <CONNECTION INSTANCE="axi_smc_1" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="tlast_generator_0" PORT="aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -7059,14 +7075,14 @@
             <CONNECTION INSTANCE="axi_dma_0" PORT="axi_resetn"/>
             <CONNECTION INSTANCE="axi_timer_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_smc_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="tlast_generator_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_dma_1" PORT="axi_resetn"/>
             <CONNECTION INSTANCE="axis_subset_converter_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_subset_converter_1" PORT="aresetn"/>
             <CONNECTION INSTANCE="cordic_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_smc_1" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="tlast_generator_0" PORT="aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>
@@ -7200,8 +7216,8 @@
         <PARAMETER NAME="C_ALARM_LIMIT_R13" VALUE="37355"/>
         <PARAMETER NAME="C_ALARM_LIMIT_R14" VALUE="27306"/>
         <PARAMETER NAME="C_ALARM_LIMIT_R15" VALUE="26214"/>
-        <PARAMETER NAME="C_CONFIGURATION_R0" VALUE="17"/>
-        <PARAMETER NAME="C_CONFIGURATION_R1" VALUE="12719"/>
+        <PARAMETER NAME="C_CONFIGURATION_R0" VALUE="0"/>
+        <PARAMETER NAME="C_CONFIGURATION_R1" VALUE="16655"/>
         <PARAMETER NAME="C_CONFIGURATION_R2" VALUE="1024"/>
         <PARAMETER NAME="C_DCLK_FREQUENCY" VALUE="104"/>
         <PARAMETER NAME="C_EXTERNAL_MUXADDR_ENABLE" VALUE="0"/>
@@ -7235,8 +7251,8 @@
         <PARAMETER NAME="C_HAS_VP" VALUE="1"/>
         <PARAMETER NAME="C_INCLUDE_INTR" VALUE="1"/>
         <PARAMETER NAME="C_SAMPLING_RATE" VALUE="1000000.0"/>
-        <PARAMETER NAME="C_SEQUENCE_R0" VALUE="256"/>
-        <PARAMETER NAME="C_SEQUENCE_R1" VALUE="0"/>
+        <PARAMETER NAME="C_SEQUENCE_R0" VALUE="0"/>
+        <PARAMETER NAME="C_SEQUENCE_R1" VALUE="514"/>
         <PARAMETER NAME="C_SEQUENCE_R2" VALUE="0"/>
         <PARAMETER NAME="C_SEQUENCE_R3" VALUE="0"/>
         <PARAMETER NAME="C_SEQUENCE_R4" VALUE="0"/>
@@ -7255,7 +7271,7 @@
         <PARAMETER NAME="C_VAUX6" VALUE="0"/>
         <PARAMETER NAME="C_VAUX7" VALUE="0"/>
         <PARAMETER NAME="C_VAUX8" VALUE="0"/>
-        <PARAMETER NAME="C_VAUX9" VALUE="0"/>
+        <PARAMETER NAME="C_VAUX9" VALUE="1"/>
         <PARAMETER NAME="C_VAUX10" VALUE="0"/>
         <PARAMETER NAME="C_VAUX11" VALUE="0"/>
         <PARAMETER NAME="C_VAUX12" VALUE="0"/>
@@ -7337,7 +7353,7 @@
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP13_VAUXN13" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP14_VAUXN14" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP15_VAUXN15" VALUE="false"/>
-        <PARAMETER NAME="CHANNEL_ENABLE_VAUXP1_VAUXN1" VALUE="false"/>
+        <PARAMETER NAME="CHANNEL_ENABLE_VAUXP1_VAUXN1" VALUE="true"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP2_VAUXN2" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP3_VAUXN3" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP4_VAUXN4" VALUE="false"/>
@@ -7345,7 +7361,7 @@
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP6_VAUXN6" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP7_VAUXN7" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VAUXP8_VAUXN8" VALUE="false"/>
-        <PARAMETER NAME="CHANNEL_ENABLE_VAUXP9_VAUXN9" VALUE="false"/>
+        <PARAMETER NAME="CHANNEL_ENABLE_VAUXP9_VAUXN9" VALUE="true"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VBRAM" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VCCAUX" VALUE="false"/>
         <PARAMETER NAME="CHANNEL_ENABLE_VCCDDRO" VALUE="false"/>
@@ -7421,7 +7437,7 @@
         <PARAMETER NAME="VCCPINT_ALARM_LOWER" VALUE="0.95"/>
         <PARAMETER NAME="VCCPINT_ALARM_UPPER" VALUE="1.00"/>
         <PARAMETER NAME="WAVEFORM_TYPE" VALUE="CONSTANT"/>
-        <PARAMETER NAME="XADC_STARUP_SELECTION" VALUE="single_channel"/>
+        <PARAMETER NAME="XADC_STARUP_SELECTION" VALUE="simultaneous_sampling"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
         <PARAMETER NAME="C_BASEADDR" VALUE="0x43C00000"/>
         <PARAMETER NAME="C_HIGHADDR" VALUE="0x43C0FFFF"/>
@@ -7553,9 +7569,19 @@
             <CONNECTION INSTANCE="xadc_imp" PORT="Vaux1_0_v_n"/>
           </CONNECTIONS>
         </PORT>
+        <PORT DIR="I" NAME="vauxn9" SIGIS="undef" SIGNAME="xadc_wiz_0_vauxn9">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="xadc_imp" PORT="Vaux9_0_v_n"/>
+          </CONNECTIONS>
+        </PORT>
         <PORT DIR="I" NAME="vauxp1" SIGIS="undef" SIGNAME="xadc_wiz_0_vauxp1">
           <CONNECTIONS>
             <CONNECTION INSTANCE="xadc_imp" PORT="Vaux1_0_v_p"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="vauxp9" SIGIS="undef" SIGNAME="xadc_wiz_0_vauxp9">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="xadc_imp" PORT="Vaux9_0_v_p"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="vn_in" SIGIS="undef" SIGNAME="xadc_wiz_0_vn_in">
@@ -7652,6 +7678,12 @@
           <PORTMAPS>
             <PORTMAP LOGICAL="V_N" PHYSICAL="vauxn1"/>
             <PORTMAP LOGICAL="V_P" PHYSICAL="vauxp1"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="External_Interface_Vaux9_0" NAME="Vaux9" TYPE="TARGET" VLNV="xilinx.com:interface:diff_analog_io:1.0">
+          <PORTMAPS>
+            <PORTMAP LOGICAL="V_N" PHYSICAL="vauxn9"/>
+            <PORTMAP LOGICAL="V_P" PHYSICAL="vauxp9"/>
           </PORTMAPS>
         </BUSINTERFACE>
       </BUSINTERFACES>
