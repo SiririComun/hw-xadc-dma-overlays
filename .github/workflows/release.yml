@@ -25,6 +25,7 @@ jobs:
             bin/pynq_z2.bit
             bin/pynq_z2.hwh
           draft: false
-          prerelease: false
+          # Automatically detects pre-releases if the tag contains a '-'
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
