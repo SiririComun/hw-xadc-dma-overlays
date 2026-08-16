@@ -3,11 +3,14 @@ Git Context & Branch Info:
 ```log
 Current Branch: feat/dual-xadc
 Branch Tracking Status:
-* feat/dual-xadc 36c8db2 [origin/feat/dual-xadc] build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2
+* feat/dual-xadc 424bf70 [origin/feat/dual-xadc: ahead 1] fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0
   master         34f4339 [origin/master] docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button
 
 Git Commit Graph & History:
-* 36c8db2  (HEAD -> feat/dual-xadc, tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2 (SiririComun)
+* 424bf70  (HEAD -> feat/dual-xadc) - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)
+* feb6dfc  (tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): recompile bitstream with active continuous dual-channel sequencer (SiririComun)
+* 5fb85a7  - 2026-08-16 : fix(bd): configure xadc_wiz_0 in continuous sequencer mode for Vaux1 and Vaux9 (SiririComun)
+* 36c8db2  - 2026-08-16 : build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2 (SiririComun)
 * 1bf8f65  - 2026-08-16 : feat(hw): implement dual-channel simultaneous XADC sampling and streaming pipeline (SiririComun)
 * a24b249  - 2026-08-16 : ci(release): support dynamic pre-release tagging for release candidates (SiririComun)
 * 34f4339  (origin/master, origin/HEAD, master) - 2026-08-15 : docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button (SiririComun)
@@ -20,10 +23,7 @@ Git Commit Graph & History:
 | * a4fb242  - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
 | * 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
 | * cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
-|/  
-* 1f92634  - 2026-08-14 : docs(context): capture branch status and commit graph in HW context summary (SiririComun)
-* 2ae5a3d  (tag: v1.1.0, origin/feat/hw-trigger) - 2026-08-14 : docs: update README with axis_trigger_unit architecture and v1.1.0 release details (SiririComun)
-* a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)```
+|/  ```
 
 release.yml:
 
@@ -242,6 +242,12 @@ xil_defaultlib.src:
 src/hdl/tlast_generator.vhd 93
 src/hdl/axis_trigger_unit.vhd 93
 ```
+
+constrs.src:
+
+```src
+# Constraints list for pynq_z2
+src/con/pynq_z2.xdc```
 
 xadc.bd:
 
@@ -4300,6 +4306,21 @@ begin
 
 end Behavioral;```
 
+pynq_z2.xdc:
+
+```xdc
+# ==============================================================================
+# Physical Package Pin Constraints for PYNQ-Z2 Analog Headers
+# ==============================================================================
+
+# Arduino Header A0 (Vaux1)
+set_property PACKAGE_PIN E17 [get_ports Vaux1_0_v_p]
+set_property PACKAGE_PIN D18 [get_ports Vaux1_0_v_n]
+
+# Arduino Header A1 (Vaux9)
+set_property PACKAGE_PIN E18 [get_ports Vaux9_0_v_p]
+set_property PACKAGE_PIN E19 [get_ports Vaux9_0_v_n]```
+
 generate_hw_summary.sh:
 
 ```bash
@@ -4350,10 +4371,12 @@ TARGET_FILES=(
     "Top/pynq_z2/list/ips.src:src"
     "Top/pynq_z2/list/others.src:src"
     "Top/pynq_z2/list/xil_defaultlib.src:src"
+    "Top/pynq_z2/list/constrs.src:src"
     "src/bd/xadc.bd:bd"
     "src/hdl/tlast_generator.vhd:vhd"
     "src/hdl/xadc_wrapper.vhd:vhd"
     "src/hdl/axis_trigger_unit.vhd:vhd"
+    "src/con/pynq_z2.xdc:xdc"
     "context/generate_hw_summary.sh:bash"
 )
 

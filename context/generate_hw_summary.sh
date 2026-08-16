@@ -45,10 +45,12 @@ TARGET_FILES=(
     "Top/pynq_z2/list/ips.src:src"
     "Top/pynq_z2/list/others.src:src"
     "Top/pynq_z2/list/xil_defaultlib.src:src"
+    "Top/pynq_z2/list/constrs.src:src"
     "src/bd/xadc.bd:bd"
     "src/hdl/tlast_generator.vhd:vhd"
     "src/hdl/xadc_wrapper.vhd:vhd"
     "src/hdl/axis_trigger_unit.vhd:vhd"
+    "src/con/pynq_z2.xdc:xdc"
     "context/generate_hw_summary.sh:bash"
 )
 
