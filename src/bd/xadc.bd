@@ -2039,6 +2039,9 @@
           "CHANNEL_AVERAGING": {
             "value": "None"
           },
+          "CHANNEL_ENABLE_VAUXP0_VAUXN0": {
+            "value": "false"
+          },
           "CHANNEL_ENABLE_VAUXP1_VAUXN1": {
             "value": "true"
           },
@@ -2066,6 +2069,9 @@
           "ENABLE_VCCPINT_ALARM": {
             "value": "false"
           },
+          "EXTERNAL_MUX_CHANNEL": {
+            "value": "VP_VN"
+          },
           "INTERFACE_SELECTION": {
             "value": "Enable_AXI"
           },
@@ -2073,7 +2079,7 @@
             "value": "false"
           },
           "SEQUENCER_MODE": {
-            "value": "Off"
+            "value": "Continuous"
           },
           "SINGLE_CHANNEL_SELECTION": {
             "value": "VAUXP1_VAUXN1"
@@ -2088,7 +2094,7 @@
             "value": "false"
           },
           "XADC_STARUP_SELECTION": {
-            "value": "simultaneous_sampling"
+            "value": "channel_sequencer"
           }
         }
       },
