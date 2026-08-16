@@ -3,11 +3,14 @@ Git Context & Branch Info:
 ```log
 Current Branch: feat/dual-xadc
 Branch Tracking Status:
-* feat/dual-xadc 34f4339 docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button
+* feat/dual-xadc 36c8db2 [origin/feat/dual-xadc] build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2
   master         34f4339 [origin/master] docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button
 
 Git Commit Graph & History:
-* 34f4339  (HEAD -> feat/dual-xadc, origin/master, origin/HEAD, master) - 2026-08-15 : docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button (SiririComun)
+* 36c8db2  (HEAD -> feat/dual-xadc, tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2 (SiririComun)
+* 1bf8f65  - 2026-08-16 : feat(hw): implement dual-channel simultaneous XADC sampling and streaming pipeline (SiririComun)
+* a24b249  - 2026-08-16 : ci(release): support dynamic pre-release tagging for release candidates (SiririComun)
+* 34f4339  (origin/master, origin/HEAD, master) - 2026-08-15 : docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button (SiririComun)
 *   1fadb9c  (tag: v1.2.0) - 2026-08-15 : merge: feat(bd) integrate 2048-point PL FFT engine and dedicated FFT DMA (SiririComun)
 |\  
 | * 66a4697  (tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-15 : fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus (SiririComun)
@@ -20,10 +23,7 @@ Git Commit Graph & History:
 |/  
 * 1f92634  - 2026-08-14 : docs(context): capture branch status and commit graph in HW context summary (SiririComun)
 * 2ae5a3d  (tag: v1.1.0, origin/feat/hw-trigger) - 2026-08-14 : docs: update README with axis_trigger_unit architecture and v1.1.0 release details (SiririComun)
-* a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)
-* ee2712d  (tag: v1.1.0-rc1) - 2026-08-13 : build(overlay): compile bitstream and update hardware handoff for pynq_z2 (SiririComun)
-* 61b5a2b  - 2026-08-13 : feat(bd) (SiririComun)
-* da05477  - 2026-08-13 : feat(bd): integrate axis_trigger_unit into xadc block design (SiririComun)```
+* a2f56d0  - 2026-08-13 : docs(context): track CI release workflow and update HW summary (SiririComun)```
 
 release.yml:
 
@@ -2287,6 +2287,9 @@ xadc.bd:
           "CHANNEL_AVERAGING": {
             "value": "None"
           },
+          "CHANNEL_ENABLE_VAUXP0_VAUXN0": {
+            "value": "false"
+          },
           "CHANNEL_ENABLE_VAUXP1_VAUXN1": {
             "value": "true"
           },
@@ -2314,6 +2317,9 @@ xadc.bd:
           "ENABLE_VCCPINT_ALARM": {
             "value": "false"
           },
+          "EXTERNAL_MUX_CHANNEL": {
+            "value": "VP_VN"
+          },
           "INTERFACE_SELECTION": {
             "value": "Enable_AXI"
           },
@@ -2321,7 +2327,7 @@ xadc.bd:
             "value": "false"
           },
           "SEQUENCER_MODE": {
-            "value": "Off"
+            "value": "Continuous"
           },
           "SINGLE_CHANNEL_SELECTION": {
             "value": "VAUXP1_VAUXN1"
@@ -2336,7 +2342,7 @@ xadc.bd:
             "value": "false"
           },
           "XADC_STARUP_SELECTION": {
-            "value": "simultaneous_sampling"
+            "value": "channel_sequencer"
           }
         }
       },
