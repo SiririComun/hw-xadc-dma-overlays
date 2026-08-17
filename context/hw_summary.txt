@@ -3,11 +3,13 @@ Git Context & Branch Info:
 ```log
 Current Branch: feat/dual-xadc
 Branch Tracking Status:
-* feat/dual-xadc 9bdeeb6 [origin/feat/dual-xadc] build(overlay): compile bitstream with hardware channel phase-lock
+* feat/dual-xadc b3a5fc3 [origin/feat/dual-xadc] build(overlay): compile bitstream with selectable trigger source
   master         34f4339 [origin/master] docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button
 
 Git Commit Graph & History:
-* 9bdeeb6  (HEAD -> feat/dual-xadc, tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): compile bitstream with hardware channel phase-lock (SiririComun)
+* b3a5fc3  (HEAD -> feat/dual-xadc, tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): compile bitstream with selectable trigger source (SiririComun)
+* 0fcabc6  - 2026-08-16 : feat(trigger): add selectable trigger source (CH1/CH2) and fixed A0 alignment (SiririComun)
+* 9bdeeb6  - 2026-08-16 : build(overlay): compile bitstream with hardware channel phase-lock (SiririComun)
 * 11e2221  - 2026-08-16 : feat(hw): phase-lock axis_trigger_unit to Channel 1 (Vaux1/A0) using channel_out (SiririComun)
 * c41267b  - 2026-08-16 : build(overlay): recompile bitstream with physical pin constraints for A0 and A1 (SiririComun)
 * 424bf70  - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)
@@ -20,9 +22,7 @@ Git Commit Graph & History:
 *   1fadb9c  (tag: v1.2.0) - 2026-08-15 : merge: feat(bd) integrate 2048-point PL FFT engine and dedicated FFT DMA (SiririComun)
 |\  
 | * 66a4697  (tag: v1.2.0-rc1, origin/feat/pl-fft) - 2026-08-15 : fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus (SiririComun)
-| * f2d7493  - 2026-08-14 : fix(bd): propagate TLAST through axis_subset_converter_0 to FFT core (SiririComun)
-| * dc0f654  - 2026-08-14 : fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT (SiririComun)
-| * 56e7bf0  - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)```
+| * f2d7493  - 2026-08-14 : fix(bd): propagate TLAST through axis_subset_converter_0 to FFT core (SiririComun)```
 
 release.yml:
 
