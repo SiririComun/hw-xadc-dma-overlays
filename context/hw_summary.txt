@@ -3,12 +3,13 @@ Git Context & Branch Info:
 ```log
 Current Branch: feat/dual-xadc
 Branch Tracking Status:
-* feat/dual-xadc 424bf70 [origin/feat/dual-xadc: ahead 1] fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0
+* feat/dual-xadc c41267b [origin/feat/dual-xadc] build(overlay): recompile bitstream with physical pin constraints for A0 and A1
   master         34f4339 [origin/master] docs(bd): track UI layout for deterministic BD reconstruction and add SVG export button
 
 Git Commit Graph & History:
-* 424bf70  (HEAD -> feat/dual-xadc) - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)
-* feb6dfc  (tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): recompile bitstream with active continuous dual-channel sequencer (SiririComun)
+* c41267b  (HEAD -> feat/dual-xadc, tag: v1.3.0-rc1, origin/feat/dual-xadc) - 2026-08-16 : build(overlay): recompile bitstream with physical pin constraints for A0 and A1 (SiririComun)
+* 424bf70  - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)
+* feb6dfc  - 2026-08-16 : build(overlay): recompile bitstream with active continuous dual-channel sequencer (SiririComun)
 * 5fb85a7  - 2026-08-16 : fix(bd): configure xadc_wiz_0 in continuous sequencer mode for Vaux1 and Vaux9 (SiririComun)
 * 36c8db2  - 2026-08-16 : build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2 (SiririComun)
 * 1bf8f65  - 2026-08-16 : feat(hw): implement dual-channel simultaneous XADC sampling and streaming pipeline (SiririComun)
@@ -21,9 +22,7 @@ Git Commit Graph & History:
 | * dc0f654  - 2026-08-14 : fix(fft): invert MSB in axis_subset_converter_0 for signed 2s complement FFT (SiririComun)
 | * 56e7bf0  - 2026-08-14 : fix(hw): set PACKET_SIZE to 2048 and enable TREADY on axis_subset_converter_1 (SiririComun)
 | * a4fb242  - 2026-08-14 : fix(bd): synchronize tlast_generator packet size to 2048 matching FFT frame (SiririComun)
-| * 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)
-| * cc7047e  - 2026-08-14 : feat(bd): integrate xfft, cordic magnitude, and dedicated FFT DMA into block design (SiririComun)
-|/  ```
+| * 2ca32e0  - 2026-08-14 : build(overlay): compile bitstream and update hardware handoff with PL FFT for pynq_z2 (SiririComun)```
 
 release.yml:
 
@@ -3556,6 +3555,11 @@ xadc.bd:
               }
             }
           },
+          "channel_id": {
+            "direction": "I",
+            "left": "4",
+            "right": "0"
+          },
           "frame_done": {
             "direction": "I"
           }
@@ -3723,8 +3727,8 @@ xadc.bd:
           "axi_dma_1/s_axi_lite_aclk",
           "axi_dma_1/m_axi_s2mm_aclk",
           "axi_smc_1/aclk",
-          "axis_trigger_unit_0/aclk",
-          "tlast_generator_0/aclk"
+          "tlast_generator_0/aclk",
+          "axis_trigger_unit_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -3746,8 +3750,8 @@ xadc.bd:
           "axis_subset_converter_1/aresetn",
           "cordic_0/aresetn",
           "axi_smc_1/aresetn",
-          "axis_trigger_unit_0/aresetn",
-          "tlast_generator_0/aresetn"
+          "tlast_generator_0/aresetn",
+          "axis_trigger_unit_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
@@ -3756,6 +3760,12 @@ xadc.bd:
           "axi_dma_0/s_axis_s2mm_tlast",
           "axi_timer_0/capturetrig0",
           "axis_trigger_unit_0/frame_done"
+        ]
+      },
+      "xadc_wiz_0_channel_out": {
+        "ports": [
+          "xadc_wiz_0/channel_out",
+          "axis_trigger_unit_0/channel_id"
         ]
       },
       "xlconstant_0_dout": {
@@ -4065,6 +4075,11 @@ entity axis_trigger_unit is
         s_axi_rready       : in  std_logic;
 
         -- =====================================================================
+        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
+        -- =====================================================================
+        channel_id         : in  std_logic_vector(4 downto 0);
+
+        -- =====================================================================
         -- AXI4-Stream Slave Interface (Raw Samples from XADC)
         -- =====================================================================
         s_axis_tdata       : in  std_logic_vector(15 downto 0);
@@ -4087,12 +4102,15 @@ end axis_trigger_unit;
 
 architecture Behavioral of axis_trigger_unit is
 
-    -- Register Offsets (Byte-addressed)
-    signal reg_ctrl        : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto Mode
+    -- Constant Channel Address for Channel 1 (VAUX1 / A0)
+    constant CH_VAUX1      : std_logic_vector(4 downto 0) := "10001"; -- 0x11
+
+    -- Register Offsets
+    signal reg_ctrl        : std_logic_vector(31 downto 0) := x"00000003"; -- Armed + Auto Mode
     signal reg_status      : std_logic_vector(31 downto 0) := (others => '0');
-    signal reg_threshold   : std_logic_vector(31 downto 0) := x"00000800"; -- Default: Mid-scale (1.65V)
+    signal reg_threshold   : std_logic_vector(31 downto 0) := x"00000800"; -- Mid-scale (1.65V)
     signal reg_timeout     : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32));
-    signal reg_hysteresis  : std_logic_vector(31 downto 0) := x"00000010"; -- Default: 16 ADC counts
+    signal reg_hysteresis  : std_logic_vector(31 downto 0) := x"00000010";
 
     -- AXI-Lite Handshake Signals
     signal axi_awready     : std_logic := '0';
@@ -4102,20 +4120,21 @@ architecture Behavioral of axis_trigger_unit is
     signal axi_rvalid      : std_logic := '0';
     signal axi_rdata       : std_logic_vector(31 downto 0) := (others => '0');
 
-    -- Trigger FSM State
+    -- Trigger FSM
     type t_state is (ST_IDLE, ST_ARMED, ST_STREAMING);
-    signal state : t_state := ST_IDLE;
+    signal state           : t_state := ST_IDLE;
+    signal trig_pending    : std_logic := '0';
 
-    -- Edge Detection Pipeline
+    -- Edge Detection Pipeline (Evaluates Channel 1 on A0)
     signal sample_curr     : unsigned(15 downto 0) := (others => '0');
     signal sample_prev     : unsigned(15 downto 0) := (others => '0');
     signal sample_valid_d  : std_logic := '0';
 
-    -- Timeout Counter for Auto Mode
+    -- Timeout Counter
     signal timeout_cnt     : unsigned(31 downto 0) := (others => '0');
     signal force_trig_reg  : std_logic := '0';
 
-    -- Internal Control Bits
+    -- Control Aliases
     signal cfg_arm         : std_logic;
     signal cfg_auto        : std_logic;
     signal cfg_edge_fall   : std_logic;
@@ -4233,15 +4252,18 @@ begin
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
     s_axis_tready <= m_axis_tready when (state = ST_STREAMING) else '1';
 
+    -- Trigger FSM with Deterministic Channel 1 Start
     process(aclk)
         variable thresh_val      : unsigned(15 downto 0);
         variable hyst_val        : unsigned(15 downto 0);
         variable is_rising_edge  : boolean;
         variable is_falling_edge : boolean;
+        variable is_ch1          : boolean;
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
                 state          <= ST_IDLE;
+                trig_pending   <= '0';
                 sample_curr    <= (others => '0');
                 sample_prev    <= (others => '0');
                 sample_valid_d <= '0';
@@ -4249,19 +4271,24 @@ begin
             else
                 thresh_val := unsigned(reg_threshold(15 downto 0));
                 hyst_val   := unsigned(reg_hysteresis(15 downto 0));
+                is_ch1     := (channel_id = CH_VAUX1);
 
-                if s_axis_tvalid = '1' then
+                -- Edge Detection Pipeline (STRICTLY on Channel 1 / A0)
+                if s_axis_tvalid = '1' and is_ch1 then
                     sample_prev <= sample_curr;
                     sample_curr <= unsigned(s_axis_tdata);
+                    sample_valid_d <= '1';
+                else
+                    sample_valid_d <= '0';
                 end if;
-                sample_valid_d <= s_axis_tvalid;
 
                 is_rising_edge  := (sample_prev < thresh_val) and (sample_curr >= thresh_val);
                 is_falling_edge := (sample_prev > thresh_val) and (sample_curr <= thresh_val);
 
                 case state is
                     when ST_IDLE =>
-                        timeout_cnt <= (others => '0');
+                        timeout_cnt  <= (others => '0');
+                        trig_pending <= '0';
                         if cfg_arm = '1' then
                             state <= ST_ARMED;
                         end if;
@@ -4269,23 +4296,29 @@ begin
                     when ST_ARMED =>
                         if cfg_arm = '0' then
                             state <= ST_IDLE;
+                            trig_pending <= '0';
                         else
+                            -- Check Trigger Conditions
                             if force_trig_reg = '1' then
-                                timeout_cnt <= (others => '0');
-                                state <= ST_STREAMING;
+                                trig_pending <= '1';
                             elsif (sample_valid_d = '1') and (
                                   (cfg_edge_fall = '0' and is_rising_edge) or
                                   (cfg_edge_fall = '1' and is_falling_edge)
                                   ) then
-                                timeout_cnt <= (others => '0');
-                                state <= ST_STREAMING;
+                                trig_pending <= '1';
                             elsif cfg_auto = '1' then
                                 if timeout_cnt >= unsigned(reg_timeout) then
-                                    timeout_cnt <= (others => '0');
-                                    state <= ST_STREAMING;
+                                    trig_pending <= '1';
                                 else
                                     timeout_cnt <= timeout_cnt + 1;
                                 end if;
+                            end if;
+
+                            -- DETERMINISTIC START: Only enter ST_STREAMING on a Channel 1 (A0) sample!
+                            if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
+                                timeout_cnt  <= (others => '0');
+                                trig_pending <= '0';
+                                state        <= ST_STREAMING;
                             end if;
                         end if;
 
