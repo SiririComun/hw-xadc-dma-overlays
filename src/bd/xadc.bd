@@ -3302,6 +3302,11 @@
               }
             }
           },
+          "channel_id": {
+            "direction": "I",
+            "left": "4",
+            "right": "0"
+          },
           "frame_done": {
             "direction": "I"
           }
@@ -3469,8 +3474,8 @@
           "axi_dma_1/s_axi_lite_aclk",
           "axi_dma_1/m_axi_s2mm_aclk",
           "axi_smc_1/aclk",
-          "axis_trigger_unit_0/aclk",
-          "tlast_generator_0/aclk"
+          "tlast_generator_0/aclk",
+          "axis_trigger_unit_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -3492,8 +3497,8 @@
           "axis_subset_converter_1/aresetn",
           "cordic_0/aresetn",
           "axi_smc_1/aresetn",
-          "axis_trigger_unit_0/aresetn",
-          "tlast_generator_0/aresetn"
+          "tlast_generator_0/aresetn",
+          "axis_trigger_unit_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
@@ -3502,6 +3507,12 @@
           "axi_dma_0/s_axis_s2mm_tlast",
           "axi_timer_0/capturetrig0",
           "axis_trigger_unit_0/frame_done"
+        ]
+      },
+      "xadc_wiz_0_channel_out": {
+        "ports": [
+          "xadc_wiz_0/channel_out",
+          "axis_trigger_unit_0/channel_id"
         ]
       },
       "xlconstant_0_dout": {

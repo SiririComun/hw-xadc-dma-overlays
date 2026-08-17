@@ -36,6 +36,11 @@ entity axis_trigger_unit is
         s_axi_rready       : in  std_logic;
 
         -- =====================================================================
+        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
+        -- =====================================================================
+        channel_id         : in  std_logic_vector(4 downto 0);
+
+        -- =====================================================================
         -- AXI4-Stream Slave Interface (Raw Samples from XADC)
         -- =====================================================================
         s_axis_tdata       : in  std_logic_vector(15 downto 0);
@@ -58,12 +63,15 @@ end axis_trigger_unit;
 
 architecture Behavioral of axis_trigger_unit is
 
-    -- Register Offsets (Byte-addressed)
-    signal reg_ctrl        : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto Mode
+    -- Constant Channel Address for Channel 1 (VAUX1 / A0)
+    constant CH_VAUX1      : std_logic_vector(4 downto 0) := "10001"; -- 0x11
+
+    -- Register Offsets
+    signal reg_ctrl        : std_logic_vector(31 downto 0) := x"00000003"; -- Armed + Auto Mode
     signal reg_status      : std_logic_vector(31 downto 0) := (others => '0');
-    signal reg_threshold   : std_logic_vector(31 downto 0) := x"00000800"; -- Default: Mid-scale (1.65V)
+    signal reg_threshold   : std_logic_vector(31 downto 0) := x"00000800"; -- Mid-scale (1.65V)
     signal reg_timeout     : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32));
-    signal reg_hysteresis  : std_logic_vector(31 downto 0) := x"00000010"; -- Default: 16 ADC counts
+    signal reg_hysteresis  : std_logic_vector(31 downto 0) := x"00000010";
 
     -- AXI-Lite Handshake Signals
     signal axi_awready     : std_logic := '0';
@@ -73,20 +81,21 @@ architecture Behavioral of axis_trigger_unit is
     signal axi_rvalid      : std_logic := '0';
     signal axi_rdata       : std_logic_vector(31 downto 0) := (others => '0');
 
-    -- Trigger FSM State
+    -- Trigger FSM
     type t_state is (ST_IDLE, ST_ARMED, ST_STREAMING);
-    signal state : t_state := ST_IDLE;
+    signal state           : t_state := ST_IDLE;
+    signal trig_pending    : std_logic := '0';
 
-    -- Edge Detection Pipeline
+    -- Edge Detection Pipeline (Evaluates Channel 1 on A0)
     signal sample_curr     : unsigned(15 downto 0) := (others => '0');
     signal sample_prev     : unsigned(15 downto 0) := (others => '0');
     signal sample_valid_d  : std_logic := '0';
 
-    -- Timeout Counter for Auto Mode
+    -- Timeout Counter
     signal timeout_cnt     : unsigned(31 downto 0) := (others => '0');
     signal force_trig_reg  : std_logic := '0';
 
-    -- Internal Control Bits
+    -- Control Aliases
     signal cfg_arm         : std_logic;
     signal cfg_auto        : std_logic;
     signal cfg_edge_fall   : std_logic;
@@ -204,15 +213,18 @@ begin
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
     s_axis_tready <= m_axis_tready when (state = ST_STREAMING) else '1';
 
+    -- Trigger FSM with Deterministic Channel 1 Start
     process(aclk)
         variable thresh_val      : unsigned(15 downto 0);
         variable hyst_val        : unsigned(15 downto 0);
         variable is_rising_edge  : boolean;
         variable is_falling_edge : boolean;
+        variable is_ch1          : boolean;
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
                 state          <= ST_IDLE;
+                trig_pending   <= '0';
                 sample_curr    <= (others => '0');
                 sample_prev    <= (others => '0');
                 sample_valid_d <= '0';
@@ -220,19 +232,24 @@ begin
             else
                 thresh_val := unsigned(reg_threshold(15 downto 0));
                 hyst_val   := unsigned(reg_hysteresis(15 downto 0));
+                is_ch1     := (channel_id = CH_VAUX1);
 
-                if s_axis_tvalid = '1' then
+                -- Edge Detection Pipeline (STRICTLY on Channel 1 / A0)
+                if s_axis_tvalid = '1' and is_ch1 then
                     sample_prev <= sample_curr;
                     sample_curr <= unsigned(s_axis_tdata);
+                    sample_valid_d <= '1';
+                else
+                    sample_valid_d <= '0';
                 end if;
-                sample_valid_d <= s_axis_tvalid;
 
                 is_rising_edge  := (sample_prev < thresh_val) and (sample_curr >= thresh_val);
                 is_falling_edge := (sample_prev > thresh_val) and (sample_curr <= thresh_val);
 
                 case state is
                     when ST_IDLE =>
-                        timeout_cnt <= (others => '0');
+                        timeout_cnt  <= (others => '0');
+                        trig_pending <= '0';
                         if cfg_arm = '1' then
                             state <= ST_ARMED;
                         end if;
@@ -240,23 +257,29 @@ begin
                     when ST_ARMED =>
                         if cfg_arm = '0' then
                             state <= ST_IDLE;
+                            trig_pending <= '0';
                         else
+                            -- Check Trigger Conditions
                             if force_trig_reg = '1' then
-                                timeout_cnt <= (others => '0');
-                                state <= ST_STREAMING;
+                                trig_pending <= '1';
                             elsif (sample_valid_d = '1') and (
                                   (cfg_edge_fall = '0' and is_rising_edge) or
                                   (cfg_edge_fall = '1' and is_falling_edge)
                                   ) then
-                                timeout_cnt <= (others => '0');
-                                state <= ST_STREAMING;
+                                trig_pending <= '1';
                             elsif cfg_auto = '1' then
                                 if timeout_cnt >= unsigned(reg_timeout) then
-                                    timeout_cnt <= (others => '0');
-                                    state <= ST_STREAMING;
+                                    trig_pending <= '1';
                                 else
                                     timeout_cnt <= timeout_cnt + 1;
                                 end if;
+                            end if;
+
+                            -- DETERMINISTIC START: Only enter ST_STREAMING on a Channel 1 (A0) sample!
+                            if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
+                                timeout_cnt  <= (others => '0');
+                                trig_pending <= '0';
+                                state        <= ST_STREAMING;
                             end if;
                         end if;
 
