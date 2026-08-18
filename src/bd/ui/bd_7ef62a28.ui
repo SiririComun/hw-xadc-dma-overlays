@@ -1,66 +1,66 @@
 {
    "ActiveEmotionalView":"Default View",
-   "Default View_ScaleFactor":"0.345724",
-   "Default View_TopLeft":"-318,-220",
+   "Default View_ScaleFactor":"0.487154",
+   "Default View_TopLeft":"-150,-228",
    "ExpandedHierarchyInLayout":"",
    "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:21.0 TLS
 #  -string -flagsOSRD
-preplace port DDR -pg 1 -lvl 8 -x 2810 -y 380 -defaultsOSRD
-preplace port FIXED_IO -pg 1 -lvl 8 -x 2810 -y 350 -defaultsOSRD
-preplace port Vaux1_0 -pg 1 -lvl 0 -x -70 -y 160 -defaultsOSRD
-preplace port Vp_Vn_0 -pg 1 -lvl 0 -x -70 -y 130 -defaultsOSRD
-preplace port Vaux9_0 -pg 1 -lvl 0 -x -70 -y 190 -defaultsOSRD
-preplace inst processing_system7_0 -pg 1 -lvl 7 -x 2560 -y 430 -defaultsOSRD
-preplace inst xadc_wiz_0 -pg 1 -lvl 1 -x 170 -y 150 -defaultsOSRD
-preplace inst axi_smc_0 -pg 1 -lvl 6 -x 2130 -y 200 -defaultsOSRD
-preplace inst rst_ps7_0_100M -pg 1 -lvl 6 -x 2130 -y 590 -defaultsOSRD
-preplace inst tlast_generator_0 -pg 1 -lvl 2 -x 520 -y 230 -defaultsOSRD
-preplace inst axi_dma_0 -pg 1 -lvl 5 -x 1720 -y 190 -defaultsOSRD
-preplace inst axi_timer_0 -pg 1 -lvl 7 -x 2560 -y 230 -defaultsOSRD
-preplace inst axis_broadcaster_0 -pg 1 -lvl 2 -x 520 -y 370 -defaultsOSRD
-preplace inst axis_subset_converter_0 -pg 1 -lvl 3 -x 850 -y 610 -defaultsOSRD
-preplace inst xfft_0 -pg 1 -lvl 4 -x 1260 -y 440 -defaultsOSRD
-preplace inst cordic_0 -pg 1 -lvl 4 -x 1260 -y 670 -defaultsOSRD
-preplace inst axi_dma_1 -pg 1 -lvl 5 -x 1720 -y 430 -defaultsOSRD
-preplace inst xlconstant_1 -pg 1 -lvl 3 -x 850 -y 370 -defaultsOSRD
-preplace inst axis_subset_converter_1 -pg 1 -lvl 5 -x 1720 -y 610 -defaultsOSRD
-preplace inst axi_smc_1 -pg 1 -lvl 6 -x 2130 -y 420 -defaultsOSRD
-preplace inst xlconstant_0 -pg 1 -lvl 3 -x 850 -y 470 -defaultsOSRD
-preplace inst axis_trigger_unit_0 -pg 1 -lvl 1 -x 170 -y 360 -defaultsOSRD
-preplace inst axis_decimator_0 -pg 1 -lvl 1 -x 170 -y 530 -defaultsOSRD
-preplace netloc processing_system7_0_FCLK_CLK0 1 0 8 10 620 350 530 680 530 1030 570 1500 80 1930 300 2310 540 2780
-preplace netloc processing_system7_0_FCLK_RESET0_N 1 5 3 1950 690 N 690 2770
-preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 0 7 -10 630 360 630 670 690 1040 590 1480 300 1920 310 2350
-preplace netloc tlast_generator_0_m_axis_tlast 1 0 7 -30 640 NJ 640 690 180 N 180 1480 70 N 70 2350
-preplace netloc xadc_wiz_0_channel_out 1 0 2 0 0 350
-preplace netloc xlconstant_0_dout 1 3 1 1010 440n
-preplace netloc xlconstant_1_dout 1 3 1 1020 370n
-preplace netloc Vaux1_0_1 1 0 1 -40J 130n
-preplace netloc Vaux9_0_1 1 0 1 -30 150n
-preplace netloc Vp_Vn_0_1 1 0 1 -50J 110n
-preplace netloc axi_dma_0_M_AXI_S2MM 1 5 1 1940 170n
-preplace netloc axi_dma_1_M_AXI_S2MM 1 5 1 N 410
-preplace netloc axi_smc_M00_AXI 1 0 7 10 10 N 10 N 10 N 10 N 10 N 10 2340
-preplace netloc axi_smc_M01_AXI 1 4 3 1520 50 N 50 2320
-preplace netloc axi_smc_M02_AXI 1 6 1 2340 180n
-preplace netloc axi_smc_M03_AXI 1 0 7 20 20 N 20 N 20 N 20 N 20 N 20 2330
-preplace netloc axi_smc_M04_AXI 1 4 3 1530 60 N 60 2310
-preplace netloc axis_broadcaster_0_M00_AXIS 1 2 3 680 160 NJ 160 NJ
-preplace netloc axis_broadcaster_0_M01_AXIS 1 2 1 670 380n
-preplace netloc axis_subset_converter_0_M_AXIS 1 3 1 1000 400n
-preplace netloc axis_subset_converter_1_M_AXIS 1 4 2 1510 330 1910
-preplace netloc cordic_0_M_AXIS_DOUT 1 4 1 1490 590n
-preplace netloc processing_system7_0_DDR 1 7 1 N 380
-preplace netloc processing_system7_0_FIXED_IO 1 7 1 2790 350n
-preplace netloc processing_system7_0_M_AXI_GP0 1 5 3 1950 100 N 100 2780
-preplace netloc smartconnect_0_M00_AXI 1 6 1 N 420
-preplace netloc tlast_generator_0_m_axis 1 1 2 370 150 670
-preplace netloc xfft_0_M_AXIS_DATA 1 3 2 1050 310 1470
-preplace netloc xadc_wiz_0_M_AXIS 1 0 2 30 30 310
-preplace netloc axis_trigger_unit_0_m_axis 1 0 2 30 610 310
-preplace netloc axis_decimator_0_m_axis 1 1 1 320 210n
-levelinfo -pg 1 -70 170 520 850 1260 1720 2130 2560 2810
-pagesize -pg 1 -db -bbox -sgen -180 -10 2920 930
+preplace port DDR -pg 1 -lvl 8 -x 2870 -y 360 -defaultsOSRD
+preplace port FIXED_IO -pg 1 -lvl 8 -x 2870 -y 400 -defaultsOSRD
+preplace port Vaux1_0 -pg 1 -lvl 0 -x -40 -y 140 -defaultsOSRD
+preplace port Vp_Vn_0 -pg 1 -lvl 0 -x -40 -y 110 -defaultsOSRD
+preplace port Vaux9_0 -pg 1 -lvl 0 -x -40 -y 170 -defaultsOSRD
+preplace inst processing_system7_0 -pg 1 -lvl 7 -x 2620 -y 420 -defaultsOSRD
+preplace inst xadc_wiz_0 -pg 1 -lvl 1 -x 180 -y 160 -defaultsOSRD
+preplace inst axi_smc_0 -pg 1 -lvl 6 -x 2160 -y 170 -defaultsOSRD
+preplace inst rst_ps7_0_100M -pg 1 -lvl 6 -x 2160 -y 520 -defaultsOSRD
+preplace inst axi_dma_0 -pg 1 -lvl 5 -x 1710 -y 210 -defaultsOSRD
+preplace inst axi_timer_0 -pg 1 -lvl 7 -x 2620 -y 220 -defaultsOSRD
+preplace inst axis_subset_converter_0 -pg 1 -lvl 3 -x 840 -y 600 -defaultsOSRD
+preplace inst xfft_0 -pg 1 -lvl 4 -x 1240 -y 430 -defaultsOSRD
+preplace inst cordic_0 -pg 1 -lvl 4 -x 1240 -y 630 -defaultsOSRD
+preplace inst axi_dma_1 -pg 1 -lvl 5 -x 1710 -y 440 -defaultsOSRD
+preplace inst xlconstant_1 -pg 1 -lvl 3 -x 840 -y 380 -defaultsOSRD
+preplace inst axis_subset_converter_1 -pg 1 -lvl 5 -x 1710 -y 600 -defaultsOSRD
+preplace inst axi_smc_1 -pg 1 -lvl 6 -x 2160 -y 340 -defaultsOSRD
+preplace inst xlconstant_0 -pg 1 -lvl 3 -x 840 -y 480 -defaultsOSRD
+preplace inst axis_trigger_unit_0 -pg 1 -lvl 1 -x 180 -y 370 -defaultsOSRD
+preplace inst axis_decimator_0 -pg 1 -lvl 1 -x 180 -y 550 -defaultsOSRD
+preplace inst tlast_generator_0 -pg 1 -lvl 2 -x 520 -y 280 -defaultsOSRD
+preplace inst axis_broadcaster_0 -pg 1 -lvl 2 -x 520 -y 440 -defaultsOSRD
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 8 0 650 350 600 690 680 1020 710 1480 100 1970 60 2380 110 2830
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 5 3 1980 620 N 620 2830
+preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 0 7 -10 660 360 620 670 690 1030 720 1500 320 1960 40 2390
+preplace netloc tlast_generator_0_m_axis_tlast 1 0 7 10 10 NJ 10 680 50 N 50 1500 50 N 50 2400
+preplace netloc xadc_wiz_0_channel_out 1 0 2 30 30 360
+preplace netloc xlconstant_0_dout 1 3 1 1000 430n
+preplace netloc xlconstant_1_dout 1 3 1 1010 380n
+preplace netloc Vaux1_0_1 1 0 1 NJ 140
+preplace netloc Vaux9_0_1 1 0 1 -20 160n
+preplace netloc Vp_Vn_0_1 1 0 1 -20J 110n
+preplace netloc axi_dma_0_M_AXI_S2MM 1 5 1 1900 190n
+preplace netloc axi_dma_1_M_AXI_S2MM 1 5 1 1980 330n
+preplace netloc axi_smc_M00_AXI 1 0 7 -10 0 N 0 N 0 N 0 N 0 N 0 2340
+preplace netloc axi_smc_M01_AXI 1 4 3 1510 10 N 10 2350
+preplace netloc axi_smc_M02_AXI 1 6 1 N 170
+preplace netloc axi_smc_M03_AXI 1 0 7 20 20 N 20 N 20 N 20 N 20 N 20 2360
+preplace netloc axi_smc_M04_AXI 1 4 3 1520 30 N 30 2370
+preplace netloc axis_broadcaster_0_M00_AXIS 1 2 3 690 180 N 180 NJ
+preplace netloc axis_broadcaster_0_M01_AXIS 1 2 1 670 450n
+preplace netloc axis_subset_converter_0_M_AXIS 1 3 1 990 390n
+preplace netloc axis_subset_converter_1_M_AXIS 1 4 2 1510 340 1900
+preplace netloc cordic_0_M_AXIS_DOUT 1 4 1 1490 580n
+preplace netloc processing_system7_0_DDR 1 7 1 2850 360n
+preplace netloc processing_system7_0_FIXED_IO 1 7 1 2850 390n
+preplace netloc processing_system7_0_M_AXI_GP0 1 5 3 1980 70 N 70 2840
+preplace netloc smartconnect_0_M00_AXI 1 6 1 2340 340n
+preplace netloc xfft_0_M_AXIS_DATA 1 3 2 1030 300 1450
+preplace netloc xadc_wiz_0_M_AXIS 1 0 2 40 40 320
+preplace netloc axis_trigger_unit_0_m_axis 1 0 2 40 640 320
+preplace netloc axis_decimator_0_m_axis 1 1 1 330 260n
+preplace netloc tlast_generator_0_m_axis 1 1 2 370 360 670
+levelinfo -pg 1 -40 180 520 840 1240 1710 2160 2620 2870
+pagesize -pg 1 -db -bbox -sgen -150 -10 2980 950
 "
 }
 0
