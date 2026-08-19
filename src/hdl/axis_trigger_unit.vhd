@@ -1,3 +1,12 @@
+-- =============================================================================
+-- File: axis_trigger_unit.vhd
+-- Description: Central Acquisition, Edge Trigger & Runtime Configuration Controller.
+--              Hosts AXI4-Lite registers to dynamically control:
+--                • Hardware Edge/Level Triggering (A0 vs A1)
+--                • Decimation Ratio (M = 1, 10, 20, 50)
+--                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048 via 16-bit config)
+--                • TLAST Packet Size (512, 1024, 2048)
+-- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -8,107 +17,133 @@ entity axis_trigger_unit is
         C_S_AXI_ADDR_WIDTH : integer := 5
     );
     port (
-        aclk               : in  std_logic;
-        aresetn            : in  std_logic;
+        aclk                     : in  std_logic;
+        aresetn                  : in  std_logic;
 
         -- =====================================================================
         -- AXI4-Lite Slave Interface (Control & Status Registers)
         -- =====================================================================
-        s_axi_awaddr       : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
-        s_axi_awprot       : in  std_logic_vector(2 downto 0);
-        s_axi_awvalid      : in  std_logic;
-        s_axi_awready      : out std_logic;
-        s_axi_wdata        : in  std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
-        s_axi_wstrb        : in  std_logic_vector((C_S_AXI_DATA_WIDTH / 8) - 1 downto 0);
-        s_axi_wvalid       : in  std_logic;
-        s_axi_wready       : out std_logic;
-        s_axi_bresp        : out std_logic_vector(1 downto 0);
-        s_axi_bvalid       : out std_logic;
-        s_axi_bready       : in  std_logic;
-        s_axi_araddr       : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
-        s_axi_arprot       : in  std_logic_vector(2 downto 0);
-        s_axi_arvalid      : in  std_logic;
-        s_axi_arready      : out std_logic;
-        s_axi_rdata        : out std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
-        s_axi_rresp        : out std_logic_vector(1 downto 0);
-        s_axi_rvalid       : out std_logic;
-        s_axi_rready       : in  std_logic;
+        s_axi_awaddr             : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_awprot             : in  std_logic_vector(2 downto 0);
+        s_axi_awvalid            : in  std_logic;
+        s_axi_awready            : out std_logic;
+        s_axi_wdata              : in  std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_wstrb              : in  std_logic_vector((C_S_AXI_DATA_WIDTH / 8) - 1 downto 0);
+        s_axi_wvalid             : in  std_logic;
+        s_axi_wready             : out std_logic;
+        s_axi_bresp              : out std_logic_vector(1 downto 0);
+        s_axi_bvalid             : out std_logic;
+        s_axi_bready             : in  std_logic;
+        s_axi_araddr             : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_arprot             : in  std_logic_vector(2 downto 0);
+        s_axi_arvalid            : in  std_logic;
+        s_axi_arready            : out std_logic;
+        s_axi_rdata              : out std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_rresp              : out std_logic_vector(1 downto 0);
+        s_axi_rvalid             : out std_logic;
+        s_axi_rready             : in  std_logic;
 
         -- =====================================================================
         -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
         -- =====================================================================
-        channel_id         : in  std_logic_vector(4 downto 0);
+        channel_id               : in  std_logic_vector(4 downto 0);
 
         -- =====================================================================
         -- AXI4-Stream Slave Interface (Raw Samples from XADC)
         -- =====================================================================
-        s_axis_tdata       : in  std_logic_vector(15 downto 0);
-        s_axis_tvalid      : in  std_logic;
-        s_axis_tready      : out std_logic;
+        s_axis_tdata             : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid            : in  std_logic;
+        s_axis_tready            : out std_logic;
 
         -- =====================================================================
-        -- AXI4-Stream Master Interface (Trigger-Gated Stream)
+        -- AXI4-Stream Master Interface (Trigger-Gated Stream to Decimator)
         -- =====================================================================
-        m_axis_tdata       : out std_logic_vector(15 downto 0);
-        m_axis_tvalid      : out std_logic;
-        m_axis_tready      : in  std_logic;
+        m_axis_tdata             : out std_logic_vector(15 downto 0);
+        m_axis_tvalid            : out std_logic;
+        m_axis_tready            : in  std_logic;
 
         -- =====================================================================
         -- Frame Feedback (Connected to tlast_generator's m_axis_tlast)
         -- =====================================================================
-        frame_done         : in  std_logic
+        frame_done               : in  std_logic;
+
+        -- =====================================================================
+        -- Phase 2.5 Runtime Configuration Outputs
+        -- =====================================================================
+        -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
+        decim_factor_out         : out std_logic_vector(1 downto 0);
+
+        -- Runtime FFT Configuration Master Stream to xfft_0 (S_AXIS_CONFIG - 16 bits)
+        m_axis_fft_config_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_fft_config_tvalid : out std_logic;
+
+        -- Programmable packet size to tlast_generator_0
+        packet_size_out          : out std_logic_vector(15 downto 0)
     );
 end axis_trigger_unit;
 
 architecture Behavioral of axis_trigger_unit is
 
     -- Constant Channel Addresses in 7-Series XADC
-    constant CH_VAUX1      : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
-    constant CH_VAUX9      : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
+    constant CH_VAUX1            : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
+    constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
-    -- Register Offsets (Byte-addressed)
-    -- 0x00: CONTROL_REG [0:Arm, 1:Auto, 2:Edge, 3:Single, 4:Force, 5:TrigSource(0=A0, 1=A1)]
-    signal reg_ctrl        : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto Mode + CH1
-    signal reg_status      : std_logic_vector(31 downto 0) := (others => '0');
-    signal reg_threshold   : std_logic_vector(31 downto 0) := x"00000800"; -- Default: Mid-scale (1.65V)
-    signal reg_timeout     : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32));
-    signal reg_hysteresis  : std_logic_vector(31 downto 0) := x"00000010";
+    -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
+    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- 0x00: Default Armed + Auto + CH1
+    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
+    signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
+    signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
+    signal reg_hysteresis        : std_logic_vector(31 downto 0) := x"00000010"; -- 0x10
+    signal reg_decimation        : std_logic_vector(31 downto 0) := x"00000001"; -- 0x14: Default M=10
+    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"00000B01"; -- 0x18: Default N=2048 (0x0B), FWD (0x01)
+    signal reg_packet_size       : std_logic_vector(31 downto 0) := x"00000800"; -- 0x1C: Default 2048 samples
 
-    -- AXI Handshakes
-    signal axi_awready     : std_logic := '0';
-    signal axi_wready      : std_logic := '0';
-    signal axi_bvalid      : std_logic := '0';
-    signal axi_arready     : std_logic := '0';
-    signal axi_rvalid      : std_logic := '0';
-    signal axi_rdata       : std_logic_vector(31 downto 0) := (others => '0');
+    -- AXI Handshake Signals
+    signal axi_awready           : std_logic := '0';
+    signal axi_wready            : std_logic := '0';
+    signal axi_bvalid            : std_logic := '0';
+    signal axi_arready           : std_logic := '0';
+    signal axi_rvalid            : std_logic := '0';
+    signal axi_rdata             : std_logic_vector(31 downto 0) := (others => '0');
 
-    -- Trigger FSM
+    -- Configuration Pulse for FFT Core
+    signal fft_cfg_valid_pulse   : std_logic := '0';
+
+    -- Trigger FSM State
     type t_state is (ST_IDLE, ST_ARMED, ST_STREAMING);
-    signal state           : t_state := ST_IDLE;
-    signal trig_pending    : std_logic := '0';
+    signal state                 : t_state := ST_IDLE;
+    signal trig_pending          : std_logic := '0';
 
-    -- Independent Channel Sample Histories for Zero-Skew Edge Detection
-    signal ch1_prev        : unsigned(15 downto 0) := (others => '0');
-    signal ch2_prev        : unsigned(15 downto 0) := (others => '0');
+    -- Sample Histories for Edge Detection
+    signal ch1_prev              : unsigned(15 downto 0) := (others => '0');
+    signal ch2_prev              : unsigned(15 downto 0) := (others => '0');
 
-    signal timeout_cnt     : unsigned(31 downto 0) := (others => '0');
-    signal force_trig_reg  : std_logic := '0';
+    signal timeout_cnt           : unsigned(31 downto 0) := (others => '0');
+    signal force_trig_reg        : std_logic := '0';
 
     -- Control Bit Aliases
-    signal cfg_arm         : std_logic;
-    signal cfg_auto        : std_logic;
-    signal cfg_edge_fall   : std_logic;
-    signal cfg_single      : std_logic;
-    signal cfg_trig_src_ch2: std_logic;
+    signal cfg_arm               : std_logic;
+    signal cfg_auto              : std_logic;
+    signal cfg_edge_fall         : std_logic;
+    signal cfg_single            : std_logic;
+    signal cfg_trig_src_ch2      : std_logic;
 
 begin
 
+    -- Output Port Assignments
+    decim_factor_out         <= reg_decimation(1 downto 0);
+    packet_size_out          <= reg_packet_size(15 downto 0);
+    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x0B01 for N=2048 FWD)
+    m_axis_fft_config_tvalid <= fft_cfg_valid_pulse;
+
+    -- Control aliases
     cfg_arm          <= reg_ctrl(0);
     cfg_auto         <= reg_ctrl(1);
     cfg_edge_fall    <= reg_ctrl(2);
     cfg_single       <= reg_ctrl(3);
     cfg_trig_src_ch2 <= reg_ctrl(5); -- Bit 5: 0 = Trigger on A0, 1 = Trigger on A1
 
+    -- Status mapping
     reg_status(0) <= '1' when (state = ST_ARMED) else '0';
     reg_status(1) <= '1' when (state = ST_STREAMING) else '0';
     reg_status(2) <= '1' when (state = ST_STREAMING and s_axis_tvalid = '1') else '0';
@@ -131,17 +166,23 @@ begin
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                axi_awready <= '0';
-                axi_wready  <= '0';
-                axi_bvalid  <= '0';
-                reg_ctrl    <= x"00000003";
-                reg_threshold  <= x"00000800";
-                reg_timeout    <= std_logic_vector(to_unsigned(5000000, 32));
-                reg_hysteresis <= x"00000010";
-                force_trig_reg <= '0';
+                axi_awready          <= '0';
+                axi_wready           <= '0';
+                axi_bvalid           <= '0';
+                reg_ctrl             <= x"00000003";
+                reg_threshold        <= x"00000800";
+                reg_timeout          <= std_logic_vector(to_unsigned(5000000, 32));
+                reg_hysteresis       <= x"00000010";
+                reg_decimation       <= x"00000001"; -- Default M=10
+                reg_fft_config       <= x"00000B01"; -- Default N=2048, FWD
+                reg_packet_size      <= x"00000800"; -- Default 2048
+                fft_cfg_valid_pulse  <= '1';         -- Emit initial configuration on reset
+                force_trig_reg       <= '0';
             else
-                force_trig_reg <= '0';
+                force_trig_reg       <= '0';
+                fft_cfg_valid_pulse  <= '0';
 
+                -- Address Handshake
                 if (axi_awready = '0' and s_axi_awvalid = '1' and s_axi_wvalid = '1') then
                     axi_awready <= '1';
                     axi_wready  <= '1';
@@ -150,27 +191,35 @@ begin
                     axi_wready  <= '0';
                 end if;
 
+                -- Register Write Handling
                 if (axi_awready = '1' and axi_wready = '1') then
                     write_addr := to_integer(unsigned(s_axi_awaddr(4 downto 2)));
                     case write_addr is
-                        when 0 =>
+                        when 0 => -- 0x00: CONTROL
                             reg_ctrl <= s_axi_wdata;
                             if s_axi_wdata(4) = '1' then
                                 force_trig_reg <= '1';
                             end if;
-                        when 2 => reg_threshold <= s_axi_wdata;
-                        when 3 => reg_timeout <= s_axi_wdata;
-                        when 4 => reg_hysteresis <= s_axi_wdata;
+                        when 2 => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
+                        when 3 => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
+                        when 4 => reg_hysteresis  <= s_axi_wdata; -- 0x10: HYSTERESIS
+                        when 5 => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
+                        when 6 => -- 0x18: FFT_CONFIG
+                            reg_fft_config      <= s_axi_wdata;
+                            fft_cfg_valid_pulse <= '1';           -- Pulse valid to reconfigure xfft_0
+                        when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
                         when others => null;
                     end case;
                 end if;
 
+                -- Write Response
                 if (axi_awready = '1' and axi_wready = '1' and axi_bvalid = '0') then
                     axi_bvalid <= '1';
                 elsif (s_axi_bready = '1' and axi_bvalid = '1') then
                     axi_bvalid <= '0';
                 end if;
 
+                -- Auto-disarm on Single-Shot frame completion
                 if (state = ST_STREAMING and frame_done = '1' and cfg_single = '1') then
                     reg_ctrl(0) <= '0';
                 end if;
@@ -178,6 +227,7 @@ begin
         end if;
     end process;
 
+    -- Read Address & Data Handling
     process(aclk)
         variable read_addr : integer;
     begin
@@ -196,6 +246,9 @@ begin
                         when 2 => axi_rdata <= reg_threshold;
                         when 3 => axi_rdata <= reg_timeout;
                         when 4 => axi_rdata <= reg_hysteresis;
+                        when 5 => axi_rdata <= reg_decimation;
+                        when 6 => axi_rdata <= reg_fft_config;
+                        when 7 => axi_rdata <= reg_packet_size;
                         when others => axi_rdata <= (others => '0');
                     end case;
                 else
@@ -212,13 +265,12 @@ begin
     end process;
 
     -- =========================================================================
-    -- 2. Streaming Pass-Through & Trigger Logic
+    -- 2. Streaming Pass-Through & Trigger Engine
     -- =========================================================================
     m_axis_tdata  <= s_axis_tdata;
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
     s_axis_tready <= m_axis_tready when (state = ST_STREAMING) else '1';
 
-    -- Synchronous Trigger Engine with Channel Source Selection & Fixed A0 Alignment
     process(aclk)
         variable thresh_val      : unsigned(15 downto 0);
         variable cur_sample      : unsigned(15 downto 0);
@@ -242,7 +294,6 @@ begin
                 is_ch1     := (channel_id = CH_VAUX1);
                 is_ch2     := (channel_id = CH_VAUX9);
 
-                -- Select active trigger channel based on Control Register Bit 5
                 if cfg_trig_src_ch2 = '0' then
                     is_trig_channel := is_ch1;
                     prev_val        := ch1_prev;
@@ -251,7 +302,6 @@ begin
                     prev_val        := ch2_prev;
                 end if;
 
-                -- Maintain independent channel sample histories
                 if s_axis_tvalid = '1' then
                     if is_ch1 then
                         ch1_prev <= cur_sample;
@@ -260,7 +310,6 @@ begin
                     end if;
                 end if;
 
-                -- Edge evaluation strictly on the chosen channel's data
                 is_rising  := (prev_val < thresh_val) and (cur_sample >= thresh_val);
                 is_falling := (prev_val > thresh_val) and (cur_sample <= thresh_val);
 
@@ -277,18 +326,18 @@ begin
                             state <= ST_IDLE;
                             trig_pending <= '0';
                         else
-                            -- 1. Check Software Force Trigger
+                            -- 1. Software Force Trigger
                             if force_trig_reg = '1' then
                                 trig_pending <= '1';
 
-                            -- 2. Check Hardware Edge on Selected Trigger Channel
+                            -- 2. Hardware Edge on selected trigger source
                             elsif (s_axis_tvalid = '1') and is_trig_channel and (
                                   (cfg_edge_fall = '0' and is_rising) or
                                   (cfg_edge_fall = '1' and is_falling)
                                   ) then
                                 trig_pending <= '1';
 
-                            -- 3. Check Auto Timeout
+                            -- 3. Auto-Timeout Fallback
                             elsif cfg_auto = '1' then
                                 if timeout_cnt >= unsigned(reg_timeout) then
                                     trig_pending <= '1';
@@ -297,7 +346,7 @@ begin
                                 end if;
                             end if;
 
-                            -- DETERMINISTIC PACKET START: Always begin DMA frame on Channel 1 (A0)
+                            -- Always start packet on Channel 1 (A0) for deterministic alignment
                             if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
                                 timeout_cnt  <= (others => '0');
                                 trig_pending <= '0';
