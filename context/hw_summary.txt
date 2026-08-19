@@ -3,12 +3,16 @@ Git Context & Branch Info:
 ```log
 Current Branch: feat/pl-audio-decimation
 Branch Tracking Status:
-  feat/dual-xadc           51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
-* feat/pl-audio-decimation d66fc56 build(overlay): compile bitstream with PL audio decimator for pynq_z2
-  master                   66b934b [origin/master] merge: feat(dual-xadc) release v1.3.0 dual-channel simultaneous XADC acquisition overlay
+  feat/dual-xadc            51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
+* feat/pl-audio-decimation  afb4657 build(overlay): recompile bitstream with channel-locked audio decimator
+  feat/runtime-config-audio dd75480 [origin/feat/runtime-config-audio] build(overlay): compile bitstream with multi-regime runtime configuration for pynq_z2
+  master                    66b934b [origin/master] merge: feat(dual-xadc) release v1.3.0 dual-channel simultaneous XADC acquisition overlay
 
 Git Commit Graph & History:
-* d66fc56  (HEAD -> feat/pl-audio-decimation, tag: v1.4.0-rc1, origin/feat/pl-audio-decimation) - 2026-08-18 : build(overlay): compile bitstream with PL audio decimator for pynq_z2 (SiririComun)
+* afb4657  (HEAD -> feat/pl-audio-decimation, tag: v1.4.0-rc1, origin/feat/pl-audio-decimation) - 2026-08-18 : build(overlay): recompile bitstream with channel-locked audio decimator (SiririComun)
+* b72b549  - 2026-08-18 : docs(context): update block design diagram and hardware summary (SiririComun)
+* abfa628  - 2026-08-18 : fix(hw): phase-lock axis_decimator to channel_id to eliminate channel swapping (SiririComun)
+* d66fc56  - 2026-08-18 : build(overlay): compile bitstream with PL audio decimator for pynq_z2 (SiririComun)
 * cab57f6  - 2026-08-18 : docs(context): update block design layout and hardware context summary (SiririComun)
 * 6474c0e  - 2026-08-18 : feat(bd): integrate axis_decimator into xadc audio streaming pipeline (SiririComun)
 * 9bd01fa  - 2026-08-18 : feat(hdl): add axis_decimator core for audio anti-aliasing downsampling (SiririComun)
@@ -20,10 +24,7 @@ Git Commit Graph & History:
 | * 9bdeeb6  - 2026-08-16 : build(overlay): compile bitstream with hardware channel phase-lock (SiririComun)
 | * 11e2221  - 2026-08-16 : feat(hw): phase-lock axis_trigger_unit to Channel 1 (Vaux1/A0) using channel_out (SiririComun)
 | * c41267b  - 2026-08-16 : build(overlay): recompile bitstream with physical pin constraints for A0 and A1 (SiririComun)
-| * 424bf70  - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)
-| * feb6dfc  - 2026-08-16 : build(overlay): recompile bitstream with active continuous dual-channel sequencer (SiririComun)
-| * 5fb85a7  - 2026-08-16 : fix(bd): configure xadc_wiz_0 in continuous sequencer mode for Vaux1 and Vaux9 (SiririComun)
-| * 36c8db2  - 2026-08-16 : build(overlay): compile dual-channel bitstream and update hardware handoff for pynq_z2 (SiririComun)```
+| * 424bf70  - 2026-08-16 : fix(xdc): add physical pin constraints for Vaux1_0 and Vaux9_0 (SiririComun)```
 
 release.yml:
 
