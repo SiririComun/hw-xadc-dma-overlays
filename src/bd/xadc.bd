@@ -6,7 +6,8 @@
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.2.2"
+      "tool_version": "2024.2.2",
+      "validated": "true"
     },
     "design_tree": {
       "processing_system7_0": "",
@@ -19,10 +20,8 @@
       "xfft_0": "",
       "cordic_0": "",
       "axi_dma_1": "",
-      "xlconstant_1": "",
       "axis_subset_converter_1": "",
       "axi_smc_1": "",
-      "xlconstant_0": "",
       "axis_trigger_unit_0": "",
       "axis_decimator_0": "",
       "tlast_generator_0": "",
@@ -2427,6 +2426,9 @@
           "output_ordering": {
             "value": "natural_order"
           },
+          "run_time_configurable_transform_length": {
+            "value": "true"
+          },
           "scaling_options": {
             "value": "block_floating_point"
           },
@@ -2517,13 +2519,6 @@
             }
           }
         }
-      },
-      "xlconstant_1": {
-        "vlnv": "xilinx.com:ip:xlconstant:1.1",
-        "ip_revision": "9",
-        "xci_name": "xadc_xlconstant_1_0",
-        "xci_path": "ip/xadc_xlconstant_1_0/xadc_xlconstant_1_0.xci",
-        "inst_hier_path": "xlconstant_1"
       },
       "axis_subset_converter_1": {
         "vlnv": "xilinx.com:ip:axis_subset_converter:1.1",
@@ -2666,18 +2661,6 @@
           }
         }
       },
-      "xlconstant_0": {
-        "vlnv": "xilinx.com:ip:xlconstant:1.1",
-        "ip_revision": "9",
-        "xci_name": "xadc_xlconstant_0_0",
-        "xci_path": "ip/xadc_xlconstant_0_0/xadc_xlconstant_0_0.xci",
-        "inst_hier_path": "xlconstant_0",
-        "parameters": {
-          "CONST_WIDTH": {
-            "value": "8"
-          }
-        }
-      },
       "axis_trigger_unit_0": {
         "vlnv": "xilinx.com:module_ref:axis_trigger_unit:1.0",
         "ip_revision": "1",
@@ -2750,6 +2733,65 @@
               "TREADY": {
                 "physical_name": "m_axis_tready",
                 "direction": "I"
+              }
+            }
+          },
+          "m_axis_fft_config": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_fft_config_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_fft_config_tvalid",
+                "direction": "O"
               }
             }
           },
@@ -3043,7 +3085,7 @@
             "direction": "I",
             "parameters": {
               "ASSOCIATED_BUSIF": {
-                "value": "m_axis:s_axis:s_axi",
+                "value": "m_axis:m_axis_fft_config:s_axis:s_axi",
                 "value_src": "constant"
               },
               "ASSOCIATED_RESET": {
@@ -3077,6 +3119,16 @@
           },
           "frame_done": {
             "direction": "I"
+          },
+          "decim_factor_out": {
+            "direction": "O",
+            "left": "1",
+            "right": "0"
+          },
+          "packet_size_out": {
+            "direction": "O",
+            "left": "15",
+            "right": "0"
           }
         }
       },
@@ -3252,6 +3304,11 @@
               }
             }
           },
+          "decim_sel": {
+            "direction": "I",
+            "left": "1",
+            "right": "0"
+          },
           "channel_id": {
             "direction": "I",
             "left": "4",
@@ -3265,11 +3322,6 @@
         "xci_name": "xadc_tlast_generator_0_0",
         "xci_path": "ip/xadc_tlast_generator_0_0/xadc_tlast_generator_0_0.xci",
         "inst_hier_path": "tlast_generator_0",
-        "parameters": {
-          "PACKET_SIZE": {
-            "value": "2048"
-          }
-        },
         "reference_info": {
           "ref_type": "hdl",
           "ref_name": "tlast_generator",
@@ -3439,6 +3491,11 @@
                 "value_src": "constant"
               }
             }
+          },
+          "packet_size_in": {
+            "direction": "I",
+            "left": "15",
+            "right": "0"
           }
         }
       },
@@ -3639,6 +3696,30 @@
       }
     },
     "nets": {
+      "axis_trigger_unit_0_decim_factor_out": {
+        "ports": [
+          "axis_trigger_unit_0/decim_factor_out",
+          "axis_decimator_0/decim_sel"
+        ]
+      },
+      "axis_trigger_unit_0_m_axis_fft_config_tdata": {
+        "ports": [
+          "axis_trigger_unit_0/m_axis_fft_config_tdata",
+          "xfft_0/s_axis_config_tdata"
+        ]
+      },
+      "axis_trigger_unit_0_m_axis_fft_config_tvalid": {
+        "ports": [
+          "axis_trigger_unit_0/m_axis_fft_config_tvalid",
+          "xfft_0/s_axis_config_tvalid"
+        ]
+      },
+      "axis_trigger_unit_0_packet_size_out": {
+        "ports": [
+          "axis_trigger_unit_0/packet_size_out",
+          "tlast_generator_0/packet_size_in"
+        ]
+      },
       "processing_system7_0_FCLK_CLK0": {
         "ports": [
           "processing_system7_0/FCLK_CLK0",
@@ -3658,10 +3739,10 @@
           "axi_dma_1/s_axi_lite_aclk",
           "axi_dma_1/m_axi_s2mm_aclk",
           "axi_smc_1/aclk",
-          "axis_trigger_unit_0/aclk",
+          "axis_broadcaster_0/aclk",
           "axis_decimator_0/aclk",
           "tlast_generator_0/aclk",
-          "axis_broadcaster_0/aclk"
+          "axis_trigger_unit_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -3682,10 +3763,10 @@
           "axis_subset_converter_1/aresetn",
           "cordic_0/aresetn",
           "axi_smc_1/aresetn",
-          "axis_trigger_unit_0/aresetn",
+          "axis_broadcaster_0/aresetn",
           "axis_decimator_0/aresetn",
           "tlast_generator_0/aresetn",
-          "axis_broadcaster_0/aresetn"
+          "axis_trigger_unit_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
@@ -3699,20 +3780,8 @@
       "xadc_wiz_0_channel_out": {
         "ports": [
           "xadc_wiz_0/channel_out",
-          "axis_trigger_unit_0/channel_id",
-          "axis_decimator_0/channel_id"
-        ]
-      },
-      "xlconstant_0_dout": {
-        "ports": [
-          "xlconstant_0/dout",
-          "xfft_0/s_axis_config_tdata"
-        ]
-      },
-      "xlconstant_1_dout": {
-        "ports": [
-          "xlconstant_1/dout",
-          "xfft_0/s_axis_config_tvalid"
+          "axis_decimator_0/channel_id",
+          "axis_trigger_unit_0/channel_id"
         ]
       }
     },
