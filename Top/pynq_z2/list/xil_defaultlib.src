@@ -2,3 +2,4 @@
 src/hdl/tlast_generator.vhd 93
 src/hdl/axis_trigger_unit.vhd 93
 src/hdl/axis_decimator.vhd 93
+src/hdl/axis_channel_demux.vhd 93

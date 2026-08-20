@@ -3,6 +3,7 @@
 -- Description: Central Acquisition, Edge Trigger & Runtime Configuration Controller.
 --              Hosts AXI4-Lite registers to dynamically control:
 --                • Hardware Edge/Level Triggering (A0 vs A1)
+--                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
 --                • Decimation Ratio (M = 1, 10, 20, 50)
 --                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048 via 16-bit config)
 --                • TLAST Packet Size (512, 1024, 2048)
@@ -68,7 +69,7 @@ entity axis_trigger_unit is
         frame_done               : in  std_logic;
 
         -- =====================================================================
-        -- Phase 2.5 Runtime Configuration Outputs
+        -- Runtime Configuration Outputs
         -- =====================================================================
         -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
         decim_factor_out         : out std_logic_vector(1 downto 0);
@@ -78,7 +79,10 @@ entity axis_trigger_unit is
         m_axis_fft_config_tvalid : out std_logic;
 
         -- Programmable packet size to tlast_generator_0
-        packet_size_out          : out std_logic_vector(15 downto 0)
+        packet_size_out          : out std_logic_vector(15 downto 0);
+
+        -- FFT Channel Selector (0 = Route A0/CH1 to FFT, 1 = Route A1/CH2 to FFT)
+        fft_chan_sel_out         : out std_logic
     );
 end axis_trigger_unit;
 
@@ -89,7 +93,8 @@ architecture Behavioral of axis_trigger_unit is
     constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
     -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
-    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- 0x00: Default Armed + Auto + CH1
+    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1)
+    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto + CH1 Trig + CH1 FFT
     signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
     signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
     signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
@@ -135,6 +140,7 @@ begin
     packet_size_out          <= reg_packet_size(15 downto 0);
     m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x0B01 for N=2048 FWD)
     m_axis_fft_config_tvalid <= fft_cfg_valid_pulse;
+    fft_chan_sel_out         <= reg_ctrl(6);                 -- Bit 6: 0 = Route A0 (CH1) to FFT, 1 = Route A1 (CH2) to FFT
 
     -- Control aliases
     cfg_arm          <= reg_ctrl(0);
