@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Aug 18 22:21:32 2026" VIVADOVERSION="2024.2.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Thu Aug 20 17:51:20 2026" VIVADOVERSION="2024.2.2">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="xadc" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -4654,7 +4654,7 @@
             <CONNECTION INSTANCE="axi_dma_0" PORT="s_axis_s2mm_tdata"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tdata"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="s_axis_tdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="1" NAME="m_axis_tlast" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tlast">
@@ -4662,7 +4662,7 @@
             <CONNECTION INSTANCE="axi_dma_0" PORT="s_axis_s2mm_tlast"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tlast"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="s_axis_tlast"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" LEFT="1" NAME="m_axis_tready" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tready">
@@ -4670,7 +4670,7 @@
             <CONNECTION INSTANCE="axi_dma_0" PORT="s_axis_s2mm_tready"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tready"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="s_axis_tready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="1" NAME="m_axis_tvalid" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tvalid">
@@ -4678,7 +4678,7 @@
             <CONNECTION INSTANCE="axi_dma_0" PORT="s_axis_s2mm_tvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tvalid"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="s_axis_tvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" LEFT="15" NAME="s_axis_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_s_axis_tdata">
@@ -4764,6 +4764,114 @@
             <PORTMAP LOGICAL="TLAST" PHYSICAL="m_axis_tlast"/>
             <PORTMAP LOGICAL="TREADY" PHYSICAL="m_axis_tready"/>
             <PORTMAP LOGICAL="TVALID" PHYSICAL="m_axis_tvalid"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+      </BUSINTERFACES>
+    </MODULE>
+    <MODULE COREREVISION="1" FULLNAME="/axis_channel_demux_0" HWVERSION="1.0" INSTANCE="axis_channel_demux_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="axis_channel_demux" VLNV="xilinx.com:module_ref:axis_channel_demux:1.0">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="Component_Name" VALUE="xadc_axis_channel_demux_0_0"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="aclk" SIGIS="clk" SIGNAME="processing_system7_0_FCLK_CLK0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="processing_system7_0" PORT="FCLK_CLK0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="aresetn" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="rst_ps7_0_100M_peripheral_aresetn">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="rst_ps7_0_100M" PORT="peripheral_aresetn"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="15" NAME="m_axis_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tdata">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tdata"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="m_axis_tlast" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tlast">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tlast"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="m_axis_tready" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="m_axis_tvalid" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_subset_converter_0" PORT="s_axis_tvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="15" NAME="s_axis_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tdata">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tdata"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axis_tlast" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tlast">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tlast"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axis_tready" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axis_tvalid" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="sel_ch" SIGIS="undef" SIGNAME="axis_trigger_unit_0_fft_chan_sel_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="fft_chan_sel_out"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES>
+        <BUSINTERFACE BUSNAME="axis_channel_demux_0_m_axis" NAME="m_axis" TYPE="INITIATOR" VLNV="xilinx.com:interface:axis:1.0">
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="xadc_processing_system7_0_0_FCLK_CLK0"/>
+          <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
+          <PARAMETER NAME="HAS_TKEEP" VALUE="0"/>
+          <PARAMETER NAME="HAS_TLAST" VALUE="1"/>
+          <PARAMETER NAME="HAS_TREADY" VALUE="1"/>
+          <PARAMETER NAME="HAS_TSTRB" VALUE="0"/>
+          <PARAMETER NAME="INSERT_VIP" VALUE="0"/>
+          <PARAMETER NAME="LAYERED_METADATA" VALUE="undef"/>
+          <PARAMETER NAME="PHASE" VALUE="0.0"/>
+          <PARAMETER NAME="TDATA_NUM_BYTES" VALUE="2"/>
+          <PARAMETER NAME="TDEST_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TID_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TUSER_WIDTH" VALUE="0"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="TDATA" PHYSICAL="m_axis_tdata"/>
+            <PORTMAP LOGICAL="TLAST" PHYSICAL="m_axis_tlast"/>
+            <PORTMAP LOGICAL="TREADY" PHYSICAL="m_axis_tready"/>
+            <PORTMAP LOGICAL="TVALID" PHYSICAL="m_axis_tvalid"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="axis_broadcaster_0_M01_AXIS" NAME="s_axis" TYPE="SLAVE" VLNV="xilinx.com:interface:axis:1.0">
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="xadc_processing_system7_0_0_FCLK_CLK0"/>
+          <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
+          <PARAMETER NAME="HAS_TKEEP" VALUE="0"/>
+          <PARAMETER NAME="HAS_TLAST" VALUE="1"/>
+          <PARAMETER NAME="HAS_TREADY" VALUE="1"/>
+          <PARAMETER NAME="HAS_TSTRB" VALUE="0"/>
+          <PARAMETER NAME="INSERT_VIP" VALUE="0"/>
+          <PARAMETER NAME="LAYERED_METADATA" VALUE="undef"/>
+          <PARAMETER NAME="PHASE" VALUE="0.0"/>
+          <PARAMETER NAME="TDATA_NUM_BYTES" VALUE="2"/>
+          <PARAMETER NAME="TDEST_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TID_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TUSER_WIDTH" VALUE="0"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="TDATA" PHYSICAL="s_axis_tdata"/>
+            <PORTMAP LOGICAL="TLAST" PHYSICAL="s_axis_tlast"/>
+            <PORTMAP LOGICAL="TREADY" PHYSICAL="s_axis_tready"/>
+            <PORTMAP LOGICAL="TVALID" PHYSICAL="s_axis_tvalid"/>
           </PORTMAPS>
         </BUSINTERFACE>
       </BUSINTERFACES>
@@ -4945,29 +5053,29 @@
             <CONNECTION INSTANCE="xfft_0" PORT="s_axis_data_tvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="15" NAME="s_axis_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tdata">
+        <PORT DIR="I" LEFT="15" NAME="s_axis_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tdata"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="m_axis_tdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axis_tlast" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tlast">
+        <PORT DIR="I" NAME="s_axis_tlast" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tlast"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="m_axis_tlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="s_axis_tready" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tready">
+        <PORT DIR="O" NAME="s_axis_tready" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tready"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="m_axis_tready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axis_tvalid" SIGIS="undef" SIGNAME="axis_broadcaster_0_m_axis_tvalid">
+        <PORT DIR="I" NAME="s_axis_tvalid" SIGIS="undef" SIGNAME="axis_channel_demux_0_m_axis_tvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_broadcaster_0" PORT="m_axis_tvalid"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="m_axis_tvalid"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
       <BUSINTERFACES>
-        <BUSINTERFACE BUSNAME="axis_broadcaster_0_M01_AXIS" NAME="S_AXIS" TYPE="SLAVE" VLNV="xilinx.com:interface:axis:1.0">
+        <BUSINTERFACE BUSNAME="axis_channel_demux_0_m_axis" NAME="S_AXIS" TYPE="TARGET" VLNV="xilinx.com:interface:axis:1.0">
           <PARAMETER NAME="CLK_DOMAIN" VALUE="xadc_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_TKEEP" VALUE="0"/>
@@ -5179,6 +5287,11 @@
         <PORT DIR="O" LEFT="1" NAME="decim_factor_out" RIGHT="0" SIGIS="undef" SIGNAME="axis_trigger_unit_0_decim_factor_out">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axis_decimator_0" PORT="decim_sel"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="fft_chan_sel_out" SIGIS="undef" SIGNAME="axis_trigger_unit_0_fft_chan_sel_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="sel_ch"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="frame_done" SIGIS="undef" SIGNAME="tlast_generator_0_m_axis_tlast">
@@ -6650,9 +6763,10 @@
             <CONNECTION INSTANCE="axi_dma_1" PORT="m_axi_s2mm_aclk"/>
             <CONNECTION INSTANCE="axi_smc_1" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aclk"/>
-            <CONNECTION INSTANCE="axis_decimator_0" PORT="aclk"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_decimator_0" PORT="aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -7227,9 +7341,10 @@
             <CONNECTION INSTANCE="cordic_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_smc_1" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axis_decimator_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_decimator_0" PORT="aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>
@@ -7599,8 +7714,8 @@
         <PORT DIR="O" NAME="busy_out" SIGIS="undef"/>
         <PORT DIR="O" LEFT="4" NAME="channel_out" RIGHT="0" SIGIS="undef" SIGNAME="xadc_wiz_0_channel_out">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axis_decimator_0" PORT="channel_id"/>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="channel_id"/>
+            <CONNECTION INSTANCE="axis_decimator_0" PORT="channel_id"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="eoc_out" SIGIS="undef"/>
