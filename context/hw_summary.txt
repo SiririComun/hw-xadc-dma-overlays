@@ -6,11 +6,12 @@ Branch Tracking Status:
   feat/dual-xadc                   51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   feat/pl-audio-decimation         16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
   feat/runtime-config-audio        58437e7 [origin/feat/runtime-config-audio] docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
-* feat/simultaneous-xadc-fft-demux 396b1bb merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation
+* feat/simultaneous-xadc-fft-demux dc6f448 feat(hw): add axis channel selector to route pure single-channel stream to xfft
   master                           396b1bb [origin/master] merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation
 
 Git Commit Graph & History:
-*   396b1bb  (HEAD -> feat/simultaneous-xadc-fft-demux, tag: v1.4.5, origin/master, origin/HEAD, master) - 2026-08-19 : merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation (SiririComun)
+* dc6f448  (HEAD -> feat/simultaneous-xadc-fft-demux) - 2026-08-20 : feat(hw): add axis channel selector to route pure single-channel stream to xfft (SiririComun)
+*   396b1bb  (tag: v1.4.5, origin/master, origin/HEAD, master) - 2026-08-19 : merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation (SiririComun)
 |\  
 | * 58437e7  (origin/feat/runtime-config-audio, feat/runtime-config-audio) - 2026-08-19 : docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation (SiririComun)
 | * dd75480  (tag: v1.4.5-rc1) - 2026-08-18 : build(overlay): compile bitstream with multi-regime runtime configuration for pynq_z2 (SiririComun)
@@ -25,9 +26,7 @@ Git Commit Graph & History:
 * d66fc56  - 2026-08-18 : build(overlay): compile bitstream with PL audio decimator for pynq_z2 (SiririComun)
 * cab57f6  - 2026-08-18 : docs(context): update block design layout and hardware context summary (SiririComun)
 * 6474c0e  - 2026-08-18 : feat(bd): integrate axis_decimator into xadc audio streaming pipeline (SiririComun)
-* 9bd01fa  - 2026-08-18 : feat(hdl): add axis_decimator core for audio anti-aliasing downsampling (SiririComun)
-*   66b934b  (tag: v1.3.0) - 2026-08-16 : merge: feat(dual-xadc) release v1.3.0 dual-channel simultaneous XADC acquisition overlay (SiririComun)
-|\  ```
+* 9bd01fa  - 2026-08-18 : feat(hdl): add axis_decimator core for audio anti-aliasing downsampling (SiririComun)```
 
 release.yml:
 
@@ -265,7 +264,8 @@ xadc.bd:
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.2.2"
+      "tool_version": "2024.2.2",
+      "validated": "true"
     },
     "design_tree": {
       "processing_system7_0": "",
@@ -2968,6 +2968,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "0",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -3023,6 +3031,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "0",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -3074,6 +3090,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "0",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -3105,6 +3129,10 @@ xadc.bd:
               "PROTOCOL": {
                 "value": "AXI4LITE",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
               },
               "ID_WIDTH": {
                 "value": "0",
@@ -3189,6 +3217,26 @@ xadc.bd:
               "MAX_BURST_LENGTH": {
                 "value": "1",
                 "value_src": "auto"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
               }
             },
             "memory_map_ref": "s_axi",
@@ -3302,6 +3350,14 @@ xadc.bd:
               "ASSOCIATED_RESET": {
                 "value": "aresetn",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             }
           },
@@ -3802,6 +3858,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "1",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -3861,6 +3925,14 @@ xadc.bd:
               "HAS_TLAST": {
                 "value": "1",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             },
             "port_maps": {
@@ -3897,6 +3969,14 @@ xadc.bd:
               "ASSOCIATED_RESET": {
                 "value": "aresetn",
                 "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
               }
             }
           },
@@ -4119,10 +4199,10 @@ xadc.bd:
           "axi_dma_1/m_axi_s2mm_aclk",
           "axi_smc_1/aclk",
           "axis_broadcaster_0/aclk",
-          "axis_decimator_0/aclk",
           "tlast_generator_0/aclk",
           "axis_channel_demux_0/aclk",
-          "axis_trigger_unit_0/aclk"
+          "axis_trigger_unit_0/aclk",
+          "axis_decimator_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -4144,10 +4224,10 @@ xadc.bd:
           "cordic_0/aresetn",
           "axi_smc_1/aresetn",
           "axis_broadcaster_0/aresetn",
-          "axis_decimator_0/aresetn",
           "tlast_generator_0/aresetn",
           "axis_channel_demux_0/aresetn",
-          "axis_trigger_unit_0/aresetn"
+          "axis_trigger_unit_0/aresetn",
+          "axis_decimator_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
@@ -4161,8 +4241,8 @@ xadc.bd:
       "xadc_wiz_0_channel_out": {
         "ports": [
           "xadc_wiz_0/channel_out",
-          "axis_decimator_0/channel_id",
-          "axis_trigger_unit_0/channel_id"
+          "axis_trigger_unit_0/channel_id",
+          "axis_decimator_0/channel_id"
         ]
       }
     },
@@ -4835,6 +4915,7 @@ axis_decimator.vhd:
 --                • "10": M = 20 (25 kSPS Speech / Acoustic)
 --                • "11": M = 50 (10 kSPS Deep Bass Zoom, Δf = 4.88 Hz)
 --              Phase-locked to physical XADC channel_id (0x11 = A0, 0x19 = A1).
+--              Includes synchronous accumulator flush on dynamic decim_sel changes.
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -4874,22 +4955,25 @@ end axis_decimator;
 architecture Behavioral of axis_decimator is
 
     -- Constant Channel Addresses in 7-Series XADC
-    constant CH_VAUX1       : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
-    constant CH_VAUX9       : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
+    constant CH_VAUX1          : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
+    constant CH_VAUX9          : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
     -- Independent 24-bit Accumulators (Prevent overflow for up to M=50 sums)
-    signal acc_ch1          : unsigned(23 downto 0) := (others => '0');
-    signal acc_ch2          : unsigned(23 downto 0) := (others => '0');
-    signal count_ch1        : integer range 0 to 50 := 0;
-    signal count_ch2        : integer range 0 to 50 := 0;
+    signal acc_ch1             : unsigned(23 downto 0) := (others => '0');
+    signal acc_ch2             : unsigned(23 downto 0) := (others => '0');
+    signal count_ch1           : integer range 0 to 50 := 0;
+    signal count_ch2           : integer range 0 to 50 := 0;
+
+    -- Edge detection for runtime profile switching
+    signal decim_sel_prev      : std_logic_vector(1 downto 0) := "01";
 
     -- Output Emission Registers
-    signal avg_ch1_reg      : std_logic_vector(15 downto 0) := (others => '0');
-    signal avg_ch2_reg      : std_logic_vector(15 downto 0) := (others => '0');
+    signal avg_ch1_reg         : std_logic_vector(15 downto 0) := (others => '0');
+    signal avg_ch2_reg         : std_logic_vector(15 downto 0) := (others => '0');
 
     -- Output State Machine (Emits decimated Ch1 then Ch2 sequentially)
     type t_out_state is (ST_ACCUMULATING, ST_EMIT_CH1, ST_EMIT_CH2);
-    signal out_state        : t_out_state := ST_ACCUMULATING;
+    signal out_state           : t_out_state := ST_ACCUMULATING;
 
 begin
 
@@ -4909,114 +4993,126 @@ begin
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                acc_ch1       <= (others => '0');
-                acc_ch2       <= (others => '0');
-                count_ch1     <= 0;
-                count_ch2     <= 0;
-                avg_ch1_reg   <= (others => '0');
-                avg_ch2_reg   <= (others => '0');
-                out_state     <= ST_ACCUMULATING;
+                acc_ch1        <= (others => '0');
+                acc_ch2        <= (others => '0');
+                count_ch1      <= 0;
+                count_ch2      <= 0;
+                avg_ch1_reg    <= (others => '0');
+                avg_ch2_reg    <= (others => '0');
+                decim_sel_prev <= decim_sel;
+                out_state      <= ST_ACCUMULATING;
             else
-                -- Resolve active decimation target factor M
-                case decim_sel is
-                    when "00"   => m_target := 1;   -- Bypass Mode (500 kSPS)
-                    when "01"   => m_target := 10;  -- Full Audio (50 kSPS)
-                    when "10"   => m_target := 20;  -- Speech / Vocal (25 kSPS)
-                    when "11"   => m_target := 50;  -- Deep Bass Zoom (10 kSPS)
-                    when others => m_target := 10;
-                end case;
+                decim_sel_prev <= decim_sel;
 
-                case out_state is
-                    -- ---------------------------------------------------------
-                    -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
-                    -- ---------------------------------------------------------
-                    when ST_ACCUMULATING =>
-                        if s_axis_tvalid = '1' then
-                            sample_val := unsigned(s_axis_tdata);
-                            is_ch1     := (channel_id = CH_VAUX1);
-                            is_ch2     := (channel_id = CH_VAUX9);
+                -- Synchronous flush on dynamic decimation mode switch
+                if decim_sel /= decim_sel_prev then
+                    acc_ch1     <= (others => '0');
+                    acc_ch2     <= (others => '0');
+                    count_ch1   <= 0;
+                    count_ch2   <= 0;
+                    out_state   <= ST_ACCUMULATING;
+                else
+                    -- Resolve active decimation target factor M
+                    case decim_sel is
+                        when "00"   => m_target := 1;   -- Bypass Mode (500 kSPS)
+                        when "01"   => m_target := 10;  -- Full Audio (50 kSPS)
+                        when "10"   => m_target := 20;  -- Speech / Vocal (25 kSPS)
+                        when "11"   => m_target := 50;  -- Deep Bass Zoom (10 kSPS)
+                        when others => m_target := 10;
+                    end case;
 
-                            if is_ch1 then
-                                if count_ch1 < m_target then
-                                    acc_ch1   <= acc_ch1 + sample_val;
-                                    count_ch1 <= count_ch1 + 1;
+                    case out_state is
+                        -- ---------------------------------------------------------
+                        -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
+                        -- ---------------------------------------------------------
+                        when ST_ACCUMULATING =>
+                            if s_axis_tvalid = '1' then
+                                sample_val := unsigned(s_axis_tdata);
+                                is_ch1     := (channel_id = CH_VAUX1);
+                                is_ch2     := (channel_id = CH_VAUX9);
+
+                                if is_ch1 then
+                                    if count_ch1 < m_target then
+                                        acc_ch1   <= acc_ch1 + sample_val;
+                                        count_ch1 <= count_ch1 + 1;
+                                    end if;
+                                elsif is_ch2 then
+                                    if count_ch2 < m_target then
+                                        acc_ch2   <= acc_ch2 + sample_val;
+                                        count_ch2 <= count_ch2 + 1;
+                                    end if;
                                 end if;
-                            elsif is_ch2 then
-                                if count_ch2 < m_target then
-                                    acc_ch2   <= acc_ch2 + sample_val;
-                                    count_ch2 <= count_ch2 + 1;
-                                end if;
-                            end if;
 
-                            -- When both channels reach M samples, normalize and emit
-                            if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
-                               (count_ch1 = m_target and count_ch2 = m_target) then
-                                
-                                case decim_sel is
-                                    when "00" => -- M = 1 (Bypass)
-                                        avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
-                                        if is_ch2 then
-                                            avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
-                                        else
-                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
-                                        end if;
+                                -- When both channels reach M samples, normalize and emit
+                                if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
+                                   (count_ch1 = m_target and count_ch2 = m_target) then
+                                    
+                                    case decim_sel is
+                                        when "00" => -- M = 1 (Bypass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
+                                            end if;
 
-                                    when "01" => -- M = 10 (Audio)
-                                        avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                        if is_ch2 then
-                                            avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
-                                        else
+                                        when "01" => -- M = 10 (Audio)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
+                                            end if;
+
+                                        when "10" => -- M = 20 (Speech)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
+                                            end if;
+
+                                        when "11" => -- M = 50 (Deep Bass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
+                                            end if;
+
+                                        when others =>
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
                                             avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                        end if;
+                                    end case;
 
-                                    when "10" => -- M = 20 (Speech)
-                                        avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
-                                        if is_ch2 then
-                                            avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
-                                        else
-                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
-                                        end if;
+                                    -- Reset accumulators
+                                    acc_ch1     <= (others => '0');
+                                    acc_ch2     <= (others => '0');
+                                    count_ch1   <= 0;
+                                    count_ch2   <= 0;
 
-                                    when "11" => -- M = 50 (Deep Bass)
-                                        avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
-                                        if is_ch2 then
-                                            avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
-                                        else
-                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
-                                        end if;
-
-                                    when others =>
-                                        avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                        avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                end case;
-
-                                -- Reset accumulators
-                                acc_ch1     <= (others => '0');
-                                acc_ch2     <= (others => '0');
-                                count_ch1   <= 0;
-                                count_ch2   <= 0;
-
-                                out_state   <= ST_EMIT_CH1;
+                                    out_state   <= ST_EMIT_CH1;
+                                end if;
                             end if;
-                        end if;
 
-                    -- ---------------------------------------------------------
-                    -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
-                    -- ---------------------------------------------------------
-                    when ST_EMIT_CH1 =>
-                        if m_axis_tready = '1' then
-                            out_state <= ST_EMIT_CH2;
-                        end if;
+                        -- ---------------------------------------------------------
+                        -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH1 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_EMIT_CH2;
+                            end if;
 
-                    -- ---------------------------------------------------------
-                    -- 3. EMIT CHANNEL 2 (A1) SECOND
-                    -- ---------------------------------------------------------
-                    when ST_EMIT_CH2 =>
-                        if m_axis_tready = '1' then
-                            out_state <= ST_ACCUMULATING;
-                        end if;
+                        -- ---------------------------------------------------------
+                        -- 3. EMIT CHANNEL 2 (A1) SECOND
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH2 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_ACCUMULATING;
+                            end if;
 
-                end case;
+                    end case;
+                end if;
             end if;
         end if;
     end process;
