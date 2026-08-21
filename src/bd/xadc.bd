@@ -3942,9 +3942,9 @@
           "axi_smc_1/aclk",
           "axis_broadcaster_0/aclk",
           "tlast_generator_0/aclk",
-          "axis_channel_demux_0/aclk",
           "axis_trigger_unit_0/aclk",
-          "axis_decimator_0/aclk"
+          "axis_decimator_0/aclk",
+          "axis_channel_demux_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -3967,9 +3967,9 @@
           "axi_smc_1/aresetn",
           "axis_broadcaster_0/aresetn",
           "tlast_generator_0/aresetn",
-          "axis_channel_demux_0/aresetn",
           "axis_trigger_unit_0/aresetn",
-          "axis_decimator_0/aresetn"
+          "axis_decimator_0/aresetn",
+          "axis_channel_demux_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {

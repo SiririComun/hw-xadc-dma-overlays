@@ -2,7 +2,7 @@
 -- File: axis_channel_demux.vhd
 -- Description: AXI4-Stream Channel Demultiplexer & Single-Channel Filter.
 --              Filters interleaved dual-channel stream (A0, A1, A0, A1...) and
---              emits a pure single-channel continuous stream with aligned TLAST.
+--              emits a pure single-channel continuous stream with concurrent TLAST.
 --              sel_ch: '0' => Emit Channel 1 (A0)
 --                      '1' => Emit Channel 2 (A1)
 -- =============================================================================
@@ -38,27 +38,25 @@ architecture Behavioral of axis_channel_demux is
     signal state      : t_state := ST_WAIT_CH1;
 
     signal ch1_reg    : std_logic_vector(15 downto 0) := (others => '0');
-    signal ch2_reg    : std_logic_vector(15 downto 0) := (others => '0');
-    signal tlast_reg  : std_logic := '0';
 
 begin
 
     -- Stream Ready to upstream: accept Ch1 immediately, wait for downstream ready on Ch2
     s_axis_tready <= '1' when (state = ST_WAIT_CH1) else m_axis_tready;
 
-    -- Stream Master Outputs
-    m_axis_tdata  <= ch1_reg when (sel_ch = '0') else ch2_reg;
-    m_axis_tlast  <= tlast_reg;
+    -- Master Stream Outputs:
+    -- On Beat 2, pass ch1_reg (if sel_ch=0) or live s_axis_tdata (if sel_ch=1)
+    -- s_axis_tlast is mapped combinationally so TLAST is asserted concurrently with TVALID!
+    m_axis_tdata  <= ch1_reg when (sel_ch = '0') else s_axis_tdata;
+    m_axis_tlast  <= s_axis_tlast;
     m_axis_tvalid <= '1' when (state = ST_EMIT and s_axis_tvalid = '1') else '0';
 
     process(aclk)
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                state     <= ST_WAIT_CH1;
-                ch1_reg   <= (others => '0');
-                ch2_reg   <= (others => '0');
-                tlast_reg <= '0';
+                state   <= ST_WAIT_CH1;
+                ch1_reg <= (others => '0');
             else
                 case state is
                     -- Beat 1: Capture Channel 1 (A0) sample
@@ -68,15 +66,10 @@ begin
                             state   <= ST_EMIT;
                         end if;
 
-                    -- Beat 2: Capture Channel 2 (A1) sample & emit the selected channel
+                    -- Beat 2: Emit selected channel and return to Beat 1 on downstream handshake
                     when ST_EMIT =>
-                        if s_axis_tvalid = '1' then
-                            ch2_reg   <= s_axis_tdata;
-                            tlast_reg <= s_axis_tlast;
-
-                            if m_axis_tready = '1' then
-                                state <= ST_WAIT_CH1;
-                            end if;
+                        if s_axis_tvalid = '1' and m_axis_tready = '1' then
+                            state <= ST_WAIT_CH1;
                         end if;
                 end case;
             end if;
