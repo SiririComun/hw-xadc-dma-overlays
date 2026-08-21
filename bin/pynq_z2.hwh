@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Thu Aug 20 17:51:20 2026" VIVADOVERSION="2024.2.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Aug 21 14:32:36 2026" VIVADOVERSION="2024.2.2">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="xadc" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -6764,9 +6764,9 @@
             <CONNECTION INSTANCE="axi_smc_1" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aclk"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aclk"/>
-            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_decimator_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -7342,9 +7342,9 @@
             <CONNECTION INSTANCE="axi_smc_1" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_decimator_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>
