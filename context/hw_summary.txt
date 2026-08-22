@@ -6,11 +6,13 @@ Branch Tracking Status:
   feat/dual-xadc                   51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   feat/pl-audio-decimation         16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
   feat/runtime-config-audio        58437e7 [origin/feat/runtime-config-audio] docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
-* feat/simultaneous-xadc-fft-demux 7ddb5a2 [origin/feat/simultaneous-xadc-fft-demux] build(overlay): recompile bitstream with concurrent TLAST demux for pynq_z2
+* feat/simultaneous-xadc-fft-demux 20e7db0 [origin/feat/simultaneous-xadc-fft-demux] build(overlay): recompile bitstream with FFT config TREADY handshake for pynq_z2
   master                           396b1bb [origin/master] merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation
 
 Git Commit Graph & History:
-* 7ddb5a2  (HEAD -> feat/simultaneous-xadc-fft-demux, tag: v1.5.0-rc1, origin/feat/simultaneous-xadc-fft-demux) - 2026-08-21 : build(overlay): recompile bitstream with concurrent TLAST demux for pynq_z2 (SiririComun)
+* 20e7db0  (HEAD -> feat/simultaneous-xadc-fft-demux, tag: v1.5.0-rc1, origin/feat/simultaneous-xadc-fft-demux) - 2026-08-21 : build(overlay): recompile bitstream with FFT config TREADY handshake for pynq_z2 (SiririComun)
+* 4c2378b  - 2026-08-21 : fix(hw): implement TREADY handshake on FFT config channel and update diagrams (SiririComun)
+* 7ddb5a2  - 2026-08-21 : build(overlay): recompile bitstream with concurrent TLAST demux for pynq_z2 (SiririComun)
 * d39ba43  - 2026-08-21 : fix(hw): align concurrent TLAST assertion on axis_channel_demux and update diagrams (SiririComun)
 * b1ce437  - 2026-08-20 : build(overlay): compile bitstream with simultaneous sampling and clean fft demux for pynq_z2 (SiririComun)
 * 7a77d0f  - 2026-08-20 : docs(context): update block design layout and hardware context summary for v1.5.0-rc1 (SiririComun)
@@ -24,9 +26,7 @@ Git Commit Graph & History:
 | * cc58ff3  - 2026-08-18 : feat(bd): connect runtime configuration buses to xfft_0, decimator, and packetizer (SiririComun)
 | * d2b26c2  - 2026-08-18 : feat(hdl): add runtime control ports for dynamic decimation, FFT transform length, and packetizer (SiririComun)
 * | 16ecc19  (tag: v1.4.0, origin/feat/pl-audio-decimation, feat/pl-audio-decimation) - 2026-08-19 : docs: update README with v1.4.0 PL audio decimation architecture and release details (SiririComun)
-|/  
-* afb4657  (tag: v1.4.0-rc1) - 2026-08-18 : build(overlay): recompile bitstream with channel-locked audio decimator (SiririComun)
-* b72b549  - 2026-08-18 : docs(context): update block design diagram and hardware summary (SiririComun)```
+|/  ```
 
 release.yml:
 
@@ -284,7 +284,8 @@ xadc.bd:
       "axis_decimator_0": "",
       "tlast_generator_0": "",
       "axis_broadcaster_0": "",
-      "axis_channel_demux_0": ""
+      "axis_channel_demux_0": "",
+      "axis_subset_converter_2": ""
     },
     "interface_ports": {
       "DDR": {
@@ -3998,6 +3999,66 @@ xadc.bd:
             "direction": "I"
           }
         }
+      },
+      "axis_subset_converter_2": {
+        "vlnv": "xilinx.com:ip:axis_subset_converter:1.1",
+        "ip_revision": "34",
+        "xci_name": "xadc_axis_subset_converter_2_0",
+        "xci_path": "ip/xadc_axis_subset_converter_2_0/xadc_axis_subset_converter_2_0.xci",
+        "inst_hier_path": "axis_subset_converter_2",
+        "parameters": {
+          "M_HAS_TKEEP": {
+            "value": "0"
+          },
+          "M_HAS_TLAST": {
+            "value": "1"
+          },
+          "M_HAS_TSTRB": {
+            "value": "0"
+          },
+          "M_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "M_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "M_TID_WIDTH": {
+            "value": "0"
+          },
+          "M_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "S_HAS_TKEEP": {
+            "value": "0"
+          },
+          "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TSTRB": {
+            "value": "0"
+          },
+          "S_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "S_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "S_TID_WIDTH": {
+            "value": "0"
+          },
+          "S_TUSER_WIDTH": {
+            "value": "0"
+          }
+        },
+        "interface_ports": {
+          "S_AXIS": {
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "mode": "Slave",
+            "bridges": [
+              "M_AXIS"
+            ]
+          }
+        }
       }
     },
     "interface_nets": {
@@ -4097,6 +4158,12 @@ xadc.bd:
           "axi_dma_1/S_AXIS_S2MM"
         ]
       },
+      "axis_subset_converter_2_M_AXIS": {
+        "interface_ports": [
+          "axis_subset_converter_2/M_AXIS",
+          "cordic_0/S_AXIS_CARTESIAN"
+        ]
+      },
       "axis_trigger_unit_0_m_axis": {
         "interface_ports": [
           "axis_trigger_unit_0/m_axis",
@@ -4148,7 +4215,7 @@ xadc.bd:
       "xfft_0_M_AXIS_DATA": {
         "interface_ports": [
           "xfft_0/M_AXIS_DATA",
-          "cordic_0/S_AXIS_CARTESIAN"
+          "axis_subset_converter_2/S_AXIS"
         ]
       }
     },
@@ -4206,7 +4273,8 @@ xadc.bd:
           "tlast_generator_0/aclk",
           "axis_decimator_0/aclk",
           "axis_channel_demux_0/aclk",
-          "axis_trigger_unit_0/aclk"
+          "axis_trigger_unit_0/aclk",
+          "axis_subset_converter_2/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -4231,7 +4299,8 @@ xadc.bd:
           "tlast_generator_0/aresetn",
           "axis_decimator_0/aresetn",
           "axis_channel_demux_0/aresetn",
-          "axis_trigger_unit_0/aresetn"
+          "axis_trigger_unit_0/aresetn",
+          "axis_subset_converter_2/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
