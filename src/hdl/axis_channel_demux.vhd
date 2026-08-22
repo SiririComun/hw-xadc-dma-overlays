@@ -34,44 +34,54 @@ end axis_channel_demux;
 
 architecture Behavioral of axis_channel_demux is
 
-    type t_state is (ST_WAIT_CH1, ST_EMIT);
-    signal state      : t_state := ST_WAIT_CH1;
+    type t_state is (ST_WAIT_CH1, ST_EMIT_CH2);
+    signal state       : t_state := ST_WAIT_CH1;
 
-    signal ch1_reg    : std_logic_vector(15 downto 0) := (others => '0');
+    signal ch1_reg     : std_logic_vector(15 downto 0) := (others => '0');
+    signal tlast_latch : std_logic := '0';
 
 begin
 
-    -- Stream Ready to upstream: accept Ch1 immediately, wait for downstream ready on Ch2
+    -- Upstream Handshake:
+    -- Beat 1 (CH1): Ready to capture CH1 sample
+    -- Beat 2 (CH2): Ready only when downstream (FFT) accepts the emitted sample
     s_axis_tready <= '1' when (state = ST_WAIT_CH1) else m_axis_tready;
 
-    -- Master Stream Outputs:
-    -- On Beat 2, pass ch1_reg (if sel_ch=0) or live s_axis_tdata (if sel_ch=1)
-    -- s_axis_tlast is mapped combinationally so TLAST is asserted concurrently with TVALID!
+    -- Master Outputs:
     m_axis_tdata  <= ch1_reg when (sel_ch = '0') else s_axis_tdata;
-    m_axis_tlast  <= s_axis_tlast;
-    m_axis_tvalid <= '1' when (state = ST_EMIT and s_axis_tvalid = '1') else '0';
+    m_axis_tlast  <= s_axis_tlast or tlast_latch;
+    m_axis_tvalid <= '1' when (state = ST_EMIT_CH2 and s_axis_tvalid = '1') else '0';
 
     process(aclk)
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                state   <= ST_WAIT_CH1;
-                ch1_reg <= (others => '0');
+                state       <= ST_WAIT_CH1;
+                ch1_reg     <= (others => '0');
+                tlast_latch <= '0';
             else
                 case state is
-                    -- Beat 1: Capture Channel 1 (A0) sample
+                    -- Beat 1: Capture CH1 sample ONLY on valid handshake
                     when ST_WAIT_CH1 =>
-                        if s_axis_tvalid = '1' then
-                            ch1_reg <= s_axis_tdata;
-                            state   <= ST_EMIT;
+                        if (s_axis_tvalid = '1') then
+                            ch1_reg     <= s_axis_tdata;
+                            tlast_latch <= s_axis_tlast;
+                            state       <= ST_EMIT_CH2;
                         end if;
 
-                    -- Beat 2: Emit selected channel and return to Beat 1 on downstream handshake
-                    when ST_EMIT =>
-                        if s_axis_tvalid = '1' and m_axis_tready = '1' then
-                            state <= ST_WAIT_CH1;
+                    -- Beat 2: Emit selected channel and advance ONLY when downstream handshakes
+                    when ST_EMIT_CH2 =>
+                        if (s_axis_tvalid = '1' and m_axis_tready = '1') then
+                            tlast_latch <= '0';
+                            state       <= ST_WAIT_CH1;
                         end if;
                 end case;
+
+                -- Self-healing Frame Sync: Always reset to Beat 1 on packet end
+                if (s_axis_tvalid = '1' and s_axis_tlast = '1' and m_axis_tready = '1') then
+                    state       <= ST_WAIT_CH1;
+                    tlast_latch <= '0';
+                end if;
             end if;
         end if;
     end process;
