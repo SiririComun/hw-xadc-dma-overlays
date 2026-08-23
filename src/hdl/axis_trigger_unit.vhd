@@ -3,9 +3,11 @@
 -- Description: Central Acquisition, Edge Trigger & Runtime Configuration Controller.
 --              Hosts AXI4-Lite registers to dynamically control:
 --                • Hardware Edge/Level Triggering (A0 vs A1)
+--                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
 --                • Decimation Ratio (M = 1, 10, 20, 50)
 --                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048 via 16-bit config)
 --                • TLAST Packet Size (512, 1024, 2048)
+--                • Persistent AXI4-Stream Handshake on m_axis_fft_config
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -68,17 +70,21 @@ entity axis_trigger_unit is
         frame_done               : in  std_logic;
 
         -- =====================================================================
-        -- Phase 2.5 Runtime Configuration Outputs
+        -- Runtime Configuration Outputs
         -- =====================================================================
         -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
         decim_factor_out         : out std_logic_vector(1 downto 0);
 
-        -- Runtime FFT Configuration Master Stream to xfft_0 (S_AXIS_CONFIG - 16 bits)
+        -- Runtime FFT Configuration Master Stream to xfft_0 (With TREADY Handshake!)
         m_axis_fft_config_tdata  : out std_logic_vector(15 downto 0);
         m_axis_fft_config_tvalid : out std_logic;
+        m_axis_fft_config_tready : in  std_logic;
 
         -- Programmable packet size to tlast_generator_0
-        packet_size_out          : out std_logic_vector(15 downto 0)
+        packet_size_out          : out std_logic_vector(15 downto 0);
+
+        -- FFT Channel Selector (0 = Route A0/CH1 to FFT, 1 = Route A1/CH2 to FFT)
+        fft_chan_sel_out         : out std_logic
     );
 end axis_trigger_unit;
 
@@ -89,13 +95,15 @@ architecture Behavioral of axis_trigger_unit is
     constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
     -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
-    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- 0x00: Default Armed + Auto + CH1
+    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1)
+    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto + CH1 Trig + CH1 FFT
     signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
     signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
     signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
     signal reg_hysteresis        : std_logic_vector(31 downto 0) := x"00000010"; -- 0x10
     signal reg_decimation        : std_logic_vector(31 downto 0) := x"00000001"; -- 0x14: Default M=10
-    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"00000B01"; -- 0x18: Default N=2048 (0x0B), FWD (0x01)
+    -- PG109 Format: Byte 0 = NFFT (10 = 0x0A for 1024-pt), Byte 1 = FWD_INV (1 = Forward) -> 0x0000010A
+    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"0000010A"; -- 0x18: Default 1024-pt Forward FFT
     signal reg_packet_size       : std_logic_vector(31 downto 0) := x"00000800"; -- 0x1C: Default 2048 samples
 
     -- AXI Handshake Signals
@@ -106,8 +114,8 @@ architecture Behavioral of axis_trigger_unit is
     signal axi_rvalid            : std_logic := '0';
     signal axi_rdata             : std_logic_vector(31 downto 0) := (others => '0');
 
-    -- Configuration Pulse for FFT Core
-    signal fft_cfg_valid_pulse   : std_logic := '0';
+    -- Persistent Configuration Handshake Flag for xfft_0 (Holds valid high until TREADY arrives)
+    signal fft_cfg_valid_reg     : std_logic := '1';
 
     -- Trigger FSM State
     type t_state is (ST_IDLE, ST_ARMED, ST_STREAMING);
@@ -133,8 +141,9 @@ begin
     -- Output Port Assignments
     decim_factor_out         <= reg_decimation(1 downto 0);
     packet_size_out          <= reg_packet_size(15 downto 0);
-    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x0B01 for N=2048 FWD)
-    m_axis_fft_config_tvalid <= fft_cfg_valid_pulse;
+    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x010A for N=1024 FWD)
+    m_axis_fft_config_tvalid <= fft_cfg_valid_reg;
+    fft_chan_sel_out         <= reg_ctrl(6);                 -- Bit 6: 0 = Route A0 (CH1) to FFT, 1 = Route A1 (CH2) to FFT
 
     -- Control aliases
     cfg_arm          <= reg_ctrl(0);
@@ -166,21 +175,25 @@ begin
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                axi_awready          <= '0';
-                axi_wready           <= '0';
-                axi_bvalid           <= '0';
-                reg_ctrl             <= x"00000003";
-                reg_threshold        <= x"00000800";
-                reg_timeout          <= std_logic_vector(to_unsigned(5000000, 32));
-                reg_hysteresis       <= x"00000010";
-                reg_decimation       <= x"00000001"; -- Default M=10
-                reg_fft_config       <= x"00000B01"; -- Default N=2048, FWD
-                reg_packet_size      <= x"00000800"; -- Default 2048
-                fft_cfg_valid_pulse  <= '1';         -- Emit initial configuration on reset
-                force_trig_reg       <= '0';
+                axi_awready        <= '0';
+                axi_wready         <= '0';
+                axi_bvalid         <= '0';
+                reg_ctrl           <= x"00000003";
+                reg_threshold      <= x"00000800";
+                reg_timeout        <= std_logic_vector(to_unsigned(5000000, 32));
+                reg_hysteresis     <= x"00000010";
+                reg_decimation     <= x"00000001"; -- Default M=10
+                reg_fft_config     <= x"0000010A"; -- Default N=1024, FWD (PG109)
+                reg_packet_size    <= x"00000800"; -- Default 2048
+                fft_cfg_valid_reg  <= '1';         -- Hold high on startup until xfft_0 is ready!
+                force_trig_reg     <= '0';
             else
-                force_trig_reg       <= '0';
-                fft_cfg_valid_pulse  <= '0';
+                force_trig_reg <= '0';
+
+                -- Clear valid when xfft_0 confirms receipt via TREADY handshake
+                if fft_cfg_valid_reg = '1' and m_axis_fft_config_tready = '1' then
+                    fft_cfg_valid_reg <= '0';
+                end if;
 
                 -- Address Handshake
                 if (axi_awready = '0' and s_axi_awvalid = '1' and s_axi_wvalid = '1') then
@@ -205,8 +218,8 @@ begin
                         when 4 => reg_hysteresis  <= s_axi_wdata; -- 0x10: HYSTERESIS
                         when 5 => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
                         when 6 => -- 0x18: FFT_CONFIG
-                            reg_fft_config      <= s_axi_wdata;
-                            fft_cfg_valid_pulse <= '1';           -- Pulse valid to reconfigure xfft_0
+                            reg_fft_config    <= s_axi_wdata;
+                            fft_cfg_valid_reg <= '1';             -- Hold valid high until xfft_0 asserts TREADY!
                         when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
                         when others => null;
                     end case;
