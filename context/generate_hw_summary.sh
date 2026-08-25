@@ -52,6 +52,7 @@ TARGET_FILES=(
     "src/hdl/axis_trigger_unit.vhd:vhd"
     "src/hdl/axis_decimator.vhd:vhd"
     "src/hdl/axis_channel_demux.vhd:vhd"
+    "src/hdl/axis_spectral_mask.vhd:vhd"
     "src/con/pynq_z2.xdc:xdc"
     "context/generate_hw_summary.sh:bash"
 )
