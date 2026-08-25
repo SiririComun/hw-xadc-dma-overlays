@@ -3,7 +3,7 @@
 -- Description: Hardware Frequency-Domain Spectral Masking & Filter Core.
 --              Operates on 32-bit complex FFT streams ({Im[15:0], Re[15:0]}).
 --              Zeros out or passes complex frequency bins according to AXI-Lite
---              registers (0x43C20000) with automatic Hermitian symmetry handling.
+--              registers (0x43C20000) in pure VHDL-93 standard.
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -62,8 +62,8 @@ end axis_spectral_mask;
 architecture Behavioral of axis_spectral_mask is
 
     -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
-    -- 0x00: REG_CTRL    [0]: Filter Enable (0=Bypass, 1=Enable)
-    --                   [2:1]: Mode (00=Lowpass/Bass, 01=Highpass, 10=Bandpass, 11=Notch)
+    -- 0x00: REG_CTRL      [0]: Filter Enable (0=Bypass, 1=Enable)
+    --                     [2:1]: Mode (00=Lowpass/Bass, 01=Highpass, 10=Bandpass, 11=Notch)
     -- 0x04: REG_BIN_START [15:0] Lower Cutoff Bin (k_start)
     -- 0x08: REG_BIN_STOP  [15:0] Upper Cutoff Bin (k_stop)
     -- 0x0C: REG_STATUS    [0]: Frame Active, [31:16]: Current Bin Count
@@ -182,13 +182,14 @@ begin
     end process;
 
     -- =========================================================================
-    -- 2. AXI4-Stream Spectral Masking Engine
+    -- 2. AXI4-Stream Spectral Masking Engine (VHDL-93 Compliant)
     -- =========================================================================
     s_axis_tready <= m_axis_tready;
     m_axis_tvalid <= s_axis_tvalid;
     m_axis_tlast  <= s_axis_tlast;
 
-    process(all)
+    -- Explicit sensitivity list for VHDL-93 compatibility
+    process(bin_count, reg_bin_start, reg_bin_stop, filter_en, filter_mode, s_axis_tdata)
         variable k_val   : unsigned(15 downto 0);
         variable k_start : unsigned(15 downto 0);
         variable k_stop  : unsigned(15 downto 0);
@@ -199,7 +200,7 @@ begin
         k_stop  := unsigned(reg_bin_stop(15 downto 0));
 
         if filter_en = '0' then
-            pass := true; -- Bypass mode: pass everything
+            pass := true; -- Bypass mode: pass all frequencies
         else
             case filter_mode is
                 when "00" => -- Lowpass / Bass: Pass k <= k_stop
