@@ -5,13 +5,14 @@ Current Branch: feat/pl-freq-filter-ifft
 Branch Tracking Status:
   feat/dual-xadc                   51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   feat/pl-audio-decimation         16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
-* feat/pl-freq-filter-ifft         d4e34b6 [origin/feat/pl-freq-filter-ifft] build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2
+* feat/pl-freq-filter-ifft         7742815 [origin/feat/pl-freq-filter-ifft: ahead 1] fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset
   feat/runtime-config-audio        58437e7 [origin/feat/runtime-config-audio] docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
   feat/simultaneous-xadc-fft-demux 212fafa [origin/feat/simultaneous-xadc-fft-demux] docs(readme): document v1.5.0 architecture, stream demux, and register map
   master                           6439be4 [origin/master] docs(readme): document v1.5.0 simultaneous sampling and demux architecture
 
 Git Commit Graph & History:
-* d4e34b6  (HEAD -> feat/pl-freq-filter-ifft, tag: v1.6.0-rc1, origin/feat/pl-freq-filter-ifft) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
+* 7742815  (HEAD -> feat/pl-freq-filter-ifft) - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
+* d4e34b6  (tag: v1.6.0-rc1, origin/feat/pl-freq-filter-ifft) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
 * abf04b6  - 2026-08-25 : docs(context): update block design layout diagrams and hardware summary for PL filter (SiririComun)
 * d7b0023  - 2026-08-25 : feat(bd): integrate axis_spectral_mask, IFFT core, and filtered DMA into block design (SiririComun)
 * dfbab6d  - 2026-08-25 : fix(hdl): replace process(all) with explicit sensitivity list for VHDL-93 compatibility (SiririComun)
@@ -25,8 +26,7 @@ Git Commit Graph & History:
 | * 86d72ca  - 2026-08-22 : fix(bd): integrate axis_subset_converter between xfft and cordic (SiririComun)
 | * a8fdf97  - 2026-08-22 : build(overlay): recompile bitstream with Cartesian stream sanitization for pynq_z2 (SiririComun)
 | * 88eabe2  - 2026-08-22 : docs(context): update block design layout diagrams and hardware summary (SiririComun)
-| * 4a7681f  - 2026-08-22 : fix(bd): insert axis_subset_converter to sanitize Cartesian stream between xfft and cordic (SiririComun)
-| * 20e7db0  - 2026-08-21 : build(overlay): recompile bitstream with FFT config TREADY handshake for pynq_z2 (SiririComun)```
+| * 4a7681f  - 2026-08-22 : fix(bd): insert axis_subset_converter to sanitize Cartesian stream between xfft and cordic (SiririComun)```
 
 release.yml:
 

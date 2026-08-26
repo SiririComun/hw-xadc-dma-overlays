@@ -1,7 +1,7 @@
 {
    "ActiveEmotionalView":"Default View",
-   "Default View_ScaleFactor":"0.293489",
-   "Default View_TopLeft":"-303,-249",
+   "Default View_ScaleFactor":"0.476774",
+   "Default View_TopLeft":"375,346",
    "ExpandedHierarchyInLayout":"",
    "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:21.0 TLS
 #  -string -flagsOSRD
@@ -48,6 +48,9 @@ preplace netloc Vaux9_0_1 1 0 1 0 800n
 preplace netloc Vp_Vn_0_1 1 0 1 -10J 760n
 preplace netloc axi_dma_0_M_AXI_S2MM 1 6 1 2360 -100n
 preplace netloc axi_dma_1_M_AXI_S2MM 1 6 1 2340 370n
+preplace netloc axi_dma_2_M_AXI_S2MM 1 6 1 2360J 610n
+preplace netloc axi_smc_0_M05_AXI 1 3 6 1150 -210 N -210 N -210 N -210 N -210 3160
+preplace netloc axi_smc_0_M06_AXI 1 5 4 1910 270 N 270 2640 310 3130
 preplace netloc axi_smc_M00_AXI 1 0 9 0 -240 N -240 N -240 N -240 N -240 N -240 N -240 N -240 3130
 preplace netloc axi_smc_M01_AXI 1 5 4 1930 -230 N -230 N -230 3180
 preplace netloc axi_smc_M02_AXI 1 7 2 2680 -140 3120
@@ -55,12 +58,20 @@ preplace netloc axi_smc_M03_AXI 1 1 8 370 -220 N -220 N -220 N -220 N -220 N -22
 preplace netloc axi_smc_M04_AXI 1 5 4 1920 -190 N -190 N -190 3140
 preplace netloc axis_broadcaster_0_M00_AXIS 1 3 3 1100 -110 N -110 N
 preplace netloc axis_broadcaster_0_M01_AXIS 1 3 1 1130 300n
+preplace netloc axis_broadcaster_1_M00_AXIS 1 5 1 1870 840n
+preplace netloc axis_broadcaster_1_M01_AXIS 1 5 1 1870 1110n
+preplace netloc axis_broadcaster_cfg_M00_AXIS 1 2 2 780 800 N
+preplace netloc axis_broadcaster_cfg_M01_AXIS 1 2 2 N 1280 1090
 preplace netloc axis_channel_demux_0_m_axis 1 3 2 1140 930 1530
 preplace netloc axis_decimator_0_m_axis 1 1 2 390 110 770
+preplace netloc axis_spectral_mask_0_m_axis 1 4 1 1550 1080n
 preplace netloc axis_subset_converter_0_M_AXIS 1 3 2 1160 660 1540
 preplace netloc axis_subset_converter_1_M_AXIS 1 5 2 1930 290 2310
 preplace netloc axis_subset_converter_2_M_AXIS 1 5 2 1930 640 2320
+preplace netloc axis_subset_converter_3_M_AXIS 1 5 2 1930 1660 2310
+preplace netloc axis_subset_converter_cfg_M_AXIS 1 4 2 1570 1380 N
 preplace netloc axis_trigger_unit_0_m_axis 1 1 2 390 130 740
+preplace netloc axis_trigger_unit_0_m_axis_fft_config 1 1 2 390 380 730
 preplace netloc cordic_0_M_AXIS_DOUT 1 5 2 1920 630 2310
 preplace netloc processing_system7_0_DDR 1 8 1 3180 560n
 preplace netloc processing_system7_0_FIXED_IO 1 8 1 N 590
@@ -69,18 +80,7 @@ preplace netloc smartconnect_0_M00_AXI 1 7 1 N 610
 preplace netloc tlast_generator_0_m_axis 1 2 1 780 0n
 preplace netloc xadc_wiz_0_M_AXIS 1 1 1 350 440n
 preplace netloc xfft_0_M_AXIS_DATA 1 3 2 1170 670 1530
-preplace netloc axis_spectral_mask_0_m_axis 1 4 1 1550 1080n
-preplace netloc axis_broadcaster_1_M00_AXIS 1 5 1 1870 840n
-preplace netloc axis_broadcaster_1_M01_AXIS 1 5 1 1870 1110n
 preplace netloc xfft_1_M_AXIS_DATA 1 5 2 1920 1650 2320
-preplace netloc axis_subset_converter_3_M_AXIS 1 5 2 1930 1660 2310
-preplace netloc axi_smc_0_M05_AXI 1 3 6 1150 -210 N -210 N -210 N -210 N -210 3160
-preplace netloc axi_smc_0_M06_AXI 1 5 4 1910 270 N 270 2640 310 3130
-preplace netloc axi_dma_2_M_AXI_S2MM 1 6 1 2360J 610n
-preplace netloc axis_trigger_unit_0_m_axis_fft_config 1 1 2 390 380 730
-preplace netloc axis_broadcaster_cfg_M00_AXIS 1 2 2 780 800 N
-preplace netloc axis_broadcaster_cfg_M01_AXIS 1 2 2 N 1280 1090
-preplace netloc axis_subset_converter_cfg_M_AXIS 1 4 2 1570 1380 N
 levelinfo -pg 1 -30 170 560 940 1350 1720 2120 2500 2910 3210
 pagesize -pg 1 -db -bbox -sgen -140 -290 3320 1870
 "
