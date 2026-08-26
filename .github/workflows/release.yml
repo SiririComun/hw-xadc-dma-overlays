@@ -18,14 +18,57 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Create GitHub Release & Upload Artifacts
+      - name: Validate Release Artifacts Integrity
+        run: |
+          echo "========================================================"
+          echo " Validating Hardware Handoff & Bitstream Artifacts"
+          echo "========================================================"
+          
+          # 1. Check Bitstream File
+          if [ ! -s "bin/pynq_z2.bit" ]; then
+            echo "❌ ERROR: bin/pynq_z2.bit is missing or empty (0 bytes)!" >&2
+            exit 1
+          fi
+          
+          # 2. Check Hardware Handoff Metadata
+          if [ ! -s "bin/pynq_z2.hwh" ]; then
+            echo "❌ ERROR: bin/pynq_z2.hwh is missing or empty (0 bytes)!" >&2
+            exit 1
+          fi
+          
+          BIT_SIZE=$(stat -c%s "bin/pynq_z2.bit")
+          HWH_SIZE=$(stat -c%s "bin/pynq_z2.hwh")
+          echo "✅ Verified bin/pynq_z2.bit ($((BIT_SIZE / 1024)) KB)"
+          echo "✅ Verified bin/pynq_z2.hwh ($((HWH_SIZE / 1024)) KB)"
+
+      - name: Generate Cryptographic SHA-256 Checksums
+        run: |
+          echo "========================================================"
+          echo " Generating SHA-256 Checksum Manifests"
+          echo "========================================================"
+          cd bin
+          
+          # Generate individual checksum files
+          sha256sum pynq_z2.bit > pynq_z2.bit.sha256
+          sha256sum pynq_z2.hwh > pynq_z2.hwh.sha256
+          
+          # Generate combined manifest
+          sha256sum pynq_z2.bit pynq_z2.hwh > SHA256SUMS.txt
+          
+          cat SHA256SUMS.txt
+          cd ..
+
+      - name: Create GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           files: |
             bin/pynq_z2.bit
             bin/pynq_z2.hwh
+            bin/pynq_z2.bit.sha256
+            bin/pynq_z2.hwh.sha256
+            bin/SHA256SUMS.txt
           draft: false
-          # Automatically detects pre-releases if the tag contains a '-'
+          # Automatically marks pre-releases if tag contains '-' (e.g. v1.6.0-rc1)
           prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
