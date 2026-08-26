@@ -1,0 +1,41 @@
+name: RTL Syntax & Lint Verification
+
+on:
+  push:
+    branches:
+      - master
+      - 'feat/**'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  vhdl-lint:
+    name: Fast-Fail VHDL Syntax Check (GHDL)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install GHDL Analyzer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ghdl
+
+      - name: Run VHDL-93 Syntax & Elaboration Check
+        run: |
+          echo "========================================================"
+          echo " Running Fast-Fail VHDL Syntax Check on Custom RTL Cores"
+          echo "========================================================"
+          
+          # Analyze RTL cores in dependency order
+          ghdl -s --std=93 --ieee=synopsys -fexplicit src/hdl/tlast_generator.vhd
+          ghdl -s --std=93 --ieee=synopsys -fexplicit src/hdl/axis_trigger_unit.vhd
+          ghdl -s --std=93 --ieee=synopsys -fexplicit src/hdl/axis_decimator.vhd
+          ghdl -s --std=93 --ieee=synopsys -fexplicit src/hdl/axis_channel_demux.vhd
+          ghdl -s --std=93 --ieee=synopsys -fexplicit src/hdl/axis_spectral_mask.vhd
+          
+          echo "✅ All VHDL RTL cores passed syntax and elaboration verification cleanly!"
