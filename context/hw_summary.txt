@@ -1,19 +1,28 @@
+==============================================================================
+⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
+==============================================================================
+• Repository State    : master @ cf02545
+• Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
+• Target FPGA Device  : xc7z020clg400-1
+• Primary HDL Language: VHDL
+==============================================================================
+
 Git Context & Branch Topology:
 
 ```log
-Current Branch: feat/ci-fast-fail-lint | Working Tree: Dirty (1 modified files)
+Current Branch: master | Working Tree: Dirty (2 modified files)
 
 Branch Tracking & Divergence Status:
-* feat/ci-fast-fail-lint                          a92287d [origin/feat/ci-fast-fail-lint] fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments
+feat/ci-fast-fail-lint                          cf02545 [origin/feat/ci-fast-fail-lint] ci(release): add asset integrity validation gate and SHA-256 checksum generation
   feat/cog-integration                            e31b64f [origin/feat/cog-integration] feat(context): integrate Cog submodule and update hardware summary
   feat/dual-xadc                                  51c01bf [origin/feat/dual-xadc] docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   feat/pl-audio-decimation                        16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
   feat/pl-freq-filter-ifft                        3e44936 [origin/feat/pl-freq-filter-ifft] docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture
   feat/runtime-config-audio                       58437e7 [origin/feat/runtime-config-audio] docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
   feat/simultaneous-xadc-fft-demux                212fafa [origin/feat/simultaneous-xadc-fft-demux] docs(readme): document v1.5.0 architecture, stream demux, and register map
-  master                                          e31b64f [origin/master] feat(context): integrate Cog submodule and update hardware summary
+* master                                          cf02545 [origin/master] ci(release): add asset integrity validation gate and SHA-256 checksum generation
   remotes/origin/HEAD                             -> origin/master
-  remotes/origin/feat/ci-fast-fail-lint           a92287d fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments
+  remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
   remotes/origin/feat/cog-integration             e31b64f feat(context): integrate Cog submodule and update hardware summary
   remotes/origin/feat/dual-xadc                   51c01bf docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   remotes/origin/feat/hw-trigger                  2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
@@ -22,9 +31,10 @@ Branch Tracking & Divergence Status:
   remotes/origin/feat/pl-freq-filter-ifft         3e44936 docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture
   remotes/origin/feat/runtime-config-audio        58437e7 docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
   remotes/origin/feat/simultaneous-xadc-fft-demux 212fafa docs(readme): document v1.5.0 architecture, stream demux, and register map
-  remotes/origin/master                           e31b64f feat(context): integrate Cog submodule and update hardware summary
+  remotes/origin/master                           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
 
 Repository Tags & Release History:
+v1.6.0-rc3      test(ci): verify release workflow with SHA-256 generation and integrity checks
 v1.6.0          release(hw): v1.6.0 with PL frequency filter, IFFT core, and 3-DMA streaming
 v1.6.0-rc2      build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2
 v1.6.0-rc1      release(hw): v1.6.0-rc1 with PL frequency filter, IFFT engine, and 3-DMA streaming
@@ -34,21 +44,12 @@ v1.4.5          merge: feat(hw) release v1.4.5 with multi-regime runtime configu
 v1.4.0          docs: update README with v1.4.0 PL audio decimation architecture and release details
 v1.4.5-rc1      build(overlay): compile bitstream with multi-regime runtime configuration for pynq_z2
 v1.4.0-rc1      Release Candidate 1 with channel-locked audio decimator
-v1.3.0          Release v1.3.0: Simultaneous Dual-Channel XADC Overlay for PYNQ-Z2
-v1.3.0-rc1      build(overlay): compile bitstream with selectable trigger source
-v1.2.0          Release v1.2.0: Real-Time PL-Accelerated FFT & Spectrum Analyzer
-v1.2.0-rc1      fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus
-v1.1.0          Release v1.1.0: Hardware edge trigger IP core and 1 MSPS DMA pipeline
-v1.1.0-rc1      Release candidate 1: Hardware edge trigger IP integration
-v1.0.2          Release v1.0.2
-v1.0.1          Release v1.0.1
-v1.0.0          Release v1.0.0: Refructured PYNQ-Z2 XADC streaming overlay
-v0.0.1          First version
 
 Multi-Branch Git Commit Graph:
-* a92287d  (HEAD -> feat/ci-fast-fail-lint, origin/feat/ci-fast-fail-lint) - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
+* cf02545  (HEAD -> master, tag: v1.6.0-rc3, origin/master, origin/feat/ci-fast-fail-lint, origin/HEAD, feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
+* a92287d  - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
 * 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
-* e31b64f  (origin/master, origin/feat/cog-integration, origin/HEAD, master, feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
+* e31b64f  (origin/feat/cog-integration, feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
 * 3e44936  (tag: v1.6.0, origin/feat/pl-freq-filter-ifft, feat/pl-freq-filter-ifft) - 2026-08-26 : docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture (SiririComun)
 * 7b2a3f0  (tag: v1.6.0-rc2) - 2026-08-26 : build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2 (SiririComun)
 * 7742815  - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
@@ -61,30 +62,6 @@ Multi-Branch Git Commit Graph:
 *   061eee9  (tag: v1.5.0) - 2026-08-22 : merge: feat(hw) release v1.5.0 with simultaneous sampling, axis demux, and sanitized fft stream (SiririComun)
 |\  
 | * 212fafa  (origin/feat/simultaneous-xadc-fft-demux, feat/simultaneous-xadc-fft-demux) - 2026-08-22 : docs(readme): document v1.5.0 architecture, stream demux, and register map (SiririComun)
-| * 66e46b0  (tag: v1.5.0-rc1) - 2026-08-22 : build(overlay): recompile bitstream with frame-locked demux for pynq_z2 (SiririComun)
-| * a842277  - 2026-08-22 : docs(context): update block design diagram and hardware summary for v1.5.0-rc1 (SiririComun)
-| * 86d72ca  - 2026-08-22 : fix(bd): integrate axis_subset_converter between xfft and cordic (SiririComun)
-| * a8fdf97  - 2026-08-22 : build(overlay): recompile bitstream with Cartesian stream sanitization for pynq_z2 (SiririComun)
-| * 88eabe2  - 2026-08-22 : docs(context): update block design layout diagrams and hardware summary (SiririComun)
-| * 4a7681f  - 2026-08-22 : fix(bd): insert axis_subset_converter to sanitize Cartesian stream between xfft and cordic (SiririComun)
-| * 20e7db0  - 2026-08-21 : build(overlay): recompile bitstream with FFT config TREADY handshake for pynq_z2 (SiririComun)
-| * 4c2378b  - 2026-08-21 : fix(hw): implement TREADY handshake on FFT config channel and update diagrams (SiririComun)
-| * 7ddb5a2  - 2026-08-21 : build(overlay): recompile bitstream with concurrent TLAST demux for pynq_z2 (SiririComun)
-| * d39ba43  - 2026-08-21 : fix(hw): align concurrent TLAST assertion on axis_channel_demux and update diagrams (SiririComun)
-| * b1ce437  - 2026-08-20 : build(overlay): compile bitstream with simultaneous sampling and clean fft demux for pynq_z2 (SiririComun)
-| * 7a77d0f  - 2026-08-20 : docs(context): update block design layout and hardware context summary for v1.5.0-rc1 (SiririComun)
-| * 92e7df2  - 2026-08-20 : fix(hdl): add synchronous reset on decim_sel change and optimize accumulation scaling (SiririComun)
-| * dc6f448  - 2026-08-20 : feat(hw): add axis channel selector to route pure single-channel stream to xfft (SiririComun)
-|/  
-*   396b1bb  (tag: v1.4.5) - 2026-08-19 : merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation (SiririComun)
-|\  
-| * 58437e7  (origin/feat/runtime-config-audio, feat/runtime-config-audio) - 2026-08-19 : docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation (SiririComun)
-| * dd75480  (tag: v1.4.5-rc1) - 2026-08-18 : build(overlay): compile bitstream with multi-regime runtime configuration for pynq_z2 (SiririComun)
-| * 5971cfe  - 2026-08-18 : docs(context): update hardware summary and block design layout for v1.4.5-rc1 (SiririComun)
-| * cc58ff3  - 2026-08-18 : feat(bd): connect runtime configuration buses to xfft_0, decimator, and packetizer (SiririComun)
-| * d2b26c2  - 2026-08-18 : feat(hdl): add runtime control ports for dynamic decimation, FFT transform length, and packetizer (SiririComun)
-* | 16ecc19  (tag: v1.4.0, origin/feat/pl-audio-decimation, feat/pl-audio-decimation) - 2026-08-19 : docs: update README with v1.4.0 PL audio decimation architecture and release details (SiririComun)
-|/
 ```
 
 release.yml: (.github/workflows/release.yml)
@@ -411,13 +388,10 @@ xadc.bd: (src/bd/xadc.bd)
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x83FCB832B05D48D7",
       "device": "xc7z020clg400-1",
       "name": "xadc",
-      "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.2.2",
-      "validated": "true"
+      "tool_version": "2024.2.2"
     },
     "design_tree": {
       "processing_system7_0": "",
@@ -448,172 +422,12 @@ xadc.bd: (src/bd/xadc.bd)
     },
     "interface_ports": {
       "DDR": {
-        "mode": "Master",
-        "vlnv_bus_definition": "xilinx.com:interface:ddrx:1.0",
         "vlnv": "xilinx.com:interface:ddrx_rtl:1.0",
-        "parameters": {
-          "AXI_ARBITRATION_SCHEME": {
-            "value": "TDM",
-            "value_src": "default"
-          },
-          "BURST_LENGTH": {
-            "value": "8",
-            "value_src": "default"
-          },
-          "CAN_DEBUG": {
-            "value": "false",
-            "value_src": "default"
-          },
-          "CAS_LATENCY": {
-            "value": "11",
-            "value_src": "default"
-          },
-          "CAS_WRITE_LATENCY": {
-            "value": "11",
-            "value_src": "default"
-          },
-          "CS_ENABLED": {
-            "value": "true",
-            "value_src": "default"
-          },
-          "DATA_MASK_ENABLED": {
-            "value": "true",
-            "value_src": "default"
-          },
-          "DATA_WIDTH": {
-            "value": "8",
-            "value_src": "default"
-          },
-          "MEMORY_TYPE": {
-            "value": "COMPONENTS",
-            "value_src": "default"
-          },
-          "MEM_ADDR_MAP": {
-            "value": "ROW_COLUMN_BANK",
-            "value_src": "default"
-          },
-          "SLOT": {
-            "value": "Single",
-            "value_src": "default"
-          },
-          "TIMEPERIOD_PS": {
-            "value": "1250",
-            "value_src": "default"
-          }
-        },
-        "port_maps": {
-          "CAS_N": {
-            "physical_name": "DDR_cas_n",
-            "direction": "IO"
-          },
-          "CKE": {
-            "physical_name": "DDR_cke",
-            "direction": "IO"
-          },
-          "CK_N": {
-            "physical_name": "DDR_ck_n",
-            "direction": "IO"
-          },
-          "CK_P": {
-            "physical_name": "DDR_ck_p",
-            "direction": "IO"
-          },
-          "CS_N": {
-            "physical_name": "DDR_cs_n",
-            "direction": "IO"
-          },
-          "RESET_N": {
-            "physical_name": "DDR_reset_n",
-            "direction": "IO"
-          },
-          "ODT": {
-            "physical_name": "DDR_odt",
-            "direction": "IO"
-          },
-          "RAS_N": {
-            "physical_name": "DDR_ras_n",
-            "direction": "IO"
-          },
-          "WE_N": {
-            "physical_name": "DDR_we_n",
-            "direction": "IO"
-          },
-          "BA": {
-            "physical_name": "DDR_ba",
-            "direction": "IO",
-            "left": "2",
-            "right": "0"
-          },
-          "ADDR": {
-            "physical_name": "DDR_addr",
-            "direction": "IO",
-            "left": "14",
-            "right": "0"
-          },
-          "DM": {
-            "physical_name": "DDR_dm",
-            "direction": "IO",
-            "left": "3",
-            "right": "0"
-          },
-          "DQ": {
-            "physical_name": "DDR_dq",
-            "direction": "IO",
-            "left": "31",
-            "right": "0"
-          },
-          "DQS_N": {
-            "physical_name": "DDR_dqs_n",
-            "direction": "IO",
-            "left": "3",
-            "right": "0"
-          },
-          "DQS_P": {
-            "physical_name": "DDR_dqs_p",
-            "direction": "IO",
-            "left": "3",
-            "right": "0"
-          }
-        }
+        "status": "<Standard DDR Physical Interface Mappings Preserved>"
       },
       "FIXED_IO": {
-        "mode": "Master",
-        "vlnv_bus_definition": "xilinx.com:display_processing_system7:fixedio:1.0",
         "vlnv": "xilinx.com:display_processing_system7:fixedio_rtl:1.0",
-        "parameters": {
-          "CAN_DEBUG": {
-            "value": "false",
-            "value_src": "default"
-          }
-        },
-        "port_maps": {
-          "MIO": {
-            "physical_name": "FIXED_IO_mio",
-            "direction": "IO",
-            "left": "53",
-            "right": "0"
-          },
-          "DDR_VRN": {
-            "physical_name": "FIXED_IO_ddr_vrn",
-            "direction": "IO"
-          },
-          "DDR_VRP": {
-            "physical_name": "FIXED_IO_ddr_vrp",
-            "direction": "IO"
-          },
-          "PS_SRSTB": {
-            "physical_name": "FIXED_IO_ps_srstb",
-            "direction": "IO"
-          },
-          "PS_CLK": {
-            "physical_name": "FIXED_IO_ps_clk",
-            "direction": "IO"
-          },
-          "PS_PORB": {
-            "physical_name": "FIXED_IO_ps_porb",
-            "direction": "IO"
-          }
-        }
+        "status": "<Standard FIXED_IO Physical Interface Mappings Preserved>"
       },
       "Vaux1_0": {
         "mode": "Slave",
@@ -1260,7 +1074,7 @@ xadc.bd: (src/bd/xadc.bd)
             "memory_map_ref": "S_AXI_HP0"
           }
         },
-        "addressing": "<Default Zynq Memory Map Pruned>"
+        "addressing": "<Default Processing System Memory Map Pruned>"
       },
       "xadc_wiz_0": {
         "vlnv": "xilinx.com:ip:xadc_wiz:3.3",
@@ -1356,14 +1170,7 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Slave",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              }
-            },
+            "parameters": {},
             "bridges": [
               "M00_AXI",
               "M01_AXI",
@@ -1378,176 +1185,43 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M01_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M02_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M03_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M04_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M05_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           },
           "M06_AXI": {
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           }
         }
       },
@@ -1885,14 +1559,7 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Slave",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "16"
-              }
-            },
+            "parameters": {},
             "bridges": [
               "M00_AXI"
             ]
@@ -1901,14 +1568,7 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Slave",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "2"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "16"
-              }
-            },
+            "parameters": {},
             "bridges": [
               "M00_AXI"
             ]
@@ -1917,14 +1577,7 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Slave",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "NUM_READ_OUTSTANDING": {
-                "value": "2"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "16"
-              }
-            },
+            "parameters": {},
             "bridges": [
               "M00_AXI"
             ]
@@ -1933,32 +1586,7 @@ xadc.bd: (src/bd/xadc.bd)
             "mode": "Master",
             "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
             "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
-            "parameters": {
-              "MAX_BURST_LENGTH": {
-                "value": "16"
-              },
-              "NUM_READ_OUTSTANDING": {
-                "value": "8"
-              },
-              "NUM_READ_THREADS": {
-                "value": "1"
-              },
-              "NUM_WRITE_OUTSTANDING": {
-                "value": "16"
-              },
-              "NUM_WRITE_THREADS": {
-                "value": "1"
-              },
-              "RUSER_BITS_PER_BYTE": {
-                "value": "0"
-              },
-              "SUPPORTS_NARROW_BURST": {
-                "value": "0"
-              },
-              "WUSER_BITS_PER_BYTE": {
-                "value": "0"
-              }
-            }
+            "parameters": {}
           }
         }
       },
@@ -3224,54 +2852,6 @@ xadc.bd: (src/bd/xadc.bd)
               "CLK_DOMAIN": {
                 "value": "xadc_processing_system7_0_0_FCLK_CLK0",
                 "value_src": "default_prop"
-              },
-              "LAYERED_METADATA": {
-                "value": [
-                  "xilinx.com:interface:datatypes:1.0 {",
-                  "TDATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic dependency {} format long minimum {}",
-                  "maximum {}} value 32} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} array_type {name {attribs {resolve_type immediate dependency {} format string",
-                  "minimum {} maximum {}} value chan} size {attribs {resolve_type generated dependency chan_size format long minimum {} maximum {}} value 1} stride {attribs {resolve_type generated dependency chan_stride",
-                  "format long minimum {} maximum {}} value 32} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic",
-                  "dependency {} format long minimum {} maximum {}} value 32} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} array_type {name {attribs {resolve_type",
-                  "immediate dependency {} format string minimum {} maximum {}} value vect} size {attribs {resolve_type generated dependency vect_size format long minimum {} maximum {}} value 1} stride {attribs",
-                  "{resolve_type generated dependency vect_stride format long minimum {} maximum {}} value 32} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}}",
-                  "bitwidth {attribs {resolve_type automatic dependency {} format long minimum {} maximum {}} value 32} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value",
-                  "0} struct {field_xn_re {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value xn_re} enabled {attribs {resolve_type immediate dependency {} format bool minimum",
-                  "{} maximum {}} value true} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic dependency {} format",
-                  "long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} array_type {name {attribs {resolve_type immediate dependency",
-                  "{} format string minimum {} maximum {}} value {}} size {attribs {resolve_type generated dependency frame_size format long minimum {} maximum {}} value -1} stride {attribs {resolve_type generated",
-                  "dependency frame_stride format long minimum {} maximum {}} value 32} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs",
-                  "{resolve_type generated dependency xn_width format long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real",
-                  "{fixed {fractwidth {attribs {resolve_type generated dependency xn_fractwidth format long minimum {} maximum {}} value 15} signed {attribs {resolve_type immediate dependency {} format bool minimum {}",
-                  "maximum {}} value true}}}}}}} field_xn_im {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value xn_im} enabled {attribs {resolve_type immediate dependency {}",
-                  "format bool minimum {} maximum {}} value true} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic",
-                  "dependency {} format long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type generated dependency xn_im_offset format long minimum {} maximum {}} value 16} array_type {name {attribs",
-                  "{resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} size {attribs {resolve_type generated dependency frame_size format long minimum {} maximum {}} value -1} stride",
-                  "{attribs {resolve_type generated dependency frame_stride format long minimum {} maximum {}} value 32} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}}",
-                  "value {}} bitwidth {attribs {resolve_type generated dependency xn_width format long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {}",
-                  "maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type generated dependency xn_fractwidth format long minimum {} maximum {}} value 15} signed {attribs {resolve_type immediate dependency",
-                  "{} format bool minimum {} maximum {}} value true}}}}}}}}}}}}}} TDATA_WIDTH 32 TUSER {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}}",
-                  "bitwidth {attribs {resolve_type automatic dependency {} format long minimum {} maximum {}} value 5} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0}",
-                  "struct {field_xk_index {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value xk_index} enabled {attribs {resolve_type generated dependency xk_index_enabled",
-                  "format bool minimum {} maximum {}} value false} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type generated",
-                  "dependency xk_index_width format long minimum {} maximum {}} value 0} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} integer {signed {attribs",
-                  "{resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}} field_blk_exp {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value",
-                  "blk_exp} enabled {attribs {resolve_type generated dependency blk_exp_enabled format bool minimum {} maximum {}} value true} datatype {name {attribs {resolve_type immediate dependency {} format string",
-                  "minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic dependency {} format long minimum {} maximum {}} value 5} bitoffset {attribs {resolve_type generated dependency",
-                  "blk_exp_offset format long minimum {} maximum {}} value 0} array_type {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} size {attribs {resolve_type",
-                  "generated dependency chan_size format long minimum {} maximum {}} value 1} stride {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 8} datatype {name {attribs",
-                  "{resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 5} bitoffset",
-                  "{attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} integer {signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value",
-                  "false}}}}}} field_ovflo {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value ovflo} enabled {attribs {resolve_type generated dependency ovflo_enabled format",
-                  "bool minimum {} maximum {}} value false} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type automatic",
-                  "dependency {} format long minimum {} maximum {}} value 1} bitoffset {attribs {resolve_type generated dependency ovflo_offset format long minimum {} maximum {}} value 8} array_type {name {attribs",
-                  "{resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} size {attribs {resolve_type generated dependency chan_size format long minimum {} maximum {}} value 1} stride",
-                  "{attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 1} datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}}",
-                  "bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 1} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0}",
-                  "integer {signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}}}} TUSER_WIDTH 8",
-                  "}"
-                ],
-                "value_src": "ip_prop"
               }
             },
             "port_maps": {
