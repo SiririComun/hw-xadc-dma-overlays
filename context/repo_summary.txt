@@ -1,7 +1,7 @@
 ==============================================================================
 ⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
 ==============================================================================
-• Repository State    : master @ cf02545
+• Repository State    : master @ 02e6246
 • Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
 • Target FPGA Device  : xc7z020clg400-1
 • Primary HDL Language: VHDL
@@ -10,7 +10,7 @@
 Git Context & Branch Topology:
 
 ```log
-Current Branch: master | Working Tree: Dirty (2 modified files)
+Current Branch: master | Working Tree: Dirty (4 modified/untracked files)
 
 Branch Tracking & Divergence Status:
 feat/ci-fast-fail-lint                          cf02545 [origin/feat/ci-fast-fail-lint] ci(release): add asset integrity validation gate and SHA-256 checksum generation
@@ -20,7 +20,7 @@ feat/ci-fast-fail-lint                          cf02545 [origin/feat/ci-fast-fai
   feat/pl-freq-filter-ifft                        3e44936 [origin/feat/pl-freq-filter-ifft] docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture
   feat/runtime-config-audio                       58437e7 [origin/feat/runtime-config-audio] docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
   feat/simultaneous-xadc-fft-demux                212fafa [origin/feat/simultaneous-xadc-fft-demux] docs(readme): document v1.5.0 architecture, stream demux, and register map
-* master                                          cf02545 [origin/master] ci(release): add asset integrity validation gate and SHA-256 checksum generation
+* master                                          02e6246 [origin/master] chore(context): update Cog submodule and regenerate hardware summary
   remotes/origin/HEAD                             -> origin/master
   remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
   remotes/origin/feat/cog-integration             e31b64f feat(context): integrate Cog submodule and update hardware summary
@@ -31,7 +31,7 @@ feat/ci-fast-fail-lint                          cf02545 [origin/feat/ci-fast-fai
   remotes/origin/feat/pl-freq-filter-ifft         3e44936 docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture
   remotes/origin/feat/runtime-config-audio        58437e7 docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
   remotes/origin/feat/simultaneous-xadc-fft-demux 212fafa docs(readme): document v1.5.0 architecture, stream demux, and register map
-  remotes/origin/master                           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
+  remotes/origin/master                           02e6246 chore(context): update Cog submodule and regenerate hardware summary
 
 Repository Tags & Release History:
 v1.6.0-rc3      test(ci): verify release workflow with SHA-256 generation and integrity checks
@@ -39,14 +39,10 @@ v1.6.0          release(hw): v1.6.0 with PL frequency filter, IFFT core, and 3-D
 v1.6.0-rc2      build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2
 v1.6.0-rc1      release(hw): v1.6.0-rc1 with PL frequency filter, IFFT engine, and 3-DMA streaming
 v1.5.0          release: v1.5.0 official hardware overlay with simultaneous dual-sampling and clean fft demux
-v1.5.0-rc1      build(overlay): recompile bitstream with frame-locked demux for pynq_z2
-v1.4.5          merge: feat(hw) release v1.4.5 with multi-regime runtime configuration and programmable decimation
-v1.4.0          docs: update README with v1.4.0 PL audio decimation architecture and release details
-v1.4.5-rc1      build(overlay): compile bitstream with multi-regime runtime configuration for pynq_z2
-v1.4.0-rc1      Release Candidate 1 with channel-locked audio decimator
 
 Multi-Branch Git Commit Graph:
-* cf02545  (HEAD -> master, tag: v1.6.0-rc3, origin/master, origin/feat/ci-fast-fail-lint, origin/HEAD, feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
+* 02e6246  (HEAD -> master, origin/master, origin/HEAD) - 2026-08-26 : chore(context): update Cog submodule and regenerate hardware summary (SiririComun)
+* cf02545  (tag: v1.6.0-rc3, origin/feat/ci-fast-fail-lint, feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
 * a92287d  - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
 * 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
 * e31b64f  (origin/feat/cog-integration, feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
@@ -60,133 +56,235 @@ Multi-Branch Git Commit Graph:
 * 6ba3316  - 2026-08-25 : feat(hdl): add axis_spectral_mask core for hardware-level frequency filtering (SiririComun)
 * 6439be4  - 2026-08-23 : docs(readme): document v1.5.0 simultaneous sampling and demux architecture (SiririComun)
 *   061eee9  (tag: v1.5.0) - 2026-08-22 : merge: feat(hw) release v1.5.0 with simultaneous sampling, axis demux, and sanitized fft stream (SiririComun)
-|\  
-| * 212fafa  (origin/feat/simultaneous-xadc-fft-demux, feat/simultaneous-xadc-fft-demux) - 2026-08-22 : docs(readme): document v1.5.0 architecture, stream demux, and register map (SiririComun)
+|\
 ```
 
-release.yml: (.github/workflows/release.yml)
+LICENSE: (LICENSE)
 
-```yaml
-name: Hardware Overlay Release Automation
+```text
+MIT License
 
-on:
-  push:
-    tags:
-      - 'v*'
+Copyright (c) 2026 Juan Pablo Sánchez Arroyave (SiririComun)
 
-jobs:
-  publish-release-artifacts:
-    name: Upload Overlay Assets to GitHub Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-      - name: Validate Release Artifacts Integrity
-        run: |
-          echo "========================================================"
-          echo " Validating Hardware Handoff & Bitstream Artifacts"
-          echo "========================================================"
-
-          # 1. Check Bitstream File
-          if [ ! -s "bin/pynq_z2.bit" ]; then
-            echo "❌ ERROR: bin/pynq_z2.bit is missing or empty (0 bytes)!" >&2
-            exit 1
-          fi
-
-          # 2. Check Hardware Handoff Metadata
-          if [ ! -s "bin/pynq_z2.hwh" ]; then
-            echo "❌ ERROR: bin/pynq_z2.hwh is missing or empty (0 bytes)!" >&2
-            exit 1
-          fi
-
-          BIT_SIZE=$(stat -c%s "bin/pynq_z2.bit")
-          HWH_SIZE=$(stat -c%s "bin/pynq_z2.hwh")
-          echo "✅ Verified bin/pynq_z2.bit ($((BIT_SIZE / 1024)) KB)"
-          echo "✅ Verified bin/pynq_z2.hwh ($((HWH_SIZE / 1024)) KB)"
-
-      - name: Generate Cryptographic SHA-256 Checksums
-        run: |
-          echo "========================================================"
-          echo " Generating SHA-256 Checksum Manifests"
-          echo "========================================================"
-          cd bin
-
-          # Generate individual checksum files
-          sha256sum pynq_z2.bit > pynq_z2.bit.sha256
-          sha256sum pynq_z2.hwh > pynq_z2.hwh.sha256
-
-          # Generate combined manifest
-          sha256sum pynq_z2.bit pynq_z2.hwh > SHA256SUMS.txt
-
-          cat SHA256SUMS.txt
-          cd ..
-
-      - name: Create GitHub Release & Upload Assets
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            bin/pynq_z2.bit
-            bin/pynq_z2.hwh
-            bin/pynq_z2.bit.sha256
-            bin/pynq_z2.hwh.sha256
-            bin/SHA256SUMS.txt
-          draft: false
-          # Automatically marks pre-releases if tag contains '-' (e.g. v1.6.0-rc1)
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          generate_release_notes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
-lint.yml: (.github/workflows/lint.yml)
+README.md: (README.md)
 
-```yaml
-name: RTL Syntax & Lint Verification
+```markdown
+# HW XADC DMA Overlays
 
-on:
-  push:
-    branches:
-      - master
-      - 'feat/**'
-  pull_request:
-    branches:
-      - master
+[![Hog Managed](https://img.shields.io/badge/HDL_Management-Hog-blue.svg)](https://cern.ch/hog)
+[![Target Board](https://img.shields.io/badge/Board-PYNQ--Z2-orange.svg)](https://tul.com.tw/ProductsPYNQ-Z2.html)
+[![Vivado Version](https://img.shields.io/badge/Vivado-2024.2.2-green.svg)](https://www.xilinx.com)
+[![Hardware Release](https://img.shields.io/badge/Release-v1.6.0-blue.svg)](https://github.com/SiririComun/hw-xadc-dma-overlays/releases/tag/v1.6.0)
 
-jobs:
-  vhdl-lint:
-    name: Fast-Fail VHDL Syntax Check (GHDL)
-    runs-on: ubuntu-latest
+A high-performance multi-regime hardware overlay for the **PYNQ-Z2** (`xc7z020clg400-1`) providing **simultaneous true dual-ADC parallel sampling ($0.00\,\mu\text{s}$ inter-channel skew)**, **FPGA-accelerated programmable decimation ($M \in \{1, 10, 20, 50\}$)**, dynamic packetization, **frame-locked channel demultiplexing**, **runtime-reconfigurable 2048-point Forward FFT (`xfft_0`)**, **Hermitian-symmetric real-time spectral frequency filtering (`axis_spectral_mask`)**, **hardware Inverse FFT (`xfft_1`) with calibrated 1:1 amplitude reconstruction**, and **concurrent 3-DMA streaming** directly to DDR memory.
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+Managed using **Hog (HDL on Git)** for strict design traceability and automated bitstream versioning.
 
-      - name: Install GHDL Analyzer
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ghdl
+---
 
-      - name: Run VHDL-93 Syntax & Elaboration Check
-        run: |
-          echo "========================================================"
-          echo " Running Fast-Fail VHDL Syntax Check on Custom RTL Cores"
-          echo "========================================================"
+## 🏛 Hardware Architecture & Memory Map
 
-          # -C allows UTF-8 / non-ASCII characters in comments (bullets, arrows, etc.)
-          ghdl -s --std=93 -C --ieee=synopsys -fexplicit src/hdl/tlast_generator.vhd
-          ghdl -s --std=93 -C --ieee=synopsys -fexplicit src/hdl/axis_trigger_unit.vhd
-          ghdl -s --std=93 -C --ieee=synopsys -fexplicit src/hdl/axis_decimator.vhd
-          ghdl -s --std=93 -C --ieee=synopsys -fexplicit src/hdl/axis_channel_demux.vhd
-          ghdl -s --std=93 -C --ieee=synopsys -fexplicit src/hdl/axis_spectral_mask.vhd
+The hardware overlay captures analog data across **Arduino Header A0 (`Vaux1`)** and **A1 (`Vaux9`)** using the XADC dual continuous sequencer in true parallel sampling mode, gates frames via `axis_trigger_unit` with **selectable trigger source (A0 vs A1)**, applies runtime decimation via `axis_decimator`, packetizes frames with programmable `tlast_generator`, forks the stream via `axis_broadcaster_0`, isolates a clean single-channel stream via `axis_channel_demux`, computes the Forward FFT via `xfft_0`, applies dynamic frequency masking with Hermitian symmetry via `axis_spectral_mask`, forks the masked complex spectrum to both CORDIC (for magnitude extraction via `axi_dma_1`) and `xfft_1` (for time-domain IFFT reconstruction via `axi_dma_2`), and transfers all 3 data streams synchronously to DDR memory.
 
-          echo "✅ All custom VHDL RTL cores passed syntax and elaboration verification cleanly!"
+### Block Design Schematic
+![PYNQ-Z2 XADC Multi-Regime Block Design with PL Filter & IFFT](docs/images/xadc_bd.svg)
+
+### Dataflow Diagram
+```
+                     [ PYNQ-Z2 Header A0 (Vaux1) ]       [ PYNQ-Z2 Header A1 (Vaux9) ]
+                                   │                                   │
+                                   └───────────────┬───────────────────┘
+                                                   ▼
+                                  [ XADC Wizard Dual Simultaneous Sampling ]
+                                                   │ (1 MSPS Interleaved Stream, 0.00 µs Skew)
+                                                   ▼
+                                         [ axis_trigger_unit ]
+                                         (Selectable Trigger: A0/A1, Phase-Locked to A0)
+                                                   │ (Gated Stream)
+                                                   ▼
+                                         [ axis_decimator IP ]
+                               (Programmable M = 1, 10, 20, 50 via Reg 0x14)
+                                                   │
+                                                   ▼
+                                          [ tlast_generator ]
+                               (Programmable Packet Limit via Reg 0x1C)
+                                                   │ (w/ TLAST)
+                                        [ axis_broadcaster_0 ]
+                                  ┌────────────────┴────────────────┐
+                         (Time Stream w/ TLAST)            (Interleaved Stream w/ TLAST)
+                                  │                                 │
+                                  │                                 ▼
+                                  │                    [ axis_channel_demux ]
+                                  │                    (Clean A0 vs A1 Routing via Reg 0x00[6])
+                                  │                                 │
+                                  │                                 ▼
+                                  │                    [ xfft_0 Core (Forward FFT) ]
+                                  │                    (N = 512, 1024, 2048 via Reg 0x18)
+                                  │                                 │ (Complex Spectrum: Re + j*Im)
+                                  │                                 ▼
+                                  │                    [ axis_spectral_mask ]
+                                  │                    (Hermitian Masking: k_eff = min(k, N-k))
+                                  │                                 │ (Masked Complex Spectrum)
+                                  │                                 ▼
+                                  │                      [ axis_broadcaster_1 ]
+                                  │                        ┌────────┴────────┐
+                                  │                        ▼                 ▼
+                                  │                   [ cordic_0 ]      [ xfft_1 Core (IFFT) ]
+                                  │                (Magnitude Engine) (Time-Domain Reconstruction)
+                                  │                        │                 │
+                                  ▼                        ▼                 ▼
+                        [ AXI DMA 0 (Time) ]     [ AXI DMA 1 (FFT) ]   [ AXI DMA 2 (Filtered) ]
+                           (0x40400000)             (0x40410000)          (0x40420000)
+                                  │                        │                 │
+                                  └────────────────────────┼─────────────────┘
+                                                           ▼ (AXI SmartConnect HP0)
+                                                [ Processing System DDR ]
+```
+
+---
+
+## 🎛 Frequency-Domain Filtering & Hermitian Symmetry
+
+Real physical signals $x[n] \in \mathbb{R}$ require their discrete Fourier spectrum $X[k]$ to satisfy Hermitian symmetry:
+$$X[N - k] = X^*[k]$$
+
+If only the positive frequencies $k \in [0, N/2]$ are masked while negative frequencies $k \in (N/2, N-1]$ remain unmasked, the reconstructed time-domain signal $y[n]$ produces severe imaginary leakage, phase distortion, and amplitude attenuation.
+
+The `axis_spectral_mask` core computes the **effective symmetric bin index**:
+$$k_{\text{eff}} = \min(k, N - k)$$
+
+This guarantees strict real-signal Hermitian symmetry across all 4 filtering modes with **$< 1\%$ amplitude reconstruction error** and **$> 40\,\text{dB}$ stopband rejection**.
+
+---
+
+## 📍 Physical Pin Constraints (Arduino Header `J1`)
+
+| Signal Port | Physical Pin | Header Location | Description |
+| :--- | :--- | :--- | :--- |
+| `Vaux1_0_v_p` / `v_n` | `E17` / `D18` | **Header `J1` Pin A0** (Pin 6 - Bottom) | Channel 1 Analog Differential Pair |
+| `Vaux9_0_v_p` / `v_n` | `E18` / `E19` | **Header `J1` Pin A1** (Pin 5 - 2nd from Bottom) | Channel 2 Analog Differential Pair |
+
+---
+
+## 🗺 AXI Memory Address Table
+
+| Peripheral Block | Interface | Base Address | Address Range | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **AXI DMA Time** (`axi_dma_0`) | `S_AXI_LITE` | `0x40400000` | 64K | Raw Time-Domain Interleaved Stereo DMA Controller |
+| **AXI DMA FFT** (`axi_dma_1`) | `S_AXI_LITE` | `0x40410000` | 64K | Frequency-Domain Magnitude DMA Controller ($N/2$ bins) |
+| **AXI DMA Filtered** (`axi_dma_2`) | `S_AXI_LITE` | `0x40420000` | 64K | Filtered & Reconstructed Time-Domain DMA Controller |
+| **AXI Timer** (`axi_timer_0`) | `S_AXI` | `0x42800000` | 64K | System Timer / Hardware Capture Trigger |
+| **XADC Wizard** (`xadc_wiz_0`) | `s_axi_lite` | `0x43C00000` | 64K | XADC DRP & Dual Simultaneous Sampling Configuration |
+| **AXIS Trigger Unit** (`axis_trigger_unit_0`) | `s_axi` | `0x43C10000` | 64K | Trigger, Decimation ($M$), FFT Config, Routing & Packet Limits |
+| **AXIS Spectral Mask** (`axis_spectral_mask_0`) | `s_axi` | `0x43C20000` | 64K | Hardware Filter Mode, Cutoff Bins ($k_{\text{start}}, k_{\text{stop}}$) & $N$ |
+
+---
+
+## 📋 Register Maps
+
+### 1. `axis_trigger_unit_0` (`0x43C10000`)
+* **`0x00: REG_CONTROL`**
+  * `[0]`: Arm Trigger Unit (`1` = Arm)
+  * `[1]`: Auto-Trigger Mode (`1` = Auto, `0` = Normal)
+  * `[2]`: Trigger Edge Direction (`0` = Rising, `1` = Falling)
+  * `[3]`: Single-Shot Mode (`1` = Single Shot, `0` = Continuous)
+  * `[4]`: Software Force Trigger Pulse
+  * `[5]`: Trigger Source Selection (`0` = Channel 1 / A0, `1` = Channel 2 / A1)
+  * `[6]`: FFT Source Routing (`0` = Route A0 to FFT, `1` = Route A1 to FFT)
+* **`0x04: REG_STATUS`** — `[0]`: Armed, `[1]`: Triggered, `[2]`: Streaming
+* **`0x08: REG_THRESHOLD`** — `[15:0]`: 12-bit left-aligned comparator threshold ($0.0\,\text{V} - 3.3\,\text{V}$)
+* **`0x0C: REG_TIMEOUT`** — `[31:0]`: Auto-trigger timeout in clock cycles (Default: $5{,}000{,}000 = 50\,\text{ms}$)
+* **`0x10: REG_HYSTERESIS`** — `[15:0]`: Noise rejection hysteresis band
+* **`0x14: REG_DECIMATION`** — `[1:0]`: `00` $\implies M=1$ (Bypass), `01` $\implies M=10$, `10` $\implies M=20$, `11` $\implies M=50$
+* **`0x18: REG_FFT_CONFIG`** — `[15:0]`: `(FWD_INV << 8) | NFFT` (Pushes configuration word to `xfft_0` and `xfft_1` via `axis_broadcaster_cfg`)
+* **`0x1C: REG_PACKET_SIZE`** — `[15:0]`: Samples per DMA frame ($N$)
+
+### 2. `axis_spectral_mask_0` (`0x43C20000`)
+* **`0x00: REG_CTRL`**
+  * `[0]`: Filter Enable (`0` = Hardware Bypass, `1` = Engage Masking)
+  * `[2:1]`: Filter Mode:
+    * `00`: **Lowpass / Bass** (Pass $k_{\text{eff}} \le k_{\text{stop}}$)
+    * `01`: **Highpass / Treble** (Pass $k_{\text{eff}} \ge k_{\text{start}}$)
+    * `10`: **Bandpass** (Pass $k_{\text{start}} \le k_{\text{eff}} \le k_{\text{stop}}$)
+    * `11`: **Notch / Bandstop** (Zero $k_{\text{start}} \le k_{\text{eff}} \le k_{\text{stop}}$)
+* **`0x04: REG_BIN_START`** — `[15:0]`: Lower cutoff bin index ($k_{\text{start}}$)
+* **`0x08: REG_BIN_STOP`** — `[15:0]`: Upper cutoff bin index ($k_{\text{stop}}$)
+* **`0x0C: REG_FFT_LEN`** — `[15:0]`: FFT transform length $N$ (Default: $1024$)
+* **`0x10: REG_STATUS`** — `[0]`: Frame Active, `[31:16]`: Current streaming bin count ($k$)
+
+---
+
+## ⚡ Multi-Regime Operating Profiles
+
+| Profile Mode | Decimator ($M$) | Transform ($N$) | Sampling Rate ($f_s$) | Nyquist Bandwidth | Time Window ($T_{\text{win}}$) | Resolution ($\Delta f$) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Wideband Lab Scope** | **$1$** (Bypass) | $2048$ | $500\,\text{kSPS}$ | $0 - 250\,\text{kHz}$ | $2.05\,\text{ms}$ | $244.14\,\text{Hz}$ |
+| **Full-Band Audio** | **$10$** | $1024$ | $50\,\text{kSPS}$ | $0 - 25\,\text{kHz}$ | $20.48\,\text{ms}$ | $48.83\,\text{Hz}$ |
+| **Speech / Vocal** | **$20$** | $1024$ | $25\,\text{kSPS}$ | $0 - 12.5\,\text{kHz}$ | $40.96\,\text{ms}$ | $24.41\,\text{Hz}$ |
+| **Deep Bass Zoom** | **$50$** | $1024$ | $10\,\text{kSPS}$ | $0 - 5\,\text{kHz}$ | $102.40\,\text{ms}$ | **$9.77\,\text{Hz}$** |
+
+---
+
+## 📦 For Software Developers (Consuming this Overlay)
+
+Specify the `v1.6.0` dependency in your `hardware.json`:
+
+```json
+{
+  "repo": "SiririComun/hw-xadc-dma-overlays",
+  "version": "v1.6.0",
+  "overlay_name": "pynq_z2"
+}
+```
+
+```python
+from pynq_oscilloscope import OscilloscopeOverlay
+
+ol = OscilloscopeOverlay()
+ol.set_profile("audio")
+
+# Engage hardware Lowpass filter at 250 Hz
+ol.filter.set_lowpass(cutoff_hz=250.0)
+
+# Capture Raw Time, Filtered Time, and Spectrum simultaneously
+v_raw_a0, v_raw_a1, v_filtered, freqs, mags = ol.capture_all()
+```
+
+---
+
+## 🛠 For Firmware Developers (Building Locally)
+
+```bash
+git clone --recursive https://github.com/SiririComun/hw-xadc-dma-overlays.git
+cd hw-xadc-dma-overlays
+./Hog/Do CREATE pynq_z2
+./Hog/Do WORK pynq_z2
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
 
 hog.conf: (Top/pynq_z2/hog.conf)
@@ -198,6 +296,85 @@ hog.conf: (Top/pynq_z2/hog.conf)
 [main]
 PART = xc7z020clg400-1
 TARGET_LANGUAGE = VHDL
+```
+
+constrs.src: (Top/pynq_z2/list/constrs.src)
+
+```src
+# Constraints list for pynq_z2
+src/con/pynq_z2.xdc
+```
+
+ips.src: (Top/pynq_z2/list/ips.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/bd/xadc.bd
+```
+
+others.src: (Top/pynq_z2/list/others.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/hdl/xadc_wrapper.vhd top=xadc_wrapper
+```
+
+xil_defaultlib.src: (Top/pynq_z2/list/xil_defaultlib.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/hdl/tlast_generator.vhd 93
+src/hdl/axis_trigger_unit.vhd 93
+src/hdl/axis_decimator.vhd 93
+src/hdl/axis_channel_demux.vhd 93
+src/hdl/axis_spectral_mask.vhd 93
+```
+
+post-bitstream.tcl: (Top/pynq_z2/post-bitstream.tcl)
+
+```tcl
+# ==============================================================================
+# Hog Post-Bitstream Hook: Automated PYNQ Handoff File Copier
+# ==============================================================================
+
+# Get project directory name dynamically (evaluates to "pynq_z2")
+set script_path [file normalize [info script]]
+set script_dir  [file dirname $script_path]
+set prj_name    [file tail $script_dir]
+set repo_root   [file normalize [file join $script_dir ".." ".."]]
+
+# Source path matches Vivado's dynamic build output folder
+set bit_src [file join $repo_root "Projects" $prj_name "${prj_name}.runs" "impl_1" "xadc_wrapper.bit"]
+
+# Try generated HW handoff location
+set hwh_src [file join $repo_root "src" "bd" "hw_handoff" "xadc.hwh"]
+if {![file exists $hwh_src]} {
+    set hwh_src [file join $repo_root "Projects" $prj_name "${prj_name}.gen" "sources_1" "bd" "xadc" "hw_handoff" "xadc.hwh"]
+}
+
+set dest_dir [file join $repo_root "bin"]
+if {![file exists $dest_dir]} {
+    file mkdir $dest_dir
+}
+
+set bit_dest [file join $dest_dir "${prj_name}.bit"]
+set hwh_dest [file join $dest_dir "${prj_name}.hwh"]
+
+# Copy Bitstream
+if {[file exists $bit_src]} {
+    file copy -force $bit_src $bit_dest
+    send_msg_id "Hog-1" "INFO" "Successfully copied compiled bitstream to: $bit_dest"
+} else {
+    send_msg_id "Hog-2" "ERROR" "Could not find source bitstream at: $bit_src"
+}
+
+# Copy Hardware Handoff
+if {[file exists $hwh_src]} {
+    file copy -force $hwh_src $hwh_dest
+    send_msg_id "Hog-3" "INFO" "Successfully copied hardware handoff metadata to: $hwh_dest"
+} else {
+    send_msg_id "Hog-4" "ERROR" "Could not find source hardware handoff metadata at: $hwh_src"
+}
 ```
 
 post-creation.tcl: (Top/pynq_z2/post-creation.tcl)
@@ -301,85 +478,6 @@ if {[info commands create_gui_custom_command] ne ""} {
 # ------------------------------------------------------------------------------
 catch { eval $export_pdf_cmd }
 catch { eval $export_svg_cmd }
-```
-
-post-bitstream.tcl: (Top/pynq_z2/post-bitstream.tcl)
-
-```tcl
-# ==============================================================================
-# Hog Post-Bitstream Hook: Automated PYNQ Handoff File Copier
-# ==============================================================================
-
-# Get project directory name dynamically (evaluates to "pynq_z2")
-set script_path [file normalize [info script]]
-set script_dir  [file dirname $script_path]
-set prj_name    [file tail $script_dir]
-set repo_root   [file normalize [file join $script_dir ".." ".."]]
-
-# Source path matches Vivado's dynamic build output folder
-set bit_src [file join $repo_root "Projects" $prj_name "${prj_name}.runs" "impl_1" "xadc_wrapper.bit"]
-
-# Try generated HW handoff location
-set hwh_src [file join $repo_root "src" "bd" "hw_handoff" "xadc.hwh"]
-if {![file exists $hwh_src]} {
-    set hwh_src [file join $repo_root "Projects" $prj_name "${prj_name}.gen" "sources_1" "bd" "xadc" "hw_handoff" "xadc.hwh"]
-}
-
-set dest_dir [file join $repo_root "bin"]
-if {![file exists $dest_dir]} {
-    file mkdir $dest_dir
-}
-
-set bit_dest [file join $dest_dir "${prj_name}.bit"]
-set hwh_dest [file join $dest_dir "${prj_name}.hwh"]
-
-# Copy Bitstream
-if {[file exists $bit_src]} {
-    file copy -force $bit_src $bit_dest
-    send_msg_id "Hog-1" "INFO" "Successfully copied compiled bitstream to: $bit_dest"
-} else {
-    send_msg_id "Hog-2" "ERROR" "Could not find source bitstream at: $bit_src"
-}
-
-# Copy Hardware Handoff
-if {[file exists $hwh_src]} {
-    file copy -force $hwh_src $hwh_dest
-    send_msg_id "Hog-3" "INFO" "Successfully copied hardware handoff metadata to: $hwh_dest"
-} else {
-    send_msg_id "Hog-4" "ERROR" "Could not find source hardware handoff metadata at: $hwh_src"
-}
-```
-
-ips.src: (Top/pynq_z2/list/ips.src)
-
-```src
-#Generated by Hog on 2026-08-05 22:11:53
-src/bd/xadc.bd
-```
-
-others.src: (Top/pynq_z2/list/others.src)
-
-```src
-#Generated by Hog on 2026-08-05 22:11:53
-src/hdl/xadc_wrapper.vhd top=xadc_wrapper
-```
-
-xil_defaultlib.src: (Top/pynq_z2/list/xil_defaultlib.src)
-
-```src
-#Generated by Hog on 2026-08-05 22:11:53
-src/hdl/tlast_generator.vhd 93
-src/hdl/axis_trigger_unit.vhd 93
-src/hdl/axis_decimator.vhd 93
-src/hdl/axis_channel_demux.vhd 93
-src/hdl/axis_spectral_mask.vhd 93
-```
-
-constrs.src: (Top/pynq_z2/list/constrs.src)
-
-```src
-# Constraints list for pynq_z2
-src/con/pynq_z2.xdc
 ```
 
 xadc.bd: (src/bd/xadc.bd)
@@ -3850,210 +3948,599 @@ xadc.bd: (src/bd/xadc.bd)
 }
 ```
 
-xadc_wrapper.vhd: (src/hdl/xadc_wrapper.vhd)
+pynq_z2.xdc: (src/con/pynq_z2.xdc)
 
-```vhd
--- ==============================================================================
--- Dual-Channel XADC Top-Level Wrapper (Hog Managed)
--- ==============================================================================
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-
-entity xadc_wrapper is
-  generic (
-    -- Hog-specific versioning generics
-    GLOBAL_DATE         : std_logic_vector(31 downto 0) := x"00000000";
-    GLOBAL_TIME         : std_logic_vector(31 downto 0) := x"00000000";
-    GLOBAL_VER          : std_logic_vector(31 downto 0) := x"00000000";
-    GLOBAL_SHA          : std_logic_vector(31 downto 0) := x"00000000";
-    TOP_SHA             : std_logic_vector(31 downto 0) := x"00000000";
-    TOP_VER             : std_logic_vector(31 downto 0) := x"00000000";
-    HOG_SHA             : std_logic_vector(31 downto 0) := x"00000000";
-    HOG_VER             : std_logic_vector(31 downto 0) := x"00000000";
-    CON_VER             : std_logic_vector(31 downto 0) := x"00000000";
-    CON_SHA             : std_logic_vector(31 downto 0) := x"00000000";
-    XIL_DEFAULTLIB_VER  : std_logic_vector(31 downto 0) := x"00000000";
-    XIL_DEFAULTLIB_SHA  : std_logic_vector(31 downto 0) := x"00000000";
-    IPS_VER             : std_logic_vector(31 downto 0) := x"00000000";
-    IPS_SHA             : std_logic_vector(31 downto 0) := x"00000000";
-    OTHERS_VER          : std_logic_vector(31 downto 0) := x"00000000";
-    OTHERS_SHA          : std_logic_vector(31 downto 0) := x"00000000"
-  );
-  port (
-    DDR_addr    : inout STD_LOGIC_VECTOR ( 14 downto 0 );
-    DDR_ba      : inout STD_LOGIC_VECTOR ( 2 downto 0 );
-    DDR_cas_n   : inout STD_LOGIC;
-    DDR_ck_n    : inout STD_LOGIC;
-    DDR_ck_p    : inout STD_LOGIC;
-    DDR_cke     : inout STD_LOGIC;
-    DDR_cs_n    : inout STD_LOGIC;
-    DDR_dm      : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_dq      : inout STD_LOGIC_VECTOR ( 31 downto 0 );
-    DDR_dqs_n   : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_dqs_p   : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_odt     : inout STD_LOGIC;
-    DDR_ras_n   : inout STD_LOGIC;
-    DDR_reset_n : inout STD_LOGIC;
-    DDR_we_n    : inout STD_LOGIC;
-    FIXED_IO_ddr_vrn : inout STD_LOGIC;
-    FIXED_IO_ddr_vrp : inout STD_LOGIC;
-    FIXED_IO_mio     : inout STD_LOGIC_VECTOR ( 53 downto 0 );
-    FIXED_IO_ps_clk  : inout STD_LOGIC;
-    FIXED_IO_ps_porb : inout STD_LOGIC;
-    FIXED_IO_ps_srstb: inout STD_LOGIC;
-
-    -- Channel 1 (A0 - Vaux1)
-    Vaux1_0_v_n : in STD_LOGIC;
-    Vaux1_0_v_p : in STD_LOGIC;
-
-    -- Channel 2 (A1 - Vaux9)
-    Vaux9_0_v_n : in STD_LOGIC;
-    Vaux9_0_v_p : in STD_LOGIC;
-
-    -- Dedicated Vp/Vn Header
-    Vp_Vn_0_v_n : in STD_LOGIC;
-    Vp_Vn_0_v_p : in STD_LOGIC
-  );
-end xadc_wrapper;
-
-architecture STRUCTURE of xadc_wrapper is
-  component xadc is
-  port (
-    DDR_cas_n   : inout STD_LOGIC;
-    DDR_cke     : inout STD_LOGIC;
-    DDR_ck_n    : inout STD_LOGIC;
-    DDR_ck_p    : inout STD_LOGIC;
-    DDR_cs_n    : inout STD_LOGIC;
-    DDR_reset_n : inout STD_LOGIC;
-    DDR_odt     : inout STD_LOGIC;
-    DDR_ras_n   : inout STD_LOGIC;
-    DDR_we_n    : inout STD_LOGIC;
-    DDR_ba      : inout STD_LOGIC_VECTOR ( 2 downto 0 );
-    DDR_addr    : inout STD_LOGIC_VECTOR ( 14 downto 0 );
-    DDR_dm      : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_dq      : inout STD_LOGIC_VECTOR ( 31 downto 0 );
-    DDR_dqs_n   : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    DDR_dqs_p   : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-    FIXED_IO_mio     : inout STD_LOGIC_VECTOR ( 53 downto 0 );
-    FIXED_IO_ddr_vrn : inout STD_LOGIC;
-    FIXED_IO_ddr_vrp : inout STD_LOGIC;
-    FIXED_IO_ps_srstb: inout STD_LOGIC;
-    FIXED_IO_ps_clk  : inout STD_LOGIC;
-    FIXED_IO_ps_porb : inout STD_LOGIC;
-    Vaux1_0_v_n : in STD_LOGIC;
-    Vaux1_0_v_p : in STD_LOGIC;
-    Vaux9_0_v_n : in STD_LOGIC;
-    Vaux9_0_v_p : in STD_LOGIC;
-    Vp_Vn_0_v_n : in STD_LOGIC;
-    Vp_Vn_0_v_p : in STD_LOGIC
-  );
-  end component xadc;
-begin
-xadc_i: component xadc
-     port map (
-      DDR_addr(14 downto 0) => DDR_addr(14 downto 0),
-      DDR_ba(2 downto 0)    => DDR_ba(2 downto 0),
-      DDR_cas_n             => DDR_cas_n,
-      DDR_ck_n              => DDR_ck_n,
-      DDR_ck_p              => DDR_ck_p,
-      DDR_cke               => DDR_cke,
-      DDR_cs_n              => DDR_cs_n,
-      DDR_dm(3 downto 0)    => DDR_dm(3 downto 0),
-      DDR_dq(31 downto 0)   => DDR_dq(31 downto 0),
-      DDR_dqs_n(3 downto 0) => DDR_dqs_n(3 downto 0),
-      DDR_dqs_p(3 downto 0) => DDR_dqs_p(3 downto 0),
-      DDR_odt               => DDR_odt,
-      DDR_ras_n             => DDR_ras_n,
-      DDR_reset_n           => DDR_reset_n,
-      DDR_we_n              => DDR_we_n,
-      FIXED_IO_ddr_vrn      => FIXED_IO_ddr_vrn,
-      FIXED_IO_ddr_vrp      => FIXED_IO_ddr_vrp,
-      FIXED_IO_mio(53 downto 0) => FIXED_IO_mio(53 downto 0),
-      FIXED_IO_ps_clk       => FIXED_IO_ps_clk,
-      FIXED_IO_ps_porb      => FIXED_IO_ps_porb,
-      FIXED_IO_ps_srstb     => FIXED_IO_ps_srstb,
-      Vaux1_0_v_n           => Vaux1_0_v_n,
-      Vaux1_0_v_p           => Vaux1_0_v_p,
-      Vaux9_0_v_n           => Vaux9_0_v_n,
-      Vaux9_0_v_p           => Vaux9_0_v_p,
-      Vp_Vn_0_v_n           => Vp_Vn_0_v_n,
-      Vp_Vn_0_v_p           => Vp_Vn_0_v_p
-    );
-end STRUCTURE;
+```xdc
+# ==============================================================================
+# Physical Package Pin Constraints for PYNQ-Z2 Analog Headers
+# ==============================================================================
+# Arduino Header A0 (Vaux1)
+set_property -dict { PACKAGE_PIN E17 } [get_ports Vaux1_0_v_p]
+set_property -dict { PACKAGE_PIN D18 } [get_ports Vaux1_0_v_n]
+# Arduino Header A1 (Vaux9)
+set_property -dict { PACKAGE_PIN E18 } [get_ports Vaux9_0_v_p]
+set_property -dict { PACKAGE_PIN E19 } [get_ports Vaux9_0_v_n]
 ```
 
-tlast_generator.vhd: (src/hdl/tlast_generator.vhd)
+axis_channel_demux.vhd: (src/hdl/axis_channel_demux.vhd)
 
 ```vhd
 -- =============================================================================
--- File: tlast_generator.vhd
--- Description: Runtime-Programmable AXI4-Stream Packetizer & TLAST Generator.
---              Asserts TLAST on the final sample of a frame defined by
---              packet_size_in (driven by axis_trigger_unit register 0x1C).
+-- File: axis_channel_demux.vhd
+-- Description: AXI4-Stream Channel Demultiplexer & Single-Channel Filter.
+--              Filters interleaved dual-channel stream (A0, A1, A0, A1...) and
+--              emits a pure single-channel continuous stream with concurrent TLAST.
+--              sel_ch: '0' => Emit Channel 1 (A0)
+--                      '1' => Emit Channel 2 (A1)
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity tlast_generator is
-    generic (
-        DEFAULT_PACKET_SIZE : integer := 2048
-    );
+entity axis_channel_demux is
     port (
-        aclk            : in  std_logic;
-        aresetn         : in  std_logic;
+        aclk          : in  std_logic;
+        aresetn       : in  std_logic;
 
-        -- =====================================================================
-        -- Runtime Packet Size Input (from axis_trigger_unit register 0x1C)
-        -- =====================================================================
-        packet_size_in  : in  std_logic_vector(15 downto 0);
+        -- Channel selector (0 = Channel 1 / A0, 1 = Channel 2 / A1)
+        sel_ch        : in  std_logic;
 
-        -- =====================================================================
-        -- AXI4-Stream Slave Interface (from Decimator)
-        -- =====================================================================
-        s_axis_tdata    : in  std_logic_vector(15 downto 0);
-        s_axis_tvalid   : in  std_logic;
-        s_axis_tready   : out std_logic;
+        -- AXI4-Stream Slave Interface (Interleaved Input from Broadcaster)
+        s_axis_tdata  : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid : in  std_logic;
+        s_axis_tready : out std_logic;
+        s_axis_tlast  : in  std_logic;
 
-        -- =====================================================================
-        -- AXI4-Stream Master Interface (to Broadcaster / DMA)
-        -- =====================================================================
-        m_axis_tdata    : out std_logic_vector(15 downto 0);
-        m_axis_tvalid   : out std_logic;
-        m_axis_tready   : in  std_logic;
-        m_axis_tlast    : out std_logic
+        -- AXI4-Stream Master Interface (Filtered Output to Subset Converter / FFT)
+        m_axis_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_tvalid : out std_logic;
+        m_axis_tready : in  std_logic;
+        m_axis_tlast  : out std_logic
     );
-end tlast_generator;
+end axis_channel_demux;
 
-architecture Behavioral of tlast_generator is
-    signal count_reg    : unsigned(15 downto 0) := (others => '0');
-    signal target_limit : unsigned(15 downto 0);
+architecture Behavioral of axis_channel_demux is
+
+    type t_state is (ST_WAIT_CH1, ST_EMIT_CH2);
+    signal state       : t_state := ST_WAIT_CH1;
+
+    signal ch1_reg     : std_logic_vector(15 downto 0) := (others => '0');
+    signal tlast_latch : std_logic := '0';
+
 begin
-    -- Direct pass-through for stream data and handshakes
-    s_axis_tready <= m_axis_tready;
-    m_axis_tdata  <= s_axis_tdata;
-    m_axis_tvalid <= s_axis_tvalid;
 
-    -- Dynamic target boundary calculation (target_limit = packet_size - 1)
-    target_limit <= (unsigned(packet_size_in) - 1) when (unsigned(packet_size_in) > 0) else
-                    to_unsigned(DEFAULT_PACKET_SIZE - 1, 16);
+    -- Upstream Handshake:
+    -- Beat 1 (CH1): Ready to capture CH1 sample
+    -- Beat 2 (CH2): Ready only when downstream (FFT) accepts the emitted sample
+    s_axis_tready <= '1' when (state = ST_WAIT_CH1) else m_axis_tready;
 
-    -- Assert TLAST combinational output on the final sample of the packet
-    m_axis_tlast <= '1' when (count_reg = target_limit) and (s_axis_tvalid = '1') and (m_axis_tready = '1') else '0';
+    -- Master Outputs:
+    m_axis_tdata  <= ch1_reg when (sel_ch = '0') else s_axis_tdata;
+    m_axis_tlast  <= s_axis_tlast or tlast_latch;
+    m_axis_tvalid <= '1' when (state = ST_EMIT_CH2 and s_axis_tvalid = '1') else '0';
 
     process(aclk)
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
-                count_reg <= (others => '0');
+                state       <= ST_WAIT_CH1;
+                ch1_reg     <= (others => '0');
+                tlast_latch <= '0';
             else
-                if (s_axis_tvalid = '1') and (m_axis_tready = '1') then
-                    if count_reg >= target_limit then
-                        count_reg <= (others => '0');
+                case state is
+                    -- Beat 1: Capture CH1 sample ONLY on valid handshake
+                    when ST_WAIT_CH1 =>
+                        if (s_axis_tvalid = '1') then
+                            ch1_reg     <= s_axis_tdata;
+                            tlast_latch <= s_axis_tlast;
+                            state       <= ST_EMIT_CH2;
+                        end if;
+
+                    -- Beat 2: Emit selected channel and advance ONLY when downstream handshakes
+                    when ST_EMIT_CH2 =>
+                        if (s_axis_tvalid = '1' and m_axis_tready = '1') then
+                            tlast_latch <= '0';
+                            state       <= ST_WAIT_CH1;
+                        end if;
+                end case;
+
+                -- Self-healing Frame Sync: Always reset to Beat 1 on packet end
+                if (s_axis_tvalid = '1' and s_axis_tlast = '1' and m_axis_tready = '1') then
+                    state       <= ST_WAIT_CH1;
+                    tlast_latch <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+axis_decimator.vhd: (src/hdl/axis_decimator.vhd)
+
+```vhd
+-- =============================================================================
+-- File: axis_decimator.vhd
+-- Description: Runtime-Configurable Dual-Channel AXI4-Stream Decimator
+--              Supports dynamic switching between:
+--                • "00": M = 1  (Bypass: 500 kSPS Wideband Lab Scope)
+--                • "01": M = 10 (50 kSPS Full Audio)
+--                • "10": M = 20 (25 kSPS Speech / Acoustic)
+--                • "11": M = 50 (10 kSPS Deep Bass Zoom, Δf = 4.88 Hz)
+--              Phase-locked to physical XADC channel_id (0x11 = A0, 0x19 = A1).
+--              Includes synchronous accumulator flush on dynamic decim_sel changes.
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity axis_decimator is
+    port (
+        aclk          : in  std_logic;
+        aresetn       : in  std_logic;
+
+        -- =====================================================================
+        -- Runtime Decimation Selector (from axis_trigger_unit register 0x14)
+        -- =====================================================================
+        decim_sel     : in  std_logic_vector(1 downto 0);
+
+        -- =====================================================================
+        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
+        -- =====================================================================
+        channel_id    : in  std_logic_vector(4 downto 0);
+
+        -- =====================================================================
+        -- AXI4-Stream Slave Interface (Raw 500 kSPS Interleaved Stream)
+        -- =====================================================================
+        s_axis_tdata  : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid : in  std_logic;
+        s_axis_tready : out std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Master Interface (Decimated Interleaved Stream)
+        -- =====================================================================
+        m_axis_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_tvalid : out std_logic;
+        m_axis_tready : in  std_logic
+    );
+end axis_decimator;
+
+architecture Behavioral of axis_decimator is
+
+    -- Constant Channel Addresses in 7-Series XADC
+    constant CH_VAUX1          : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
+    constant CH_VAUX9          : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
+
+    -- Independent 24-bit Accumulators (Prevent overflow for up to M=50 sums)
+    signal acc_ch1             : unsigned(23 downto 0) := (others => '0');
+    signal acc_ch2             : unsigned(23 downto 0) := (others => '0');
+    signal count_ch1           : integer range 0 to 50 := 0;
+    signal count_ch2           : integer range 0 to 50 := 0;
+
+    -- Edge detection for runtime profile switching
+    signal decim_sel_prev      : std_logic_vector(1 downto 0) := "01";
+
+    -- Output Emission Registers
+    signal avg_ch1_reg         : std_logic_vector(15 downto 0) := (others => '0');
+    signal avg_ch2_reg         : std_logic_vector(15 downto 0) := (others => '0');
+
+    -- Output State Machine (Emits decimated Ch1 then Ch2 sequentially)
+    type t_out_state is (ST_ACCUMULATING, ST_EMIT_CH1, ST_EMIT_CH2);
+    signal out_state           : t_out_state := ST_ACCUMULATING;
+
+begin
+
+    s_axis_tready <= '1' when (out_state = ST_ACCUMULATING) else '0';
+
+    m_axis_tdata <= avg_ch1_reg when (out_state = ST_EMIT_CH1) else
+                    avg_ch2_reg when (out_state = ST_EMIT_CH2) else
+                    (others => '0');
+
+    m_axis_tvalid <= '1' when (out_state = ST_EMIT_CH1 or out_state = ST_EMIT_CH2) else '0';
+
+    process(aclk)
+        variable sample_val : unsigned(15 downto 0);
+        variable is_ch1     : boolean;
+        variable is_ch2     : boolean;
+        variable m_target   : integer range 1 to 50;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                acc_ch1        <= (others => '0');
+                acc_ch2        <= (others => '0');
+                count_ch1      <= 0;
+                count_ch2      <= 0;
+                avg_ch1_reg    <= (others => '0');
+                avg_ch2_reg    <= (others => '0');
+                decim_sel_prev <= decim_sel;
+                out_state      <= ST_ACCUMULATING;
+            else
+                decim_sel_prev <= decim_sel;
+
+                -- Synchronous flush on dynamic decimation mode switch
+                if decim_sel /= decim_sel_prev then
+                    acc_ch1     <= (others => '0');
+                    acc_ch2     <= (others => '0');
+                    count_ch1   <= 0;
+                    count_ch2   <= 0;
+                    out_state   <= ST_ACCUMULATING;
+                else
+                    -- Resolve active decimation target factor M
+                    case decim_sel is
+                        when "00"   => m_target := 1;   -- Bypass Mode (500 kSPS)
+                        when "01"   => m_target := 10;  -- Full Audio (50 kSPS)
+                        when "10"   => m_target := 20;  -- Speech / Vocal (25 kSPS)
+                        when "11"   => m_target := 50;  -- Deep Bass Zoom (10 kSPS)
+                        when others => m_target := 10;
+                    end case;
+
+                    case out_state is
+                        -- ---------------------------------------------------------
+                        -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
+                        -- ---------------------------------------------------------
+                        when ST_ACCUMULATING =>
+                            if s_axis_tvalid = '1' then
+                                sample_val := unsigned(s_axis_tdata);
+                                is_ch1     := (channel_id = CH_VAUX1);
+                                is_ch2     := (channel_id = CH_VAUX9);
+
+                                if is_ch1 then
+                                    if count_ch1 < m_target then
+                                        acc_ch1   <= acc_ch1 + sample_val;
+                                        count_ch1 <= count_ch1 + 1;
+                                    end if;
+                                elsif is_ch2 then
+                                    if count_ch2 < m_target then
+                                        acc_ch2   <= acc_ch2 + sample_val;
+                                        count_ch2 <= count_ch2 + 1;
+                                    end if;
+                                end if;
+
+                                -- When both channels reach M samples, normalize and emit
+                                if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
+                                   (count_ch1 = m_target and count_ch2 = m_target) then
+
+                                    case decim_sel is
+                                        when "00" => -- M = 1 (Bypass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
+                                            end if;
+
+                                        when "01" => -- M = 10 (Audio)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
+                                            end if;
+
+                                        when "10" => -- M = 20 (Speech)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
+                                            end if;
+
+                                        when "11" => -- M = 50 (Deep Bass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
+                                            end if;
+
+                                        when others =>
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
+                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
+                                    end case;
+
+                                    -- Reset accumulators
+                                    acc_ch1     <= (others => '0');
+                                    acc_ch2     <= (others => '0');
+                                    count_ch1   <= 0;
+                                    count_ch2   <= 0;
+
+                                    out_state   <= ST_EMIT_CH1;
+                                end if;
+                            end if;
+
+                        -- ---------------------------------------------------------
+                        -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH1 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_EMIT_CH2;
+                            end if;
+
+                        -- ---------------------------------------------------------
+                        -- 3. EMIT CHANNEL 2 (A1) SECOND
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH2 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_ACCUMULATING;
+                            end if;
+
+                    end case;
+                end if;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+axis_spectral_mask.vhd: (src/hdl/axis_spectral_mask.vhd)
+
+```vhd
+-- =============================================================================
+-- File: axis_spectral_mask.vhd
+-- Description: Hardware Frequency-Domain Spectral Masking & Filter Core.
+--              Operates on 32-bit complex FFT streams ({Im[15:0], Re[15:0]}).
+--              Implements real-signal Hermitian symmetry: k_eff = min(k, N - k)
+--              to achieve full 1:1 amplitude fidelity and >40 dB stopband rejection.
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity axis_spectral_mask is
+    generic (
+        C_S_AXI_DATA_WIDTH : integer := 32;
+        C_S_AXI_ADDR_WIDTH : integer := 5
+    );
+    port (
+        aclk          : in  std_logic;
+        aresetn       : in  std_logic;
+
+        -- =====================================================================
+        -- AXI4-Lite Slave Interface (Filter Control & Cutoff Registers)
+        -- =====================================================================
+        s_axi_awaddr  : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_awprot  : in  std_logic_vector(2 downto 0);
+        s_axi_awvalid : in  std_logic;
+        s_axi_awready : out std_logic;
+        s_axi_wdata   : in  std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_wstrb   : in  std_logic_vector((C_S_AXI_DATA_WIDTH / 8) - 1 downto 0);
+        s_axi_wvalid  : in  std_logic;
+        s_axi_wready  : out std_logic;
+        s_axi_bresp   : out std_logic_vector(1 downto 0);
+        s_axi_bvalid  : out std_logic;
+        s_axi_bready  : in  std_logic;
+        s_axi_araddr  : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_arprot  : in  std_logic_vector(2 downto 0);
+        s_axi_arvalid : in  std_logic;
+        s_axi_arready : out std_logic;
+        s_axi_rdata   : out std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_rresp   : out std_logic_vector(1 downto 0);
+        s_axi_rvalid  : out std_logic;
+        s_axi_rready  : in  std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Slave Interface (Complex Spectrum from xfft_0)
+        -- =====================================================================
+        s_axis_tdata  : in  std_logic_vector(31 downto 0); -- {Im[15:0], Re[15:0]}
+        s_axis_tvalid : in  std_logic;
+        s_axis_tready : out std_logic;
+        s_axis_tlast  : in  std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Master Interface (Masked Complex Spectrum to xfft_1)
+        -- =====================================================================
+        m_axis_tdata  : out std_logic_vector(31 downto 0);
+        m_axis_tvalid : out std_logic;
+        m_axis_tready : in  std_logic;
+        m_axis_tlast  : out std_logic
+    );
+end axis_spectral_mask;
+
+architecture Behavioral of axis_spectral_mask is
+
+    -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
+    -- 0x00: REG_CTRL      [0]: Filter Enable (0=Bypass, 1=Enable)
+    --                     [2:1]: Mode (00=Lowpass/Bass, 01=Highpass, 10=Bandpass, 11=Notch)
+    -- 0x04: REG_BIN_START [15:0] Lower Cutoff Bin (k_start)
+    -- 0x08: REG_BIN_STOP  [15:0] Upper Cutoff Bin (k_stop)
+    -- 0x0C: REG_FFT_LEN   [15:0] FFT Transform Length N (Default: 1024)
+    -- 0x10: REG_STATUS    [0]: Frame Active, [31:16]: Current Bin Count
+    signal reg_ctrl      : std_logic_vector(31 downto 0) := (others => '0'); -- Default: Bypass
+    signal reg_bin_start : std_logic_vector(31 downto 0) := (others => '0');
+    signal reg_bin_stop  : std_logic_vector(31 downto 0) := x"0000000A";     -- Default: Bin 10
+    signal reg_fft_len   : std_logic_vector(31 downto 0) := x"00000400";     -- Default: N = 1024
+    signal reg_status    : std_logic_vector(31 downto 0) := (others => '0');
+
+    -- AXI Handshake Signals
+    signal axi_awready   : std_logic := '0';
+    signal axi_wready    : std_logic := '0';
+    signal axi_bvalid    : std_logic := '0';
+    signal axi_arready   : std_logic := '0';
+    signal axi_rvalid    : std_logic := '0';
+    signal axi_rdata     : std_logic_vector(31 downto 0) := (others => '0');
+
+    -- Frequency Bin Tracking
+    signal bin_count     : unsigned(15 downto 0) := (others => '0');
+    signal frame_active  : std_logic := '0';
+    signal reg_sync_rst  : std_logic := '0';
+
+    -- Filter Aliases
+    signal filter_en     : std_logic;
+    signal filter_mode   : std_logic_vector(1 downto 0);
+
+begin
+
+    filter_en   <= reg_ctrl(0);
+    filter_mode <= reg_ctrl(2 downto 1);
+
+    -- Status register mapping
+    reg_status(0)           <= frame_active;
+    reg_status(15 downto 1) <= (others => '0');
+    reg_status(31 downto 16)<= std_logic_vector(bin_count);
+
+    -- =========================================================================
+    -- 1. AXI4-Lite Register Interface
+    -- =========================================================================
+    s_axi_awready <= axi_awready;
+    s_axi_wready  <= axi_wready;
+    s_axi_bresp   <= "00";
+    s_axi_bvalid  <= axi_bvalid;
+    s_axi_arready <= axi_arready;
+    s_axi_rdata   <= axi_rdata;
+    s_axi_rresp   <= "00";
+    s_axi_rvalid  <= axi_rvalid;
+
+    process(aclk)
+        variable write_addr : integer;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                axi_awready   <= '0';
+                axi_wready    <= '0';
+                axi_bvalid    <= '0';
+                reg_ctrl      <= (others => '0'); -- Default: Bypass
+                reg_bin_start <= (others => '0');
+                reg_bin_stop  <= x"0000000A";     -- Default: Bin 10
+                reg_fft_len   <= x"00000400";     -- Default: N = 1024
+                reg_sync_rst  <= '0';
+            else
+                reg_sync_rst <= '0';
+
+                if (axi_awready = '0' and s_axi_awvalid = '1' and s_axi_wvalid = '1') then
+                    axi_awready <= '1';
+                    axi_wready  <= '1';
+                else
+                    axi_awready <= '0';
+                    axi_wready  <= '0';
+                end if;
+
+                if (axi_awready = '1' and axi_wready = '1') then
+                    write_addr := to_integer(unsigned(s_axi_awaddr(4 downto 2)));
+                    reg_sync_rst <= '1'; -- Synchronous flush on register write to prevent phase drift!
+                    case write_addr is
+                        when 0 => reg_ctrl      <= s_axi_wdata; -- 0x00
+                        when 1 => reg_bin_start <= s_axi_wdata; -- 0x04
+                        when 2 => reg_bin_stop  <= s_axi_wdata; -- 0x08
+                        when 3 => reg_fft_len   <= s_axi_wdata; -- 0x0C
+                        when others => null;
+                    end case;
+                end if;
+
+                if (axi_awready = '1' and axi_wready = '1' and axi_bvalid = '0') then
+                    axi_bvalid <= '1';
+                elsif (s_axi_bready = '1' and axi_bvalid = '1') then
+                    axi_bvalid <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(aclk)
+        variable read_addr : integer;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                axi_arready <= '0';
+                axi_rvalid  <= '0';
+                axi_rdata   <= (others => '0');
+            else
+                if (axi_arready = '0' and s_axi_arvalid = '1') then
+                    axi_arready <= '1';
+                    read_addr := to_integer(unsigned(s_axi_araddr(4 downto 2)));
+                    case read_addr is
+                        when 0 => axi_rdata <= reg_ctrl;
+                        when 1 => axi_rdata <= reg_bin_start;
+                        when 2 => axi_rdata <= reg_bin_stop;
+                        when 3 => axi_rdata <= reg_fft_len;
+                        when 4 => axi_rdata <= reg_status;
+                        when others => axi_rdata <= (others => '0');
+                    end case;
+                else
+                    axi_arready <= '0';
+                end if;
+
+                if (axi_arready = '1' and axi_rvalid = '0') then
+                    axi_rvalid <= '1';
+                elsif (s_axi_rready = '1' and axi_rvalid = '1') then
+                    axi_rvalid <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- =========================================================================
+    -- 2. AXI4-Stream Hermitian Symmetric Masking Engine
+    -- =========================================================================
+    s_axis_tready <= m_axis_tready;
+    m_axis_tvalid <= s_axis_tvalid;
+    m_axis_tlast  <= s_axis_tlast;
+
+    -- Hermitian Symmetric Filter Process: k_eff = min(k, N - k)
+    process(bin_count, reg_bin_start, reg_bin_stop, reg_fft_len, filter_en, filter_mode, s_axis_tdata)
+        variable k_raw   : unsigned(15 downto 0);
+        variable n_len   : unsigned(15 downto 0);
+        variable k_eff   : unsigned(15 downto 0);
+        variable k_start : unsigned(15 downto 0);
+        variable k_stop  : unsigned(15 downto 0);
+        variable pass    : boolean;
+    begin
+        k_raw   := bin_count;
+        n_len   := unsigned(reg_fft_len(15 downto 0));
+        k_start := unsigned(reg_bin_start(15 downto 0));
+        k_stop  := unsigned(reg_bin_stop(15 downto 0));
+
+        -- Calculate Hermitian Effective Frequency Bin: k_eff = min(k, N - k)
+        if (k_raw <= shift_right(n_len, 1)) then
+            k_eff := k_raw;
+        else
+            k_eff := n_len - k_raw;
+        end if;
+
+        if filter_en = '0' then
+            pass := true; -- Bypass mode: pass all frequencies
+        else
+            case filter_mode is
+                when "00" => -- Lowpass / Bass: Pass k_eff <= k_stop
+                    pass := (k_eff <= k_stop);
+
+                when "01" => -- Highpass / Treble: Pass k_eff >= k_start
+                    pass := (k_eff >= k_start);
+
+                when "10" => -- Bandpass: Pass k_start <= k_eff <= k_stop
+                    pass := (k_eff >= k_start and k_eff <= k_stop);
+
+                when "11" => -- Notch / Bandstop: Zero out k_start <= k_eff <= k_stop
+                    pass := not (k_eff >= k_start and k_eff <= k_stop);
+
+                when others =>
+                    pass := true;
+            end case;
+        end if;
+
+        if pass then
+            m_axis_tdata <= s_axis_tdata; -- Pass original complex word {Im, Re}
+        else
+            m_axis_tdata <= (others => '0'); -- Zero out both Real and Imaginary
+        end if;
+    end process;
+
+    -- Bin Counter Synchronization
+    process(aclk)
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' or reg_sync_rst = '1' then
+                bin_count    <= (others => '0');
+                frame_active <= '0';
+            else
+                if (s_axis_tvalid = '1' and m_axis_tready = '1') then
+                    frame_active <= '1';
+
+                    if s_axis_tlast = '1' then
+                        bin_count    <= (others => '0'); -- Reset on frame boundary
+                        frame_active <= '0';
                     else
-                        count_reg <= count_reg + 1;
+                        bin_count    <= bin_count + 1;
                     end if;
                 end if;
             end if;
@@ -4453,585 +4940,76 @@ begin
 end Behavioral;
 ```
 
-axis_decimator.vhd: (src/hdl/axis_decimator.vhd)
+tlast_generator.vhd: (src/hdl/tlast_generator.vhd)
 
 ```vhd
 -- =============================================================================
--- File: axis_decimator.vhd
--- Description: Runtime-Configurable Dual-Channel AXI4-Stream Decimator
---              Supports dynamic switching between:
---                • "00": M = 1  (Bypass: 500 kSPS Wideband Lab Scope)
---                • "01": M = 10 (50 kSPS Full Audio)
---                • "10": M = 20 (25 kSPS Speech / Acoustic)
---                • "11": M = 50 (10 kSPS Deep Bass Zoom, Δf = 4.88 Hz)
---              Phase-locked to physical XADC channel_id (0x11 = A0, 0x19 = A1).
---              Includes synchronous accumulator flush on dynamic decim_sel changes.
+-- File: tlast_generator.vhd
+-- Description: Runtime-Programmable AXI4-Stream Packetizer & TLAST Generator.
+--              Asserts TLAST on the final sample of a frame defined by
+--              packet_size_in (driven by axis_trigger_unit register 0x1C).
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity axis_decimator is
-    port (
-        aclk          : in  std_logic;
-        aresetn       : in  std_logic;
-
-        -- =====================================================================
-        -- Runtime Decimation Selector (from axis_trigger_unit register 0x14)
-        -- =====================================================================
-        decim_sel     : in  std_logic_vector(1 downto 0);
-
-        -- =====================================================================
-        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
-        -- =====================================================================
-        channel_id    : in  std_logic_vector(4 downto 0);
-
-        -- =====================================================================
-        -- AXI4-Stream Slave Interface (Raw 500 kSPS Interleaved Stream)
-        -- =====================================================================
-        s_axis_tdata  : in  std_logic_vector(15 downto 0);
-        s_axis_tvalid : in  std_logic;
-        s_axis_tready : out std_logic;
-
-        -- =====================================================================
-        -- AXI4-Stream Master Interface (Decimated Interleaved Stream)
-        -- =====================================================================
-        m_axis_tdata  : out std_logic_vector(15 downto 0);
-        m_axis_tvalid : out std_logic;
-        m_axis_tready : in  std_logic
-    );
-end axis_decimator;
-
-architecture Behavioral of axis_decimator is
-
-    -- Constant Channel Addresses in 7-Series XADC
-    constant CH_VAUX1          : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
-    constant CH_VAUX9          : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
-
-    -- Independent 24-bit Accumulators (Prevent overflow for up to M=50 sums)
-    signal acc_ch1             : unsigned(23 downto 0) := (others => '0');
-    signal acc_ch2             : unsigned(23 downto 0) := (others => '0');
-    signal count_ch1           : integer range 0 to 50 := 0;
-    signal count_ch2           : integer range 0 to 50 := 0;
-
-    -- Edge detection for runtime profile switching
-    signal decim_sel_prev      : std_logic_vector(1 downto 0) := "01";
-
-    -- Output Emission Registers
-    signal avg_ch1_reg         : std_logic_vector(15 downto 0) := (others => '0');
-    signal avg_ch2_reg         : std_logic_vector(15 downto 0) := (others => '0');
-
-    -- Output State Machine (Emits decimated Ch1 then Ch2 sequentially)
-    type t_out_state is (ST_ACCUMULATING, ST_EMIT_CH1, ST_EMIT_CH2);
-    signal out_state           : t_out_state := ST_ACCUMULATING;
-
-begin
-
-    s_axis_tready <= '1' when (out_state = ST_ACCUMULATING) else '0';
-
-    m_axis_tdata <= avg_ch1_reg when (out_state = ST_EMIT_CH1) else
-                    avg_ch2_reg when (out_state = ST_EMIT_CH2) else
-                    (others => '0');
-
-    m_axis_tvalid <= '1' when (out_state = ST_EMIT_CH1 or out_state = ST_EMIT_CH2) else '0';
-
-    process(aclk)
-        variable sample_val : unsigned(15 downto 0);
-        variable is_ch1     : boolean;
-        variable is_ch2     : boolean;
-        variable m_target   : integer range 1 to 50;
-    begin
-        if rising_edge(aclk) then
-            if aresetn = '0' then
-                acc_ch1        <= (others => '0');
-                acc_ch2        <= (others => '0');
-                count_ch1      <= 0;
-                count_ch2      <= 0;
-                avg_ch1_reg    <= (others => '0');
-                avg_ch2_reg    <= (others => '0');
-                decim_sel_prev <= decim_sel;
-                out_state      <= ST_ACCUMULATING;
-            else
-                decim_sel_prev <= decim_sel;
-
-                -- Synchronous flush on dynamic decimation mode switch
-                if decim_sel /= decim_sel_prev then
-                    acc_ch1     <= (others => '0');
-                    acc_ch2     <= (others => '0');
-                    count_ch1   <= 0;
-                    count_ch2   <= 0;
-                    out_state   <= ST_ACCUMULATING;
-                else
-                    -- Resolve active decimation target factor M
-                    case decim_sel is
-                        when "00"   => m_target := 1;   -- Bypass Mode (500 kSPS)
-                        when "01"   => m_target := 10;  -- Full Audio (50 kSPS)
-                        when "10"   => m_target := 20;  -- Speech / Vocal (25 kSPS)
-                        when "11"   => m_target := 50;  -- Deep Bass Zoom (10 kSPS)
-                        when others => m_target := 10;
-                    end case;
-
-                    case out_state is
-                        -- ---------------------------------------------------------
-                        -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
-                        -- ---------------------------------------------------------
-                        when ST_ACCUMULATING =>
-                            if s_axis_tvalid = '1' then
-                                sample_val := unsigned(s_axis_tdata);
-                                is_ch1     := (channel_id = CH_VAUX1);
-                                is_ch2     := (channel_id = CH_VAUX9);
-
-                                if is_ch1 then
-                                    if count_ch1 < m_target then
-                                        acc_ch1   <= acc_ch1 + sample_val;
-                                        count_ch1 <= count_ch1 + 1;
-                                    end if;
-                                elsif is_ch2 then
-                                    if count_ch2 < m_target then
-                                        acc_ch2   <= acc_ch2 + sample_val;
-                                        count_ch2 <= count_ch2 + 1;
-                                    end if;
-                                end if;
-
-                                -- When both channels reach M samples, normalize and emit
-                                if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
-                                   (count_ch1 = m_target and count_ch2 = m_target) then
-
-                                    case decim_sel is
-                                        when "00" => -- M = 1 (Bypass)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
-                                            end if;
-
-                                        when "01" => -- M = 10 (Audio)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                            end if;
-
-                                        when "10" => -- M = 20 (Speech)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
-                                            end if;
-
-                                        when "11" => -- M = 50 (Deep Bass)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
-                                            end if;
-
-                                        when others =>
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                    end case;
-
-                                    -- Reset accumulators
-                                    acc_ch1     <= (others => '0');
-                                    acc_ch2     <= (others => '0');
-                                    count_ch1   <= 0;
-                                    count_ch2   <= 0;
-
-                                    out_state   <= ST_EMIT_CH1;
-                                end if;
-                            end if;
-
-                        -- ---------------------------------------------------------
-                        -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
-                        -- ---------------------------------------------------------
-                        when ST_EMIT_CH1 =>
-                            if m_axis_tready = '1' then
-                                out_state <= ST_EMIT_CH2;
-                            end if;
-
-                        -- ---------------------------------------------------------
-                        -- 3. EMIT CHANNEL 2 (A1) SECOND
-                        -- ---------------------------------------------------------
-                        when ST_EMIT_CH2 =>
-                            if m_axis_tready = '1' then
-                                out_state <= ST_ACCUMULATING;
-                            end if;
-
-                    end case;
-                end if;
-            end if;
-        end if;
-    end process;
-
-end Behavioral;
-```
-
-axis_channel_demux.vhd: (src/hdl/axis_channel_demux.vhd)
-
-```vhd
--- =============================================================================
--- File: axis_channel_demux.vhd
--- Description: AXI4-Stream Channel Demultiplexer & Single-Channel Filter.
---              Filters interleaved dual-channel stream (A0, A1, A0, A1...) and
---              emits a pure single-channel continuous stream with concurrent TLAST.
---              sel_ch: '0' => Emit Channel 1 (A0)
---                      '1' => Emit Channel 2 (A1)
--- =============================================================================
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
-
-entity axis_channel_demux is
-    port (
-        aclk          : in  std_logic;
-        aresetn       : in  std_logic;
-
-        -- Channel selector (0 = Channel 1 / A0, 1 = Channel 2 / A1)
-        sel_ch        : in  std_logic;
-
-        -- AXI4-Stream Slave Interface (Interleaved Input from Broadcaster)
-        s_axis_tdata  : in  std_logic_vector(15 downto 0);
-        s_axis_tvalid : in  std_logic;
-        s_axis_tready : out std_logic;
-        s_axis_tlast  : in  std_logic;
-
-        -- AXI4-Stream Master Interface (Filtered Output to Subset Converter / FFT)
-        m_axis_tdata  : out std_logic_vector(15 downto 0);
-        m_axis_tvalid : out std_logic;
-        m_axis_tready : in  std_logic;
-        m_axis_tlast  : out std_logic
-    );
-end axis_channel_demux;
-
-architecture Behavioral of axis_channel_demux is
-
-    type t_state is (ST_WAIT_CH1, ST_EMIT_CH2);
-    signal state       : t_state := ST_WAIT_CH1;
-
-    signal ch1_reg     : std_logic_vector(15 downto 0) := (others => '0');
-    signal tlast_latch : std_logic := '0';
-
-begin
-
-    -- Upstream Handshake:
-    -- Beat 1 (CH1): Ready to capture CH1 sample
-    -- Beat 2 (CH2): Ready only when downstream (FFT) accepts the emitted sample
-    s_axis_tready <= '1' when (state = ST_WAIT_CH1) else m_axis_tready;
-
-    -- Master Outputs:
-    m_axis_tdata  <= ch1_reg when (sel_ch = '0') else s_axis_tdata;
-    m_axis_tlast  <= s_axis_tlast or tlast_latch;
-    m_axis_tvalid <= '1' when (state = ST_EMIT_CH2 and s_axis_tvalid = '1') else '0';
-
-    process(aclk)
-    begin
-        if rising_edge(aclk) then
-            if aresetn = '0' then
-                state       <= ST_WAIT_CH1;
-                ch1_reg     <= (others => '0');
-                tlast_latch <= '0';
-            else
-                case state is
-                    -- Beat 1: Capture CH1 sample ONLY on valid handshake
-                    when ST_WAIT_CH1 =>
-                        if (s_axis_tvalid = '1') then
-                            ch1_reg     <= s_axis_tdata;
-                            tlast_latch <= s_axis_tlast;
-                            state       <= ST_EMIT_CH2;
-                        end if;
-
-                    -- Beat 2: Emit selected channel and advance ONLY when downstream handshakes
-                    when ST_EMIT_CH2 =>
-                        if (s_axis_tvalid = '1' and m_axis_tready = '1') then
-                            tlast_latch <= '0';
-                            state       <= ST_WAIT_CH1;
-                        end if;
-                end case;
-
-                -- Self-healing Frame Sync: Always reset to Beat 1 on packet end
-                if (s_axis_tvalid = '1' and s_axis_tlast = '1' and m_axis_tready = '1') then
-                    state       <= ST_WAIT_CH1;
-                    tlast_latch <= '0';
-                end if;
-            end if;
-        end if;
-    end process;
-
-end Behavioral;
-```
-
-axis_spectral_mask.vhd: (src/hdl/axis_spectral_mask.vhd)
-
-```vhd
--- =============================================================================
--- File: axis_spectral_mask.vhd
--- Description: Hardware Frequency-Domain Spectral Masking & Filter Core.
---              Operates on 32-bit complex FFT streams ({Im[15:0], Re[15:0]}).
---              Implements real-signal Hermitian symmetry: k_eff = min(k, N - k)
---              to achieve full 1:1 amplitude fidelity and >40 dB stopband rejection.
--- =============================================================================
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
-
-entity axis_spectral_mask is
+entity tlast_generator is
     generic (
-        C_S_AXI_DATA_WIDTH : integer := 32;
-        C_S_AXI_ADDR_WIDTH : integer := 5
+        DEFAULT_PACKET_SIZE : integer := 2048
     );
     port (
-        aclk          : in  std_logic;
-        aresetn       : in  std_logic;
+        aclk            : in  std_logic;
+        aresetn         : in  std_logic;
 
         -- =====================================================================
-        -- AXI4-Lite Slave Interface (Filter Control & Cutoff Registers)
+        -- Runtime Packet Size Input (from axis_trigger_unit register 0x1C)
         -- =====================================================================
-        s_axi_awaddr  : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
-        s_axi_awprot  : in  std_logic_vector(2 downto 0);
-        s_axi_awvalid : in  std_logic;
-        s_axi_awready : out std_logic;
-        s_axi_wdata   : in  std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
-        s_axi_wstrb   : in  std_logic_vector((C_S_AXI_DATA_WIDTH / 8) - 1 downto 0);
-        s_axi_wvalid  : in  std_logic;
-        s_axi_wready  : out std_logic;
-        s_axi_bresp   : out std_logic_vector(1 downto 0);
-        s_axi_bvalid  : out std_logic;
-        s_axi_bready  : in  std_logic;
-        s_axi_araddr  : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
-        s_axi_arprot  : in  std_logic_vector(2 downto 0);
-        s_axi_arvalid : in  std_logic;
-        s_axi_arready : out std_logic;
-        s_axi_rdata   : out std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
-        s_axi_rresp   : out std_logic_vector(1 downto 0);
-        s_axi_rvalid  : out std_logic;
-        s_axi_rready  : in  std_logic;
+        packet_size_in  : in  std_logic_vector(15 downto 0);
 
         -- =====================================================================
-        -- AXI4-Stream Slave Interface (Complex Spectrum from xfft_0)
+        -- AXI4-Stream Slave Interface (from Decimator)
         -- =====================================================================
-        s_axis_tdata  : in  std_logic_vector(31 downto 0); -- {Im[15:0], Re[15:0]}
-        s_axis_tvalid : in  std_logic;
-        s_axis_tready : out std_logic;
-        s_axis_tlast  : in  std_logic;
+        s_axis_tdata    : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid   : in  std_logic;
+        s_axis_tready   : out std_logic;
 
         -- =====================================================================
-        -- AXI4-Stream Master Interface (Masked Complex Spectrum to xfft_1)
+        -- AXI4-Stream Master Interface (to Broadcaster / DMA)
         -- =====================================================================
-        m_axis_tdata  : out std_logic_vector(31 downto 0);
-        m_axis_tvalid : out std_logic;
-        m_axis_tready : in  std_logic;
-        m_axis_tlast  : out std_logic
+        m_axis_tdata    : out std_logic_vector(15 downto 0);
+        m_axis_tvalid   : out std_logic;
+        m_axis_tready   : in  std_logic;
+        m_axis_tlast    : out std_logic
     );
-end axis_spectral_mask;
+end tlast_generator;
 
-architecture Behavioral of axis_spectral_mask is
-
-    -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
-    -- 0x00: REG_CTRL      [0]: Filter Enable (0=Bypass, 1=Enable)
-    --                     [2:1]: Mode (00=Lowpass/Bass, 01=Highpass, 10=Bandpass, 11=Notch)
-    -- 0x04: REG_BIN_START [15:0] Lower Cutoff Bin (k_start)
-    -- 0x08: REG_BIN_STOP  [15:0] Upper Cutoff Bin (k_stop)
-    -- 0x0C: REG_FFT_LEN   [15:0] FFT Transform Length N (Default: 1024)
-    -- 0x10: REG_STATUS    [0]: Frame Active, [31:16]: Current Bin Count
-    signal reg_ctrl      : std_logic_vector(31 downto 0) := (others => '0'); -- Default: Bypass
-    signal reg_bin_start : std_logic_vector(31 downto 0) := (others => '0');
-    signal reg_bin_stop  : std_logic_vector(31 downto 0) := x"0000000A";     -- Default: Bin 10
-    signal reg_fft_len   : std_logic_vector(31 downto 0) := x"00000400";     -- Default: N = 1024
-    signal reg_status    : std_logic_vector(31 downto 0) := (others => '0');
-
-    -- AXI Handshake Signals
-    signal axi_awready   : std_logic := '0';
-    signal axi_wready    : std_logic := '0';
-    signal axi_bvalid    : std_logic := '0';
-    signal axi_arready   : std_logic := '0';
-    signal axi_rvalid    : std_logic := '0';
-    signal axi_rdata     : std_logic_vector(31 downto 0) := (others => '0');
-
-    -- Frequency Bin Tracking
-    signal bin_count     : unsigned(15 downto 0) := (others => '0');
-    signal frame_active  : std_logic := '0';
-    signal reg_sync_rst  : std_logic := '0';
-
-    -- Filter Aliases
-    signal filter_en     : std_logic;
-    signal filter_mode   : std_logic_vector(1 downto 0);
-
+architecture Behavioral of tlast_generator is
+    signal count_reg    : unsigned(15 downto 0) := (others => '0');
+    signal target_limit : unsigned(15 downto 0);
 begin
-
-    filter_en   <= reg_ctrl(0);
-    filter_mode <= reg_ctrl(2 downto 1);
-
-    -- Status register mapping
-    reg_status(0)           <= frame_active;
-    reg_status(15 downto 1) <= (others => '0');
-    reg_status(31 downto 16)<= std_logic_vector(bin_count);
-
-    -- =========================================================================
-    -- 1. AXI4-Lite Register Interface
-    -- =========================================================================
-    s_axi_awready <= axi_awready;
-    s_axi_wready  <= axi_wready;
-    s_axi_bresp   <= "00";
-    s_axi_bvalid  <= axi_bvalid;
-    s_axi_arready <= axi_arready;
-    s_axi_rdata   <= axi_rdata;
-    s_axi_rresp   <= "00";
-    s_axi_rvalid  <= axi_rvalid;
-
-    process(aclk)
-        variable write_addr : integer;
-    begin
-        if rising_edge(aclk) then
-            if aresetn = '0' then
-                axi_awready   <= '0';
-                axi_wready    <= '0';
-                axi_bvalid    <= '0';
-                reg_ctrl      <= (others => '0'); -- Default: Bypass
-                reg_bin_start <= (others => '0');
-                reg_bin_stop  <= x"0000000A";     -- Default: Bin 10
-                reg_fft_len   <= x"00000400";     -- Default: N = 1024
-                reg_sync_rst  <= '0';
-            else
-                reg_sync_rst <= '0';
-
-                if (axi_awready = '0' and s_axi_awvalid = '1' and s_axi_wvalid = '1') then
-                    axi_awready <= '1';
-                    axi_wready  <= '1';
-                else
-                    axi_awready <= '0';
-                    axi_wready  <= '0';
-                end if;
-
-                if (axi_awready = '1' and axi_wready = '1') then
-                    write_addr := to_integer(unsigned(s_axi_awaddr(4 downto 2)));
-                    reg_sync_rst <= '1'; -- Synchronous flush on register write to prevent phase drift!
-                    case write_addr is
-                        when 0 => reg_ctrl      <= s_axi_wdata; -- 0x00
-                        when 1 => reg_bin_start <= s_axi_wdata; -- 0x04
-                        when 2 => reg_bin_stop  <= s_axi_wdata; -- 0x08
-                        when 3 => reg_fft_len   <= s_axi_wdata; -- 0x0C
-                        when others => null;
-                    end case;
-                end if;
-
-                if (axi_awready = '1' and axi_wready = '1' and axi_bvalid = '0') then
-                    axi_bvalid <= '1';
-                elsif (s_axi_bready = '1' and axi_bvalid = '1') then
-                    axi_bvalid <= '0';
-                end if;
-            end if;
-        end if;
-    end process;
-
-    process(aclk)
-        variable read_addr : integer;
-    begin
-        if rising_edge(aclk) then
-            if aresetn = '0' then
-                axi_arready <= '0';
-                axi_rvalid  <= '0';
-                axi_rdata   <= (others => '0');
-            else
-                if (axi_arready = '0' and s_axi_arvalid = '1') then
-                    axi_arready <= '1';
-                    read_addr := to_integer(unsigned(s_axi_araddr(4 downto 2)));
-                    case read_addr is
-                        when 0 => axi_rdata <= reg_ctrl;
-                        when 1 => axi_rdata <= reg_bin_start;
-                        when 2 => axi_rdata <= reg_bin_stop;
-                        when 3 => axi_rdata <= reg_fft_len;
-                        when 4 => axi_rdata <= reg_status;
-                        when others => axi_rdata <= (others => '0');
-                    end case;
-                else
-                    axi_arready <= '0';
-                end if;
-
-                if (axi_arready = '1' and axi_rvalid = '0') then
-                    axi_rvalid <= '1';
-                elsif (s_axi_rready = '1' and axi_rvalid = '1') then
-                    axi_rvalid <= '0';
-                end if;
-            end if;
-        end if;
-    end process;
-
-    -- =========================================================================
-    -- 2. AXI4-Stream Hermitian Symmetric Masking Engine
-    -- =========================================================================
+    -- Direct pass-through for stream data and handshakes
     s_axis_tready <= m_axis_tready;
+    m_axis_tdata  <= s_axis_tdata;
     m_axis_tvalid <= s_axis_tvalid;
-    m_axis_tlast  <= s_axis_tlast;
 
-    -- Hermitian Symmetric Filter Process: k_eff = min(k, N - k)
-    process(bin_count, reg_bin_start, reg_bin_stop, reg_fft_len, filter_en, filter_mode, s_axis_tdata)
-        variable k_raw   : unsigned(15 downto 0);
-        variable n_len   : unsigned(15 downto 0);
-        variable k_eff   : unsigned(15 downto 0);
-        variable k_start : unsigned(15 downto 0);
-        variable k_stop  : unsigned(15 downto 0);
-        variable pass    : boolean;
-    begin
-        k_raw   := bin_count;
-        n_len   := unsigned(reg_fft_len(15 downto 0));
-        k_start := unsigned(reg_bin_start(15 downto 0));
-        k_stop  := unsigned(reg_bin_stop(15 downto 0));
+    -- Dynamic target boundary calculation (target_limit = packet_size - 1)
+    target_limit <= (unsigned(packet_size_in) - 1) when (unsigned(packet_size_in) > 0) else
+                    to_unsigned(DEFAULT_PACKET_SIZE - 1, 16);
 
-        -- Calculate Hermitian Effective Frequency Bin: k_eff = min(k, N - k)
-        if (k_raw <= shift_right(n_len, 1)) then
-            k_eff := k_raw;
-        else
-            k_eff := n_len - k_raw;
-        end if;
+    -- Assert TLAST combinational output on the final sample of the packet
+    m_axis_tlast <= '1' when (count_reg = target_limit) and (s_axis_tvalid = '1') and (m_axis_tready = '1') else '0';
 
-        if filter_en = '0' then
-            pass := true; -- Bypass mode: pass all frequencies
-        else
-            case filter_mode is
-                when "00" => -- Lowpass / Bass: Pass k_eff <= k_stop
-                    pass := (k_eff <= k_stop);
-
-                when "01" => -- Highpass / Treble: Pass k_eff >= k_start
-                    pass := (k_eff >= k_start);
-
-                when "10" => -- Bandpass: Pass k_start <= k_eff <= k_stop
-                    pass := (k_eff >= k_start and k_eff <= k_stop);
-
-                when "11" => -- Notch / Bandstop: Zero out k_start <= k_eff <= k_stop
-                    pass := not (k_eff >= k_start and k_eff <= k_stop);
-
-                when others =>
-                    pass := true;
-            end case;
-        end if;
-
-        if pass then
-            m_axis_tdata <= s_axis_tdata; -- Pass original complex word {Im, Re}
-        else
-            m_axis_tdata <= (others => '0'); -- Zero out both Real and Imaginary
-        end if;
-    end process;
-
-    -- Bin Counter Synchronization
     process(aclk)
     begin
         if rising_edge(aclk) then
-            if aresetn = '0' or reg_sync_rst = '1' then
-                bin_count    <= (others => '0');
-                frame_active <= '0';
+            if aresetn = '0' then
+                count_reg <= (others => '0');
             else
-                if (s_axis_tvalid = '1' and m_axis_tready = '1') then
-                    frame_active <= '1';
-
-                    if s_axis_tlast = '1' then
-                        bin_count    <= (others => '0'); -- Reset on frame boundary
-                        frame_active <= '0';
+                if (s_axis_tvalid = '1') and (m_axis_tready = '1') then
+                    if count_reg >= target_limit then
+                        count_reg <= (others => '0');
                     else
-                        bin_count    <= bin_count + 1;
+                        count_reg <= count_reg + 1;
                     end if;
                 end if;
             end if;
@@ -5039,20 +5017,4 @@ begin
     end process;
 
 end Behavioral;
-```
-
-pynq_z2.xdc: (src/con/pynq_z2.xdc)
-
-```xdc
-# ==============================================================================
-# Physical Package Pin Constraints for PYNQ-Z2 Analog Headers
-# ==============================================================================
-
-# Arduino Header A0 (Vaux1)
-set_property PACKAGE_PIN E17 [get_ports Vaux1_0_v_p]
-set_property PACKAGE_PIN D18 [get_ports Vaux1_0_v_n]
-
-# Arduino Header A1 (Vaux9)
-set_property PACKAGE_PIN E18 [get_ports Vaux9_0_v_p]
-set_property PACKAGE_PIN E19 [get_ports Vaux9_0_v_n]
 ```
