@@ -1,7 +1,7 @@
 ==============================================================================
 ⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
 ==============================================================================
-• Repository State    : feat/cordic-32bit-phase-mag @ 061eee9
+• Repository State    : feat/cordic-32bit-phase-mag @ 17dc664
 • Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
 • Target FPGA Device  : xc7z020clg400-1
 • Primary HDL Language: VHDL
@@ -10,10 +10,10 @@
 Git Context & Branch Topology:
 
 ```log
-Current Branch: feat/cordic-32bit-phase-mag | Working Tree: Dirty (5 modified/untracked files)
+Current Branch: feat/cordic-32bit-phase-mag | Working Tree: Dirty (7 modified/untracked files)
 
 Branch Tracking & Divergence Status:
-* feat/cordic-32bit-phase-mag                     061eee9 merge: feat(hw) release v1.5.0 with simultaneous sampling, axis demux, and sanitized fft stream
+* feat/cordic-32bit-phase-mag                     17dc664 feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through
   master                                          dd4b758 [origin/master] chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
   remotes/origin/HEAD                             -> origin/master
   remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
@@ -35,23 +35,23 @@ v1.6.0-rc1      release(hw): v1.6.0-rc1 with PL frequency filter, IFFT engine, a
 v1.5.0          release: v1.5.0 official hardware overlay with simultaneous dual-sampling and clean fft demux
 
 Multi-Branch Git Commit Graph:
-*   ac99afc  (refs/stash) - 2026-09-01 : WIP on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
-|\  
-| * de1ca5e  - 2026-09-01 : index on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
-|/  
-* dd4b758  (origin/master, origin/HEAD, master) - 2026-08-27 : chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
-* 02e6246  - 2026-08-26 : chore(context): update Cog submodule and regenerate hardware summary (SiririComun)
-* cf02545  (tag: v1.6.0-rc3, origin/feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
-* a92287d  - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
-* 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
-* e31b64f  (origin/feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
-* 3e44936  (tag: v1.6.0, origin/feat/pl-freq-filter-ifft) - 2026-08-26 : docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture (SiririComun)
-* 7b2a3f0  (tag: v1.6.0-rc2) - 2026-08-26 : build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2 (SiririComun)
-* 7742815  - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
-* d4e34b6  (tag: v1.6.0-rc1) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
-* abf04b6  - 2026-08-25 : docs(context): update block design layout diagrams and hardware summary for PL filter (SiririComun)
-* d7b0023  - 2026-08-25 : feat(bd): integrate axis_spectral_mask, IFFT core, and filtered DMA into block design (SiririComun)
-* dfbab6d  - 2026-08-25 : fix(hdl): replace process(all) with explicit sensitivity list for VHDL-93 compatibility (SiririComun)
+* 17dc664  (HEAD -> feat/cordic-32bit-phase-mag) - 2026-09-01 : feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through (SiririComun)
+* ea798c6  - 2026-09-01 : Cog added to the repository (SiririComun)
+| *   ac99afc  (refs/stash) - 2026-09-01 : WIP on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+| |\  
+| | * de1ca5e  - 2026-09-01 : index on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+| |/  
+| * dd4b758  (origin/master, origin/HEAD, master) - 2026-08-27 : chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+| * 02e6246  - 2026-08-26 : chore(context): update Cog submodule and regenerate hardware summary (SiririComun)
+| * cf02545  (tag: v1.6.0-rc3, origin/feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
+| * a92287d  - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
+| * 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
+| * e31b64f  (origin/feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
+| * 3e44936  (tag: v1.6.0, origin/feat/pl-freq-filter-ifft) - 2026-08-26 : docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture (SiririComun)
+| * 7b2a3f0  (tag: v1.6.0-rc2) - 2026-08-26 : build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2 (SiririComun)
+| * 7742815  - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
+| * d4e34b6  (tag: v1.6.0-rc1) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
+| * abf04b6  - 2026-08-25 : docs(context): update block design layout diagrams and hardware summary for PL filter (SiririComun)
 ```
 
 LICENSE: (LICENSE)
@@ -1451,10 +1451,10 @@ xadc.bd: (src/bd/xadc.bd)
             "value": "32"
           },
           "c_s2mm_burst_size": {
-            "value": "128"
+            "value": "256"
           },
           "c_s_axis_s2mm_tdata_width": {
-            "value": "16"
+            "value": "32"
           },
           "c_sg_length_width": {
             "value": "23"
@@ -1501,7 +1501,7 @@ xadc.bd: (src/bd/xadc.bd)
             "value": "0"
           },
           "M_TDATA_NUM_BYTES": {
-            "value": "2"
+            "value": "4"
           },
           "M_TDEST_WIDTH": {
             "value": "0"
@@ -1537,7 +1537,7 @@ xadc.bd: (src/bd/xadc.bd)
             "value": "0"
           },
           "TDATA_REMAP": {
-            "value": "tdata[15:0]"
+            "value": "tdata[31:0]"
           }
         },
         "interface_ports": {
@@ -1586,8 +1586,8 @@ xadc.bd: (src/bd/xadc.bd)
       "axis_trigger_unit_0": {
         "vlnv": "xilinx.com:module_ref:axis_trigger_unit:1.0",
         "ip_revision": "1",
-        "xci_name": "xadc_axis_trigger_unit_0_1",
-        "xci_path": "ip/xadc_axis_trigger_unit_0_1/xadc_axis_trigger_unit_0_1.xci",
+        "xci_name": "xadc_axis_trigger_unit_0_0",
+        "xci_path": "ip/xadc_axis_trigger_unit_0_0_1/xadc_axis_trigger_unit_0_0.xci",
         "inst_hier_path": "axis_trigger_unit_0",
         "reference_info": {
           "ref_type": "hdl",
@@ -2675,6 +2675,9 @@ xadc.bd: (src/bd/xadc.bd)
           "M_HAS_TLAST": {
             "value": "1"
           },
+          "M_HAS_TREADY": {
+            "value": "1"
+          },
           "M_HAS_TSTRB": {
             "value": "0"
           },
@@ -2694,6 +2697,9 @@ xadc.bd: (src/bd/xadc.bd)
             "value": "0"
           },
           "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TREADY": {
             "value": "1"
           },
           "S_HAS_TSTRB": {
