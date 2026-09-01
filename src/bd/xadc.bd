@@ -27,7 +27,8 @@
       "tlast_generator_0": "",
       "axis_broadcaster_0": "",
       "axis_channel_demux_0": "",
-      "axis_subset_converter_2": ""
+      "axis_subset_converter_2": "",
+      "xlconstant_0": ""
     },
     "interface_ports": {
       "DDR": {
@@ -3807,6 +3808,13 @@
             ]
           }
         }
+      },
+      "xlconstant_0": {
+        "vlnv": "xilinx.com:ip:xlconstant:1.1",
+        "ip_revision": "9",
+        "xci_name": "xadc_xlconstant_0_0",
+        "xci_path": "ip/xadc_xlconstant_0_0/xadc_xlconstant_0_0.xci",
+        "inst_hier_path": "xlconstant_0"
       }
     },
     "interface_nets": {
@@ -4070,6 +4078,12 @@
         "ports": [
           "xfft_0/s_axis_config_tready",
           "axis_trigger_unit_0/m_axis_fft_config_tready"
+        ]
+      },
+      "xlconstant_0_dout": {
+        "ports": [
+          "xlconstant_0/dout",
+          "xfft_0/m_axis_status_tready"
         ]
       }
     },
