@@ -6,8 +6,7 @@
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.2.2",
-      "validated": "true"
+      "tool_version": "2024.2.2"
     },
     "design_tree": {
       "processing_system7_0": "",
@@ -2492,10 +2491,10 @@
             "value": "32"
           },
           "c_s2mm_burst_size": {
-            "value": "128"
+            "value": "256"
           },
           "c_s_axis_s2mm_tdata_width": {
-            "value": "16"
+            "value": "32"
           },
           "c_sg_length_width": {
             "value": "23"
@@ -2542,7 +2541,7 @@
             "value": "0"
           },
           "M_TDATA_NUM_BYTES": {
-            "value": "2"
+            "value": "4"
           },
           "M_TDEST_WIDTH": {
             "value": "0"
@@ -2578,7 +2577,7 @@
             "value": "0"
           },
           "TDATA_REMAP": {
-            "value": "tdata[15:0]"
+            "value": "tdata[31:0]"
           }
         },
         "interface_ports": {
@@ -2666,8 +2665,8 @@
       "axis_trigger_unit_0": {
         "vlnv": "xilinx.com:module_ref:axis_trigger_unit:1.0",
         "ip_revision": "1",
-        "xci_name": "xadc_axis_trigger_unit_0_1",
-        "xci_path": "ip/xadc_axis_trigger_unit_0_1/xadc_axis_trigger_unit_0_1.xci",
+        "xci_name": "xadc_axis_trigger_unit_0_0",
+        "xci_path": "ip/xadc_axis_trigger_unit_0_0_1/xadc_axis_trigger_unit_0_0.xci",
         "inst_hier_path": "axis_trigger_unit_0",
         "reference_info": {
           "ref_type": "hdl",
@@ -3755,6 +3754,9 @@
           "M_HAS_TLAST": {
             "value": "1"
           },
+          "M_HAS_TREADY": {
+            "value": "1"
+          },
           "M_HAS_TSTRB": {
             "value": "0"
           },
@@ -3774,6 +3776,9 @@
             "value": "0"
           },
           "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TREADY": {
             "value": "1"
           },
           "S_HAS_TSTRB": {
