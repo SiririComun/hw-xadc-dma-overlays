@@ -1,0 +1,47 @@
+# ==============================================================================
+# Cog Ignore Configuration File (cog.ignore)
+# Declares path patterns to exclude from Cog scanning and context generation.
+# Syntax follows standard .gitignore format (*, **, ?, leading/trailing slashes).
+# ==============================================================================
+
+# Git & Submodules (Exclude frameworks and Cog internals)
+.git/
+.cog/
+Cog/
+Hog/
+
+# Vivado / Vitis / EDA Compilation & Simulation Artifacts
+**/.runs/
+**/.cache/
+**/.sim/
+**/.hw/
+**/.ip_user_files/
+**/*.jou
+**/*.log
+**/*.str
+**/*.pb
+**/*.dcp
+**/*.bit
+**/*.bin
+**/*.hwh
+**/*.gen/
+
+# Python & C/C++ Build Artifacts
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+**/*.o
+**/*.a
+**/*.so
+**/*.dylib
+**/*.dll
+
+# OS Metadata
+.DS_Store
+Thumbs.db

@@ -1,0 +1,3932 @@
+==============================================================================
+⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
+==============================================================================
+• Repository State    : feat/cordic-32bit-phase-mag @ 061eee9
+• Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
+• Target FPGA Device  : xc7z020clg400-1
+• Primary HDL Language: VHDL
+==============================================================================
+
+Git Context & Branch Topology:
+
+```log
+Current Branch: feat/cordic-32bit-phase-mag | Working Tree: Dirty (5 modified/untracked files)
+
+Branch Tracking & Divergence Status:
+* feat/cordic-32bit-phase-mag                     061eee9 merge: feat(hw) release v1.5.0 with simultaneous sampling, axis demux, and sanitized fft stream
+  master                                          dd4b758 [origin/master] chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
+  remotes/origin/HEAD                             -> origin/master
+  remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
+  remotes/origin/feat/cog-integration             e31b64f feat(context): integrate Cog submodule and update hardware summary
+  remotes/origin/feat/dual-xadc                   51c01bf docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
+  remotes/origin/feat/hw-trigger                  2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
+  remotes/origin/feat/pl-audio-decimation         16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
+  remotes/origin/feat/pl-fft                      66a4697 fix(fft): switch xfft_0 to Block Floating Point with matching 8-bit config bus
+  remotes/origin/feat/pl-freq-filter-ifft         3e44936 docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture
+  remotes/origin/feat/runtime-config-audio        58437e7 docs(readme): finalize v1.4.5 multi-regime architecture and register map documentation
+  remotes/origin/feat/simultaneous-xadc-fft-demux 212fafa docs(readme): document v1.5.0 architecture, stream demux, and register map
+  remotes/origin/master                           dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
+
+Repository Tags & Release History:
+v1.6.0-rc3      test(ci): verify release workflow with SHA-256 generation and integrity checks
+v1.6.0          release(hw): v1.6.0 with PL frequency filter, IFFT core, and 3-DMA streaming
+v1.6.0-rc2      build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2
+v1.6.0-rc1      release(hw): v1.6.0-rc1 with PL frequency filter, IFFT engine, and 3-DMA streaming
+v1.5.0          release: v1.5.0 official hardware overlay with simultaneous dual-sampling and clean fft demux
+
+Multi-Branch Git Commit Graph:
+*   ac99afc  (refs/stash) - 2026-09-01 : WIP on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+|\  
+| * de1ca5e  - 2026-09-01 : index on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+|/  
+* dd4b758  (origin/master, origin/HEAD, master) - 2026-08-27 : chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
+* 02e6246  - 2026-08-26 : chore(context): update Cog submodule and regenerate hardware summary (SiririComun)
+* cf02545  (tag: v1.6.0-rc3, origin/feat/ci-fast-fail-lint) - 2026-08-26 : ci(release): add asset integrity validation gate and SHA-256 checksum generation (SiririComun)
+* a92287d  - 2026-08-26 : fix(ci): add -C flag to GHDL analyzer to permit UTF-8 in comments (SiririComun)
+* 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
+* e31b64f  (origin/feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
+* 3e44936  (tag: v1.6.0, origin/feat/pl-freq-filter-ifft) - 2026-08-26 : docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture (SiririComun)
+* 7b2a3f0  (tag: v1.6.0-rc2) - 2026-08-26 : build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2 (SiririComun)
+* 7742815  - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
+* d4e34b6  (tag: v1.6.0-rc1) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
+* abf04b6  - 2026-08-25 : docs(context): update block design layout diagrams and hardware summary for PL filter (SiririComun)
+* d7b0023  - 2026-08-25 : feat(bd): integrate axis_spectral_mask, IFFT core, and filtered DMA into block design (SiririComun)
+* dfbab6d  - 2026-08-25 : fix(hdl): replace process(all) with explicit sensitivity list for VHDL-93 compatibility (SiririComun)
+```
+
+LICENSE: (LICENSE)
+
+```text
+MIT License
+
+Copyright (c) 2026 Juan Pablo Sánchez Arroyave (SiririComun)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+README.md: (README.md)
+
+```markdown
+# HW XADC DMA Overlays
+
+[![Hog Managed](https://img.shields.io/badge/HDL_Management-Hog-blue.svg)](https://cern.ch/hog)
+[![Target Board](https://img.shields.io/badge/Board-PYNQ--Z2-orange.svg)](https://tul.com.tw/ProductsPYNQ-Z2.html)
+[![Vivado Version](https://img.shields.io/badge/Vivado-2024.2.2-green.svg)](https://www.xilinx.com)
+[![Hardware Release](https://img.shields.io/badge/Release-v1.5.0-blue.svg)](https://github.com/SiririComun/hw-xadc-dma-overlays/releases/tag/v1.5.0)
+
+A multi-regime hardware overlay for the **PYNQ-Z2** (`xc7z020clg400-1`) that captures simultaneous dual-channel analog signals using the XADC continuous sequencer, provides **FPGA-accelerated programmable anti-aliasing decimation ($M \in \{1, 10, 20, 50\}$)**, dynamic packetization, **pure single-channel runtime-reconfigurable FFT ($N \in \{512, 1024, 2048\}$)**, and streams data directly to DDR memory via dual AXI DMA engines.
+
+Managed using **Hog (HDL on Git)** for strict design traceability and automated bitstream versioning.
+
+---
+
+## 🏛 Hardware Architecture & Memory Map
+
+The design captures analog data across **Arduino Header A0 (`Vaux1`)** and **A1 (`Vaux9`)** with $0.0\,\mu\text{s}$ simultaneous dual-sampling, gates frames via `axis_trigger_unit` with **selectable trigger source (A0 vs A1)**, applies runtime decimation via `axis_decimator` with synchronous mode-switching flush, packetizes frames with programmable `tlast_generator`, forks the stream via `axis_broadcaster`, demultiplexes a clean single channel via `axis_channel_demux`, computes the real-time Fourier transform via runtime-configurable `xfft` and `cordic`, and transfers both Time and Frequency frames concurrently to DDR memory.
+
+### Block Design Schematic
+![PYNQ-Z2 XADC Multi-Regime Block Design](docs/images/xadc_bd.svg)
+
+### Dataflow Diagram
+```
+                     [ PYNQ-Z2 Header A0 (Vaux1) ]       [ PYNQ-Z2 Header A1 (Vaux9) ]
+                                   │                                   │
+                                   └───────────────┬───────────────────┘
+                                                   ▼
+                                  [ XADC Wizard Dual Continuous Sequencer ]
+                                                   │ (1 MSPS Simultaneous Dual Stream)
+                                                   ▼
+                                         [ axis_trigger_unit ]
+                                         (Trigger: A0/A1, Phase-Locked to A0)
+                                                   │ (Gated Stream)
+                                                   ▼
+                                         [ axis_decimator IP ]
+                               (Programmable M = 1, 10, 20, 50 w/ Sync Reset)
+                                                   │
+                                                   ▼
+                                          [ tlast_generator ]
+                               (Programmable Packet Limit via Reg 0x1C)
+                                                   │ (w/ TLAST)
+                                         [ axis_broadcaster ]
+                                  ┌────────────────┴────────────────┐
+                         (Time Stream w/ TLAST)            (Interleaved Stream w/ TLAST)
+                                  │                                 ▼
+                                  │                    [ axis_channel_demux ]
+                                  │                    (Selects Pure A0 or A1 via Reg 0x00[6])
+                                  │                                 ▼
+                                  │                    [ axis_subset_converter_0 ]
+                                  │                    (Signed 32-bit Stream w/ DC Inversion)
+                                  │                                 ▼
+                                  │                    [ xfft Core (Runtime N FFT) ]
+                                  │                    (N = 512, 1024, 2048 w/ TREADY Handshake)
+                                  │                                 ▼
+                                  │                    [ axis_subset_converter_2 ]
+                                  │                    (Cartesian Stream Sanitizer)
+                                  │                                 ▼
+                                  │                    [ CORDIC IP (Translate Mode) ]
+                                  │                                 │ (16-bit Magnitude)
+                                  ▼                                 ▼
+                        [ AXI DMA 0 (Time) ]              [ AXI DMA 1 (FFT Mag) ]
+                           (0x40400000)                      (0x40410000)
+                                  │                                 │
+                                  └────────────────┬────────────────┘
+                                                   ▼ (AXI SmartConnect HP0)
+                                        [ Processing System DDR ]
+```
+
+### Physical Pin Constraints (Arduino Header `J1`)
+
+| Signal Port | Physical Pin | Header Location | Description |
+| :--- | :--- | :--- | :--- |
+| `Vaux1_0_v_p` / `v_n` | `E17` / `D18` | **Header `J1` Pin A0** (Pin 6 - Bottom) | Channel 1 Analog Differential Pair |
+| `Vaux9_0_v_p` / `v_n` | `E18` / `E19` | **Header `J1` Pin A1** (Pin 5 - 2nd from Bottom) | Channel 2 Analog Differential Pair |
+
+### AXI Memory Address Table
+
+| Peripheral Block | Interface | Base Address | Address Range | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **AXI DMA Time** (`axi_dma_0`) | `S_AXI_LITE` | `0x40400000` | 64K | Time-Domain DMA Controller (Interleaved stereo sample frames) |
+| **AXI DMA FFT** (`axi_dma_1`) | `S_AXI_LITE` | `0x40410000` | 64K | Frequency-Domain Magnitude DMA Controller ($N/2$ bins of selected channel) |
+| **AXI Timer** (`axi_timer_0`) | `S_AXI` | `0x42800000` | 64K | System Timer / Hardware Capture Trigger |
+| **XADC Wizard** (`xadc_wiz_0`) | `s_axi_lite` | `0x43C00000` | 64K | XADC DRP & Continuous Sequencer Configuration |
+| **AXIS Trigger Unit** (`axis_trigger_unit_0`) | `s_axi` | `0x43C10000` | 64K | Trigger, Decimation ($M$), FFT Length ($N$), Channel Route & Packet Limits |
+
+### Register Map (`axis_trigger_unit_0` @ `0x43C10000`)
+* **`0x00: CONTROL_REG`** — `[0]`: Arm, `[1]`: Auto Mode, `[2]`: Falling Edge, `[3]`: Single Shot, `[4]`: Force, `[5]`: Trigger Source (`0=A0, 1=A1`), `[6]`: FFT Channel Route (`0=A0, 1=A1`)
+* **`0x04: STATUS_REG`** — `[0]`: Armed, `[1]`: Triggered, `[2]`: Streaming
+* **`0x08: THRESHOLD_REG`** — `[15:0]`: 12-bit left-aligned comparator threshold ($0.0\,\text{V} - 3.3\,\text{V}$)
+* **`0x0C: TIMEOUT_REG`** — `[31:0]`: Auto-trigger timeout in clock cycles (Default: $5{,}000{,}000 = 50\,\text{ms}$)
+* **`0x10: HYSTERESIS_REG`** — `[15:0]`: Noise rejection band
+* **`0x14: DECIMATION_REG`** — `[1:0]`: `00` $\implies M=1$ (Bypass), `01` $\implies M=10$, `10` $\implies M=20$, `11` $\implies M=50$
+* **`0x18: FFT_CONFIG_REG`** — `[15:0]`: `(NFFT << 8) | FWD_INV` (Persistent handshake to `xfft_0` on write)
+* **`0x1C: PACKET_SIZE_REG`** — `[15:0]`: Programmable sample count per DMA frame ($N$)
+
+### Operating Regimes
+
+| Profile Mode | Decimator ($M$) | Transform ($N$) | Sampling Rate ($f_s$) | Nyquist Bandwidth | Time Window ($T_{\text{win}}$) | Resolution ($\Delta f$) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Wideband Lab Scope** | **$1$** | $2048$ | $500\,\text{kSPS}$ | $0 - 250\,\text{kHz}$ | $2.05\,\text{ms}$ | $244.14\,\text{Hz}$ |
+| **Full-Band Audio** | **$10$** | $2048$ | $50\,\text{kSPS}$ | $0 - 25\,\text{kHz}$ | $40.96\,\text{ms}$ | $24.41\,\text{Hz}$ |
+| **Speech / Vocal** | **$20$** | $2048$ | $25\,\text{kSPS}$ | $0 - 12.5\,\text{kHz}$ | $81.92\,\text{ms}$ | $12.21\,\text{Hz}$ |
+| **Deep Bass Zoom** | **$50$** | $2048$ | $10\,\text{kSPS}$ | $0 - 5\,\text{kHz}$ | $204.80\,\text{ms}$ | **$4.88\,\text{Hz}$** |
+
+---
+
+## 📦 For Software Developers (Consuming this Overlay)
+
+Specify the `v1.5.0` dependency in your `hardware.json`:
+
+```json
+{
+  "repo": "SiririComun/hw-xadc-dma-overlays",
+  "version": "v1.5.0",
+  "overlay_name": "pynq_z2"
+}
+```
+
+---
+
+## 🛠 For Firmware Developers (Building Locally)
+
+```bash
+git clone --recursive https://github.com/SiririComun/hw-xadc-dma-overlays.git
+cd hw-xadc-dma-overlays
+./Hog/Do CREATE pynq_z2
+./Hog/Do WORK pynq_z2
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```
+
+hog.conf: (Top/pynq_z2/hog.conf)
+
+```conf
+# vivado 2024.2.2
+# Generated by Hog on 2026-08-05 22:11:55
+
+[main]
+PART = xc7z020clg400-1
+TARGET_LANGUAGE = VHDL
+```
+
+constrs.src: (Top/pynq_z2/list/constrs.src)
+
+```src
+# Constraints list for pynq_z2
+src/con/pynq_z2.xdc
+```
+
+ips.src: (Top/pynq_z2/list/ips.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/bd/xadc.bd
+```
+
+others.src: (Top/pynq_z2/list/others.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/hdl/xadc_wrapper.vhd top=xadc_wrapper
+```
+
+xil_defaultlib.src: (Top/pynq_z2/list/xil_defaultlib.src)
+
+```src
+#Generated by Hog on 2026-08-05 22:11:53
+src/hdl/tlast_generator.vhd 93
+src/hdl/axis_trigger_unit.vhd 93
+src/hdl/axis_decimator.vhd 93
+src/hdl/axis_channel_demux.vhd 93
+```
+
+post-bitstream.tcl: (Top/pynq_z2/post-bitstream.tcl)
+
+```tcl
+# ==============================================================================
+# Hog Post-Bitstream Hook: Automated PYNQ Handoff File Copier
+# ==============================================================================
+
+# Get project directory name dynamically (evaluates to "pynq_z2")
+set script_path [file normalize [info script]]
+set script_dir  [file dirname $script_path]
+set prj_name    [file tail $script_dir]
+set repo_root   [file normalize [file join $script_dir ".." ".."]]
+
+# Source path matches Vivado's dynamic build output folder
+set bit_src [file join $repo_root "Projects" $prj_name "${prj_name}.runs" "impl_1" "xadc_wrapper.bit"]
+
+# Try generated HW handoff location
+set hwh_src [file join $repo_root "src" "bd" "hw_handoff" "xadc.hwh"]
+if {![file exists $hwh_src]} {
+    set hwh_src [file join $repo_root "Projects" $prj_name "${prj_name}.gen" "sources_1" "bd" "xadc" "hw_handoff" "xadc.hwh"]
+}
+
+set dest_dir [file join $repo_root "bin"]
+if {![file exists $dest_dir]} {
+    file mkdir $dest_dir
+}
+
+set bit_dest [file join $dest_dir "${prj_name}.bit"]
+set hwh_dest [file join $dest_dir "${prj_name}.hwh"]
+
+# Copy Bitstream
+if {[file exists $bit_src]} {
+    file copy -force $bit_src $bit_dest
+    send_msg_id "Hog-1" "INFO" "Successfully copied compiled bitstream to: $bit_dest"
+} else {
+    send_msg_id "Hog-2" "ERROR" "Could not find source bitstream at: $bit_src"
+}
+
+# Copy Hardware Handoff
+if {[file exists $hwh_src]} {
+    file copy -force $hwh_src $hwh_dest
+    send_msg_id "Hog-3" "INFO" "Successfully copied hardware handoff metadata to: $hwh_dest"
+} else {
+    send_msg_id "Hog-4" "ERROR" "Could not find source hardware handoff metadata at: $hwh_src"
+}
+```
+
+post-creation.tcl: (Top/pynq_z2/post-creation.tcl)
+
+```tcl
+# ==============================================================================
+# Hog Post-Creation Hook & Vivado GUI Custom Commands (PDF & SVG Exporters)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Command: Export BD to context/*.pdf
+# ------------------------------------------------------------------------------
+set export_pdf_cmd {
+    set prj_dir   [get_property DIRECTORY [current_project]]
+    set repo_root [file normalize [file join $prj_dir ".." ".."]]
+    set dest_dir  [file join $repo_root "context"]
+
+    if {![file exists $dest_dir]} {
+        file mkdir $dest_dir
+    }
+
+    set bd_files [get_files *.bd]
+    if {[llength $bd_files] > 0} {
+        foreach bd $bd_files {
+            set bd_name [file rootname [file tail $bd]]
+            set pdf_dest [file join $dest_dir "${bd_name}.pdf"]
+
+            open_bd_design $bd -quiet
+
+            if {[catch {write_bd_layout -format pdf -orientation portrait -force $pdf_dest} err_msg]} {
+                send_msg_id "Hog-101" "INFO" "PDF export skipped in batch mode. Open Vivado GUI to export."
+            } else {
+                send_msg_id "Hog-100" "INFO" "Exported Block Design PDF to: $pdf_dest"
+            }
+        }
+    } else {
+        send_msg_id "Hog-102" "WARNING" "No Block Design (.bd) found in the open project."
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 2. Command: Export BD to docs/images/*_bd.svg
+# ------------------------------------------------------------------------------
+set export_svg_cmd {
+    set prj_dir   [get_property DIRECTORY [current_project]]
+    set repo_root [file normalize [file join $prj_dir ".." ".."]]
+    set dest_dir  [file join $repo_root "docs" "images"]
+
+    if {![file exists $dest_dir]} {
+        file mkdir $dest_dir
+    }
+
+    set bd_files [get_files *.bd]
+    if {[llength $bd_files] > 0} {
+        foreach bd $bd_files {
+            set bd_name [file rootname [file tail $bd]]
+            set svg_dest [file join $dest_dir "${bd_name}_bd.svg"]
+
+            open_bd_design $bd -quiet
+
+            if {[catch {write_bd_layout -format svg -force $svg_dest} err_msg]} {
+                send_msg_id "Hog-105" "INFO" "SVG export skipped in batch mode. Open Vivado GUI to export."
+            } else {
+                send_msg_id "Hog-104" "INFO" "Exported Block Design SVG to: $svg_dest"
+            }
+        }
+    } else {
+        send_msg_id "Hog-102" "WARNING" "No Block Design (.bd) found in the open project."
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 3. Register GUI Custom Commands on the Vivado Toolbar
+# ------------------------------------------------------------------------------
+if {[info commands create_gui_custom_command] ne ""} {
+    # PDF Button
+    catch { remove_gui_custom_commands "ExportBDPDF" }
+    create_gui_custom_command \
+        -name "ExportBDPDF" \
+        -menu_name "Export BD to Context PDF" \
+        -description "Exports the current Block Design diagram to context/*.pdf" \
+        -show_on_toolbar \
+        -run_proc false \
+        -command $export_pdf_cmd
+
+    # SVG Button
+    catch { remove_gui_custom_commands "ExportBDSVG" }
+    create_gui_custom_command \
+        -name "ExportBDSVG" \
+        -menu_name "Export BD to Docs SVG" \
+        -description "Exports the current Block Design diagram to docs/images/*_bd.svg" \
+        -show_on_toolbar \
+        -run_proc false \
+        -command $export_svg_cmd
+
+    send_msg_id "Hog-103" "INFO" "Custom GUI buttons registered: Tools -> Custom Commands -> Export BD to Context PDF / Docs SVG"
+}
+
+# ------------------------------------------------------------------------------
+# 4. Run immediately on project open if in GUI mode
+# ------------------------------------------------------------------------------
+catch { eval $export_pdf_cmd }
+catch { eval $export_svg_cmd }
+```
+
+xadc.bd: (src/bd/xadc.bd)
+
+```json
+{
+  "design": {
+    "design_info": {
+      "device": "xc7z020clg400-1",
+      "name": "xadc",
+      "synth_flow_mode": "Hierarchical",
+      "tool_version": "2024.2.2"
+    },
+    "design_tree": {
+      "processing_system7_0": "",
+      "xadc_wiz_0": "",
+      "axi_smc_0": "",
+      "rst_ps7_0_100M": "",
+      "axi_dma_0": "",
+      "axi_timer_0": "",
+      "axis_subset_converter_0": "",
+      "xfft_0": "",
+      "cordic_0": "",
+      "axi_dma_1": "",
+      "axis_subset_converter_1": "",
+      "axi_smc_1": "",
+      "axis_trigger_unit_0": "",
+      "axis_decimator_0": "",
+      "tlast_generator_0": "",
+      "axis_broadcaster_0": "",
+      "axis_channel_demux_0": "",
+      "axis_subset_converter_2": ""
+    },
+    "interface_ports": {
+      "DDR": {
+        "vlnv": "xilinx.com:interface:ddrx_rtl:1.0",
+        "status": "<Standard DDR Physical Interface Mappings Preserved>"
+      },
+      "FIXED_IO": {
+        "vlnv": "xilinx.com:display_processing_system7:fixedio_rtl:1.0",
+        "status": "<Standard FIXED_IO Physical Interface Mappings Preserved>"
+      },
+      "Vaux1_0": {
+        "mode": "Slave",
+        "vlnv_bus_definition": "xilinx.com:interface:diff_analog_io:1.0",
+        "vlnv": "xilinx.com:interface:diff_analog_io_rtl:1.0",
+        "port_maps": {
+          "V_N": {
+            "physical_name": "Vaux1_0_v_n",
+            "direction": "I"
+          },
+          "V_P": {
+            "physical_name": "Vaux1_0_v_p",
+            "direction": "I"
+          }
+        }
+      },
+      "Vp_Vn_0": {
+        "mode": "Slave",
+        "vlnv_bus_definition": "xilinx.com:interface:diff_analog_io:1.0",
+        "vlnv": "xilinx.com:interface:diff_analog_io_rtl:1.0",
+        "port_maps": {
+          "V_N": {
+            "physical_name": "Vp_Vn_0_v_n",
+            "direction": "I"
+          },
+          "V_P": {
+            "physical_name": "Vp_Vn_0_v_p",
+            "direction": "I"
+          }
+        }
+      },
+      "Vaux9_0": {
+        "mode": "Slave",
+        "vlnv_bus_definition": "xilinx.com:interface:diff_analog_io:1.0",
+        "vlnv": "xilinx.com:interface:diff_analog_io_rtl:1.0",
+        "port_maps": {
+          "V_N": {
+            "physical_name": "Vaux9_0_v_n",
+            "direction": "I"
+          },
+          "V_P": {
+            "physical_name": "Vaux9_0_v_p",
+            "direction": "I"
+          }
+        }
+      }
+    },
+    "components": {
+      "processing_system7_0": {
+        "vlnv": "xilinx.com:ip:processing_system7:5.5",
+        "ip_revision": "6",
+        "xci_name": "xadc_processing_system7_0_0",
+        "xci_path": "ip/xadc_processing_system7_0_0/xadc_processing_system7_0_0.xci",
+        "inst_hier_path": "processing_system7_0",
+        "parameters": {
+          "PCW_APU_CLK_RATIO_ENABLE": {
+            "value": "6:2:1"
+          },
+          "PCW_APU_PERIPHERAL_FREQMHZ": {
+            "value": "650"
+          },
+          "PCW_CAN0_PERIPHERAL_CLKSRC": {
+            "value": "External"
+          },
+          "PCW_CAN0_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_CAN1_PERIPHERAL_CLKSRC": {
+            "value": "External"
+          },
+          "PCW_CAN1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_CAN_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_CAN_PERIPHERAL_VALID": {
+            "value": "0"
+          },
+          "PCW_CLK0_FREQ": {
+            "value": "100000000"
+          },
+          "PCW_CLK1_FREQ": {
+            "value": "10000000"
+          },
+          "PCW_CLK2_FREQ": {
+            "value": "10000000"
+          },
+          "PCW_CLK3_FREQ": {
+            "value": "10000000"
+          },
+          "PCW_CPU_CPU_6X4X_MAX_RANGE": {
+            "value": "667"
+          },
+          "PCW_CPU_PERIPHERAL_CLKSRC": {
+            "value": "ARM PLL"
+          },
+          "PCW_CRYSTAL_PERIPHERAL_FREQMHZ": {
+            "value": "50"
+          },
+          "PCW_DCI_PERIPHERAL_CLKSRC": {
+            "value": "DDR PLL"
+          },
+          "PCW_DCI_PERIPHERAL_FREQMHZ": {
+            "value": "10.159"
+          },
+          "PCW_DM_WIDTH": {
+            "value": "4"
+          },
+          "PCW_DQS_WIDTH": {
+            "value": "4"
+          },
+          "PCW_DQ_WIDTH": {
+            "value": "32"
+          },
+          "PCW_ENET0_BASEADDR": {
+            "value": "0xE000B000"
+          },
+          "PCW_ENET0_ENET0_IO": {
+            "value": "MIO 16 .. 27"
+          },
+          "PCW_ENET0_GRP_MDIO_ENABLE": {
+            "value": "1"
+          },
+          "PCW_ENET0_GRP_MDIO_IO": {
+            "value": "MIO 52 .. 53"
+          },
+          "PCW_ENET0_HIGHADDR": {
+            "value": "0xE000BFFF"
+          },
+          "PCW_ENET0_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_ENET0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_ENET0_PERIPHERAL_FREQMHZ": {
+            "value": "1000 Mbps"
+          },
+          "PCW_ENET0_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_ENET0_RESET_IO": {
+            "value": "MIO 9"
+          },
+          "PCW_ENET1_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_ENET1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_ENET_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_ENET_RESET_POLARITY": {
+            "value": "Active Low"
+          },
+          "PCW_ENET_RESET_SELECT": {
+            "value": "Share reset pin"
+          },
+          "PCW_EN_4K_TIMER": {
+            "value": "0"
+          },
+          "PCW_EN_CAN0": {
+            "value": "0"
+          },
+          "PCW_EN_CAN1": {
+            "value": "0"
+          },
+          "PCW_EN_CLK0_PORT": {
+            "value": "1"
+          },
+          "PCW_EN_CLK1_PORT": {
+            "value": "0"
+          },
+          "PCW_EN_CLK2_PORT": {
+            "value": "0"
+          },
+          "PCW_EN_CLK3_PORT": {
+            "value": "0"
+          },
+          "PCW_EN_DDR": {
+            "value": "1"
+          },
+          "PCW_EN_ENET0": {
+            "value": "1"
+          },
+          "PCW_EN_ENET1": {
+            "value": "0"
+          },
+          "PCW_EN_GPIO": {
+            "value": "1"
+          },
+          "PCW_EN_I2C0": {
+            "value": "0"
+          },
+          "PCW_EN_I2C1": {
+            "value": "0"
+          },
+          "PCW_EN_MODEM_UART0": {
+            "value": "0"
+          },
+          "PCW_EN_MODEM_UART1": {
+            "value": "0"
+          },
+          "PCW_EN_PJTAG": {
+            "value": "0"
+          },
+          "PCW_EN_PTP_ENET0": {
+            "value": "0"
+          },
+          "PCW_EN_PTP_ENET1": {
+            "value": "0"
+          },
+          "PCW_EN_QSPI": {
+            "value": "1"
+          },
+          "PCW_EN_SDIO0": {
+            "value": "1"
+          },
+          "PCW_EN_SDIO1": {
+            "value": "0"
+          },
+          "PCW_EN_SMC": {
+            "value": "0"
+          },
+          "PCW_EN_SPI0": {
+            "value": "0"
+          },
+          "PCW_EN_SPI1": {
+            "value": "0"
+          },
+          "PCW_EN_TRACE": {
+            "value": "0"
+          },
+          "PCW_EN_TTC0": {
+            "value": "0"
+          },
+          "PCW_EN_TTC1": {
+            "value": "0"
+          },
+          "PCW_EN_UART0": {
+            "value": "1"
+          },
+          "PCW_EN_UART1": {
+            "value": "0"
+          },
+          "PCW_EN_USB0": {
+            "value": "1"
+          },
+          "PCW_EN_USB1": {
+            "value": "0"
+          },
+          "PCW_EN_WDT": {
+            "value": "0"
+          },
+          "PCW_FCLK0_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_FCLK1_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_FCLK2_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_FCLK3_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_FCLK_CLK0_BUF": {
+            "value": "TRUE"
+          },
+          "PCW_FPGA0_PERIPHERAL_FREQMHZ": {
+            "value": "100"
+          },
+          "PCW_FPGA1_PERIPHERAL_FREQMHZ": {
+            "value": "50"
+          },
+          "PCW_FPGA2_PERIPHERAL_FREQMHZ": {
+            "value": "50"
+          },
+          "PCW_FPGA3_PERIPHERAL_FREQMHZ": {
+            "value": "50"
+          },
+          "PCW_FPGA_FCLK0_ENABLE": {
+            "value": "1"
+          },
+          "PCW_GP0_EN_MODIFIABLE_TXN": {
+            "value": "1"
+          },
+          "PCW_GP0_NUM_READ_THREADS": {
+            "value": "4"
+          },
+          "PCW_GP0_NUM_WRITE_THREADS": {
+            "value": "4"
+          },
+          "PCW_GP1_EN_MODIFIABLE_TXN": {
+            "value": "1"
+          },
+          "PCW_GP1_NUM_READ_THREADS": {
+            "value": "4"
+          },
+          "PCW_GP1_NUM_WRITE_THREADS": {
+            "value": "4"
+          },
+          "PCW_GPIO_BASEADDR": {
+            "value": "0xE000A000"
+          },
+          "PCW_GPIO_EMIO_GPIO_ENABLE": {
+            "value": "0"
+          },
+          "PCW_GPIO_HIGHADDR": {
+            "value": "0xE000AFFF"
+          },
+          "PCW_GPIO_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_I2C0_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_I2C1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_I2C_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_I2C_RESET_POLARITY": {
+            "value": "Active Low"
+          },
+          "PCW_IMPORT_BOARD_PRESET": {
+            "value": "None"
+          },
+          "PCW_INCLUDE_ACP_TRANS_CHECK": {
+            "value": "0"
+          },
+          "PCW_M_AXI_GP0_ENABLE_STATIC_REMAP": {
+            "value": "0"
+          },
+          "PCW_M_AXI_GP0_FREQMHZ": {
+            "value": "10"
+          },
+          "PCW_M_AXI_GP0_ID_WIDTH": {
+            "value": "12"
+          },
+          "PCW_M_AXI_GP0_SUPPORT_NARROW_BURST": {
+            "value": "0"
+          },
+          "PCW_M_AXI_GP0_THREAD_ID_WIDTH": {
+            "value": "12"
+          },
+          "PCW_OVERRIDE_BASIC_CLOCK": {
+            "value": "0"
+          },
+          "PCW_PACKAGE_NAME": {
+            "value": "clg400"
+          },
+          "PCW_PCAP_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_PCAP_PERIPHERAL_FREQMHZ": {
+            "value": "200"
+          },
+          "PCW_PERIPHERAL_BOARD_PRESET": {
+            "value": "None"
+          },
+          "PCW_PJTAG_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_PLL_BYPASSMODE_ENABLE": {
+            "value": "0"
+          },
+          "PCW_PRESET_BANK0_VOLTAGE": {
+            "value": "LVCMOS 3.3V"
+          },
+          "PCW_PRESET_BANK1_VOLTAGE": {
+            "value": "LVCMOS 1.8V"
+          },
+          "PCW_PS7_SI_REV": {
+            "value": "PRODUCTION"
+          },
+          "PCW_QSPI_GRP_FBCLK_ENABLE": {
+            "value": "1"
+          },
+          "PCW_QSPI_GRP_FBCLK_IO": {
+            "value": "MIO 8"
+          },
+          "PCW_QSPI_GRP_IO1_ENABLE": {
+            "value": "0"
+          },
+          "PCW_QSPI_GRP_SINGLE_SS_ENABLE": {
+            "value": "1"
+          },
+          "PCW_QSPI_GRP_SINGLE_SS_IO": {
+            "value": "MIO 1 .. 6"
+          },
+          "PCW_QSPI_GRP_SS1_ENABLE": {
+            "value": "0"
+          },
+          "PCW_QSPI_INTERNAL_HIGHADDRESS": {
+            "value": "0xFCFFFFFF"
+          },
+          "PCW_QSPI_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_QSPI_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_QSPI_PERIPHERAL_FREQMHZ": {
+            "value": "200"
+          },
+          "PCW_QSPI_QSPI_IO": {
+            "value": "MIO 1 .. 6"
+          },
+          "PCW_SD0_GRP_CD_ENABLE": {
+            "value": "1"
+          },
+          "PCW_SD0_GRP_CD_IO": {
+            "value": "MIO 47"
+          },
+          "PCW_SD0_GRP_POW_ENABLE": {
+            "value": "0"
+          },
+          "PCW_SD0_GRP_WP_ENABLE": {
+            "value": "0"
+          },
+          "PCW_SD0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_SD0_SD0_IO": {
+            "value": "MIO 40 .. 45"
+          },
+          "PCW_SD1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_SDIO0_BASEADDR": {
+            "value": "0xE0100000"
+          },
+          "PCW_SDIO0_HIGHADDR": {
+            "value": "0xE0100FFF"
+          },
+          "PCW_SDIO_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_SDIO_PERIPHERAL_FREQMHZ": {
+            "value": "50"
+          },
+          "PCW_SDIO_PERIPHERAL_VALID": {
+            "value": "1"
+          },
+          "PCW_SINGLE_QSPI_DATA_MODE": {
+            "value": "x4"
+          },
+          "PCW_SPI0_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_SPI1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_SPI_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_SPI_PERIPHERAL_VALID": {
+            "value": "0"
+          },
+          "PCW_S_AXI_HP0_DATA_WIDTH": {
+            "value": "64"
+          },
+          "PCW_S_AXI_HP0_ID_WIDTH": {
+            "value": "6"
+          },
+          "PCW_TPIU_PERIPHERAL_CLKSRC": {
+            "value": "External"
+          },
+          "PCW_TTC0_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_TTC1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_UART0_BASEADDR": {
+            "value": "0xE0000000"
+          },
+          "PCW_UART0_BAUD_RATE": {
+            "value": "115200"
+          },
+          "PCW_UART0_GRP_FULL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_UART0_HIGHADDR": {
+            "value": "0xE0000FFF"
+          },
+          "PCW_UART0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_UART0_UART0_IO": {
+            "value": "MIO 14 .. 15"
+          },
+          "PCW_UART1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_UART_PERIPHERAL_CLKSRC": {
+            "value": "IO PLL"
+          },
+          "PCW_UART_PERIPHERAL_FREQMHZ": {
+            "value": "100"
+          },
+          "PCW_UART_PERIPHERAL_VALID": {
+            "value": "1"
+          },
+          "PCW_UIPARAM_ACT_DDR_FREQ_MHZ": {
+            "value": "525.000000"
+          },
+          "PCW_UIPARAM_GENERATE_SUMMARY": {
+            "value": "NA"
+          },
+          "PCW_USB0_BASEADDR": {
+            "value": "0xE0102000"
+          },
+          "PCW_USB0_HIGHADDR": {
+            "value": "0xE0102fff"
+          },
+          "PCW_USB0_PERIPHERAL_ENABLE": {
+            "value": "1"
+          },
+          "PCW_USB0_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_USB0_RESET_IO": {
+            "value": "MIO 46"
+          },
+          "PCW_USB0_USB0_IO": {
+            "value": "MIO 28 .. 39"
+          },
+          "PCW_USB1_PERIPHERAL_ENABLE": {
+            "value": "0"
+          },
+          "PCW_USB_RESET_ENABLE": {
+            "value": "1"
+          },
+          "PCW_USB_RESET_POLARITY": {
+            "value": "Active Low"
+          },
+          "PCW_USB_RESET_SELECT": {
+            "value": "Share reset pin"
+          },
+          "PCW_USE_AXI_FABRIC_IDLE": {
+            "value": "0"
+          },
+          "PCW_USE_AXI_NONSECURE": {
+            "value": "0"
+          },
+          "PCW_USE_CORESIGHT": {
+            "value": "0"
+          },
+          "PCW_USE_CROSS_TRIGGER": {
+            "value": "0"
+          },
+          "PCW_USE_CR_FABRIC": {
+            "value": "1"
+          },
+          "PCW_USE_DDR_BYPASS": {
+            "value": "0"
+          },
+          "PCW_USE_DEBUG": {
+            "value": "0"
+          },
+          "PCW_USE_DMA0": {
+            "value": "0"
+          },
+          "PCW_USE_DMA1": {
+            "value": "0"
+          },
+          "PCW_USE_DMA2": {
+            "value": "0"
+          },
+          "PCW_USE_DMA3": {
+            "value": "0"
+          },
+          "PCW_USE_EXPANDED_IOP": {
+            "value": "0"
+          },
+          "PCW_USE_FABRIC_INTERRUPT": {
+            "value": "0"
+          },
+          "PCW_USE_HIGH_OCM": {
+            "value": "0"
+          },
+          "PCW_USE_M_AXI_GP0": {
+            "value": "1"
+          },
+          "PCW_USE_M_AXI_GP1": {
+            "value": "0"
+          },
+          "PCW_USE_PROC_EVENT_BUS": {
+            "value": "0"
+          },
+          "PCW_USE_PS_SLCR_REGISTERS": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_ACP": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_GP0": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_GP1": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_HP0": {
+            "value": "1"
+          },
+          "PCW_USE_S_AXI_HP1": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_HP2": {
+            "value": "0"
+          },
+          "PCW_USE_S_AXI_HP3": {
+            "value": "0"
+          },
+          "PCW_USE_TRACE": {
+            "value": "0"
+          },
+          "PCW_VALUE_SILVERSION": {
+            "value": "3"
+          },
+          "preset": {
+            "value": "None"
+          }
+        },
+        "interface_ports": {
+          "M_AXI_GP0": {
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "mode": "Master",
+            "address_space_ref": "Data",
+            "base_address": {
+              "minimum": "0x40000000",
+              "maximum": "0x7FFFFFFF",
+              "width": "32"
+            }
+          },
+          "S_AXI_HP0": {
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "mode": "Slave",
+            "memory_map_ref": "S_AXI_HP0"
+          }
+        },
+        "addressing": "<Default Processing System Memory Map Pruned>"
+      },
+      "xadc_wiz_0": {
+        "vlnv": "xilinx.com:ip:xadc_wiz:3.3",
+        "ip_revision": "11",
+        "xci_name": "xadc_xadc_wiz_0_0",
+        "xci_path": "ip/xadc_xadc_wiz_0_0/xadc_xadc_wiz_0_0.xci",
+        "inst_hier_path": "xadc_wiz_0",
+        "parameters": {
+          "ADC_CONVERSION_RATE": {
+            "value": "1000"
+          },
+          "ADC_OFFSET_AND_GAIN_CALIBRATION": {
+            "value": "true"
+          },
+          "CHANNEL_AVERAGING": {
+            "value": "None"
+          },
+          "CHANNEL_ENABLE_VAUXP0_VAUXN0": {
+            "value": "false"
+          },
+          "CHANNEL_ENABLE_VAUXP1_VAUXN1": {
+            "value": "true"
+          },
+          "CHANNEL_ENABLE_VAUXP9_VAUXN9": {
+            "value": "true"
+          },
+          "CHANNEL_ENABLE_VP_VN": {
+            "value": "false"
+          },
+          "DCLK_FREQUENCY": {
+            "value": "104"
+          },
+          "ENABLE_AXI4STREAM": {
+            "value": "true"
+          },
+          "ENABLE_RESET": {
+            "value": "false"
+          },
+          "ENABLE_VCCDDRO_ALARM": {
+            "value": "false"
+          },
+          "ENABLE_VCCPAUX_ALARM": {
+            "value": "false"
+          },
+          "ENABLE_VCCPINT_ALARM": {
+            "value": "false"
+          },
+          "EXTERNAL_MUX_CHANNEL": {
+            "value": "VP_VN"
+          },
+          "INTERFACE_SELECTION": {
+            "value": "Enable_AXI"
+          },
+          "OT_ALARM": {
+            "value": "false"
+          },
+          "SEQUENCER_MODE": {
+            "value": "Continuous"
+          },
+          "SINGLE_CHANNEL_SELECTION": {
+            "value": "VAUXP1_VAUXN1"
+          },
+          "USER_TEMP_ALARM": {
+            "value": "false"
+          },
+          "VCCAUX_ALARM": {
+            "value": "false"
+          },
+          "VCCINT_ALARM": {
+            "value": "false"
+          },
+          "XADC_STARUP_SELECTION": {
+            "value": "channel_sequencer"
+          }
+        }
+      },
+      "axi_smc_0": {
+        "vlnv": "xilinx.com:ip:smartconnect:1.0",
+        "ip_revision": "26",
+        "xci_name": "xadc_axi_smc_0_0",
+        "xci_path": "ip/xadc_axi_smc_0_0_1/xadc_axi_smc_0_0.xci",
+        "inst_hier_path": "axi_smc_0",
+        "parameters": {
+          "NUM_MI": {
+            "value": "5"
+          },
+          "NUM_SI": {
+            "value": "1"
+          }
+        },
+        "interface_ports": {
+          "S00_AXI": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {},
+            "bridges": [
+              "M00_AXI",
+              "M01_AXI",
+              "M02_AXI",
+              "M03_AXI",
+              "M04_AXI"
+            ]
+          },
+          "M00_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          },
+          "M01_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          },
+          "M02_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          },
+          "M03_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          },
+          "M04_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          }
+        }
+      },
+      "rst_ps7_0_100M": {
+        "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
+        "ip_revision": "16",
+        "xci_name": "xadc_rst_ps7_0_100M_0",
+        "xci_path": "ip/xadc_rst_ps7_0_100M_0/xadc_rst_ps7_0_100M_0.xci",
+        "inst_hier_path": "rst_ps7_0_100M"
+      },
+      "axi_dma_0": {
+        "vlnv": "xilinx.com:ip:axi_dma:7.1",
+        "ip_revision": "35",
+        "xci_name": "xadc_axi_dma_0_0",
+        "xci_path": "ip/xadc_axi_dma_0_0/xadc_axi_dma_0_0.xci",
+        "inst_hier_path": "axi_dma_0",
+        "parameters": {
+          "c_include_mm2s": {
+            "value": "0"
+          },
+          "c_include_s2mm": {
+            "value": "1"
+          },
+          "c_include_sg": {
+            "value": "0"
+          },
+          "c_micro_dma": {
+            "value": "0"
+          },
+          "c_s2mm_burst_size": {
+            "value": "128"
+          },
+          "c_sg_length_width": {
+            "value": "23"
+          }
+        },
+        "interface_ports": {
+          "M_AXI_S2MM": {
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "mode": "Master",
+            "address_space_ref": "Data_S2MM",
+            "base_address": {
+              "minimum": "0x00000000",
+              "maximum": "0xFFFFFFFF",
+              "width": "32"
+            }
+          }
+        },
+        "addressing": {
+          "address_spaces": {
+            "Data_S2MM": {
+              "range": "4G",
+              "width": "32"
+            }
+          }
+        }
+      },
+      "axi_timer_0": {
+        "vlnv": "xilinx.com:ip:axi_timer:2.0",
+        "ip_revision": "36",
+        "xci_name": "xadc_axi_timer_0_0",
+        "xci_path": "ip/xadc_axi_timer_0_0/xadc_axi_timer_0_0.xci",
+        "inst_hier_path": "axi_timer_0"
+      },
+      "axis_subset_converter_0": {
+        "vlnv": "xilinx.com:ip:axis_subset_converter:1.1",
+        "ip_revision": "34",
+        "xci_name": "xadc_axis_subset_converter_0_0",
+        "xci_path": "ip/xadc_axis_subset_converter_0_0/xadc_axis_subset_converter_0_0.xci",
+        "inst_hier_path": "axis_subset_converter_0",
+        "parameters": {
+          "M_HAS_TKEEP": {
+            "value": "0"
+          },
+          "M_HAS_TLAST": {
+            "value": "1"
+          },
+          "M_HAS_TREADY": {
+            "value": "1"
+          },
+          "M_HAS_TSTRB": {
+            "value": "0"
+          },
+          "M_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "M_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "M_TID_WIDTH": {
+            "value": "0"
+          },
+          "M_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "S_HAS_TKEEP": {
+            "value": "0"
+          },
+          "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TREADY": {
+            "value": "1"
+          },
+          "S_HAS_TSTRB": {
+            "value": "0"
+          },
+          "S_TDATA_NUM_BYTES": {
+            "value": "2"
+          },
+          "S_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "S_TID_WIDTH": {
+            "value": "0"
+          },
+          "S_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "TDATA_REMAP": {
+            "value": "16'b0000000000000000, ~tdata[15], tdata[14:0]"
+          },
+          "TLAST_REMAP": {
+            "value": "tlast[0]"
+          }
+        },
+        "interface_ports": {
+          "S_AXIS": {
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "mode": "Slave",
+            "bridges": [
+              "M_AXIS"
+            ]
+          }
+        }
+      },
+      "xfft_0": {
+        "vlnv": "xilinx.com:ip:xfft:9.1",
+        "ip_revision": "13",
+        "xci_name": "xadc_xfft_0_0",
+        "xci_path": "ip/xadc_xfft_0_0/xadc_xfft_0_0.xci",
+        "inst_hier_path": "xfft_0",
+        "parameters": {
+          "data_format": {
+            "value": "fixed_point"
+          },
+          "implementation_options": {
+            "value": "pipelined_streaming_io"
+          },
+          "input_width": {
+            "value": "16"
+          },
+          "number_of_stages_using_block_ram_for_data_and_phase_factors": {
+            "value": "4"
+          },
+          "output_ordering": {
+            "value": "natural_order"
+          },
+          "run_time_configurable_transform_length": {
+            "value": "true"
+          },
+          "scaling_options": {
+            "value": "block_floating_point"
+          },
+          "target_clock_frequency": {
+            "value": "100"
+          },
+          "transform_length": {
+            "value": "2048"
+          }
+        }
+      },
+      "cordic_0": {
+        "vlnv": "xilinx.com:ip:cordic:6.0",
+        "ip_revision": "23",
+        "xci_name": "xadc_cordic_0_0",
+        "xci_path": "ip/xadc_cordic_0_0/xadc_cordic_0_0.xci",
+        "inst_hier_path": "cordic_0",
+        "parameters": {
+          "ARESETN": {
+            "value": "true"
+          },
+          "Compensation_Scaling": {
+            "value": "No_Scale_Compensation"
+          },
+          "Data_Format": {
+            "value": "SignedFraction"
+          },
+          "Functional_Selection": {
+            "value": "Translate"
+          },
+          "Input_Width": {
+            "value": "16"
+          },
+          "cartesian_has_tlast": {
+            "value": "true"
+          },
+          "flow_control": {
+            "value": "Blocking"
+          },
+          "out_tlast_behv": {
+            "value": "Pass_Cartesian_TLAST"
+          }
+        }
+      },
+      "axi_dma_1": {
+        "vlnv": "xilinx.com:ip:axi_dma:7.1",
+        "ip_revision": "35",
+        "xci_name": "xadc_axi_dma_1_0",
+        "xci_path": "ip/xadc_axi_dma_1_0/xadc_axi_dma_1_0.xci",
+        "inst_hier_path": "axi_dma_1",
+        "parameters": {
+          "c_include_mm2s": {
+            "value": "0"
+          },
+          "c_include_sg": {
+            "value": "0"
+          },
+          "c_m_axi_s2mm_data_width": {
+            "value": "32"
+          },
+          "c_s2mm_burst_size": {
+            "value": "128"
+          },
+          "c_s_axis_s2mm_tdata_width": {
+            "value": "16"
+          },
+          "c_sg_length_width": {
+            "value": "23"
+          }
+        },
+        "interface_ports": {
+          "M_AXI_S2MM": {
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "mode": "Master",
+            "address_space_ref": "Data_S2MM",
+            "base_address": {
+              "minimum": "0x00000000",
+              "maximum": "0xFFFFFFFF",
+              "width": "32"
+            }
+          }
+        },
+        "addressing": {
+          "address_spaces": {
+            "Data_S2MM": {
+              "range": "4G",
+              "width": "32"
+            }
+          }
+        }
+      },
+      "axis_subset_converter_1": {
+        "vlnv": "xilinx.com:ip:axis_subset_converter:1.1",
+        "ip_revision": "34",
+        "xci_name": "xadc_axis_subset_converter_1_0",
+        "xci_path": "ip/xadc_axis_subset_converter_1_0_1/xadc_axis_subset_converter_1_0.xci",
+        "inst_hier_path": "axis_subset_converter_1",
+        "parameters": {
+          "M_HAS_TKEEP": {
+            "value": "0"
+          },
+          "M_HAS_TLAST": {
+            "value": "1"
+          },
+          "M_HAS_TREADY": {
+            "value": "1"
+          },
+          "M_HAS_TSTRB": {
+            "value": "0"
+          },
+          "M_TDATA_NUM_BYTES": {
+            "value": "2"
+          },
+          "M_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "M_TID_WIDTH": {
+            "value": "0"
+          },
+          "M_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "S_HAS_TKEEP": {
+            "value": "0"
+          },
+          "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TREADY": {
+            "value": "1"
+          },
+          "S_HAS_TSTRB": {
+            "value": "0"
+          },
+          "S_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "S_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "S_TID_WIDTH": {
+            "value": "0"
+          },
+          "S_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "TDATA_REMAP": {
+            "value": "tdata[15:0]"
+          }
+        },
+        "interface_ports": {
+          "S_AXIS": {
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "mode": "Slave",
+            "bridges": [
+              "M_AXIS"
+            ]
+          }
+        }
+      },
+      "axi_smc_1": {
+        "vlnv": "xilinx.com:ip:smartconnect:1.0",
+        "ip_revision": "26",
+        "xci_name": "xadc_axi_smc_1_0",
+        "xci_path": "ip/xadc_axi_smc_1_0_1/xadc_axi_smc_1_0.xci",
+        "inst_hier_path": "axi_smc_1",
+        "interface_ports": {
+          "S00_AXI": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {},
+            "bridges": [
+              "M00_AXI"
+            ]
+          },
+          "S01_AXI": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {},
+            "bridges": [
+              "M00_AXI"
+            ]
+          },
+          "M00_AXI": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {}
+          }
+        }
+      },
+      "axis_trigger_unit_0": {
+        "vlnv": "xilinx.com:module_ref:axis_trigger_unit:1.0",
+        "ip_revision": "1",
+        "xci_name": "xadc_axis_trigger_unit_0_1",
+        "xci_path": "ip/xadc_axis_trigger_unit_0_1/xadc_axis_trigger_unit_0_1.xci",
+        "inst_hier_path": "axis_trigger_unit_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "axis_trigger_unit",
+          "boundary_crc": "0x0"
+        },
+        "interface_ports": {
+          "m_axis": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "m_axis_fft_config": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_fft_config_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_fft_config_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_fft_config_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "s_axis": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "s_axis_tdata",
+                "direction": "I",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "s_axis_tvalid",
+                "direction": "I"
+              },
+              "TREADY": {
+                "physical_name": "s_axis_tready",
+                "direction": "O"
+              }
+            }
+          },
+          "s_axi": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:aximm:1.0",
+            "vlnv": "xilinx.com:interface:aximm_rtl:1.0",
+            "parameters": {
+              "DATA_WIDTH": {
+                "value": "32",
+                "value_src": "auto"
+              },
+              "PROTOCOL": {
+                "value": "AXI4LITE",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "ID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "ADDR_WIDTH": {
+                "value": "5",
+                "value_src": "auto"
+              },
+              "AWUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "ARUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "WUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "RUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "BUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "READ_WRITE_MODE": {
+                "value": "READ_WRITE",
+                "value_src": "constant"
+              },
+              "HAS_BURST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_LOCK": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_PROT": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_CACHE": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_QOS": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_REGION": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_WSTRB": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_BRESP": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_RRESP": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "SUPPORTS_NARROW_BURST": {
+                "value": "0",
+                "value_src": "auto"
+              },
+              "NUM_READ_OUTSTANDING": {
+                "value": "1",
+                "value_src": "auto"
+              },
+              "NUM_WRITE_OUTSTANDING": {
+                "value": "1",
+                "value_src": "auto"
+              },
+              "MAX_BURST_LENGTH": {
+                "value": "1",
+                "value_src": "auto"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              },
+              "NUM_READ_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "NUM_WRITE_THREADS": {
+                "value": "1",
+                "value_src": "user_prop"
+              },
+              "RUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
+              },
+              "WUSER_BITS_PER_BYTE": {
+                "value": "0",
+                "value_src": "user_prop"
+              }
+            },
+            "memory_map_ref": "s_axi",
+            "port_maps": {
+              "AWADDR": {
+                "physical_name": "s_axi_awaddr",
+                "direction": "I",
+                "left": "4",
+                "right": "0"
+              },
+              "AWPROT": {
+                "physical_name": "s_axi_awprot",
+                "direction": "I",
+                "left": "2",
+                "right": "0"
+              },
+              "AWVALID": {
+                "physical_name": "s_axi_awvalid",
+                "direction": "I"
+              },
+              "AWREADY": {
+                "physical_name": "s_axi_awready",
+                "direction": "O"
+              },
+              "WDATA": {
+                "physical_name": "s_axi_wdata",
+                "direction": "I",
+                "left": "31",
+                "right": "0"
+              },
+              "WSTRB": {
+                "physical_name": "s_axi_wstrb",
+                "direction": "I",
+                "left": "3",
+                "right": "0"
+              },
+              "WVALID": {
+                "physical_name": "s_axi_wvalid",
+                "direction": "I"
+              },
+              "WREADY": {
+                "physical_name": "s_axi_wready",
+                "direction": "O"
+              },
+              "BRESP": {
+                "physical_name": "s_axi_bresp",
+                "direction": "O",
+                "left": "1",
+                "right": "0"
+              },
+              "BVALID": {
+                "physical_name": "s_axi_bvalid",
+                "direction": "O"
+              },
+              "BREADY": {
+                "physical_name": "s_axi_bready",
+                "direction": "I"
+              },
+              "ARADDR": {
+                "physical_name": "s_axi_araddr",
+                "direction": "I",
+                "left": "4",
+                "right": "0"
+              },
+              "ARPROT": {
+                "physical_name": "s_axi_arprot",
+                "direction": "I",
+                "left": "2",
+                "right": "0"
+              },
+              "ARVALID": {
+                "physical_name": "s_axi_arvalid",
+                "direction": "I"
+              },
+              "ARREADY": {
+                "physical_name": "s_axi_arready",
+                "direction": "O"
+              },
+              "RDATA": {
+                "physical_name": "s_axi_rdata",
+                "direction": "O",
+                "left": "31",
+                "right": "0"
+              },
+              "RRESP": {
+                "physical_name": "s_axi_rresp",
+                "direction": "O",
+                "left": "1",
+                "right": "0"
+              },
+              "RVALID": {
+                "physical_name": "s_axi_rvalid",
+                "direction": "O"
+              },
+              "RREADY": {
+                "physical_name": "s_axi_rready",
+                "direction": "I"
+              }
+            }
+          }
+        },
+        "ports": {
+          "aclk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_BUSIF": {
+                "value": "m_axis:m_axis_fft_config:s_axis:s_axi",
+                "value_src": "constant"
+              },
+              "ASSOCIATED_RESET": {
+                "value": "aresetn",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "aresetn": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "channel_id": {
+            "direction": "I",
+            "left": "4",
+            "right": "0"
+          },
+          "frame_done": {
+            "direction": "I"
+          },
+          "decim_factor_out": {
+            "direction": "O",
+            "left": "1",
+            "right": "0"
+          },
+          "packet_size_out": {
+            "direction": "O",
+            "left": "15",
+            "right": "0"
+          },
+          "fft_chan_sel_out": {
+            "direction": "O"
+          }
+        }
+      },
+      "axis_decimator_0": {
+        "vlnv": "xilinx.com:module_ref:axis_decimator:1.0",
+        "ip_revision": "1",
+        "xci_name": "xadc_axis_decimator_0_0",
+        "xci_path": "ip/xadc_axis_decimator_0_0/xadc_axis_decimator_0_0.xci",
+        "inst_hier_path": "axis_decimator_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "axis_decimator",
+          "boundary_crc": "0x0"
+        },
+        "interface_ports": {
+          "m_axis": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "s_axis": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "s_axis_tdata",
+                "direction": "I",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "s_axis_tvalid",
+                "direction": "I"
+              },
+              "TREADY": {
+                "physical_name": "s_axis_tready",
+                "direction": "O"
+              }
+            }
+          }
+        },
+        "ports": {
+          "aclk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_BUSIF": {
+                "value": "m_axis:s_axis",
+                "value_src": "constant"
+              },
+              "ASSOCIATED_RESET": {
+                "value": "aresetn",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "aresetn": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "decim_sel": {
+            "direction": "I",
+            "left": "1",
+            "right": "0"
+          },
+          "channel_id": {
+            "direction": "I",
+            "left": "4",
+            "right": "0"
+          }
+        }
+      },
+      "tlast_generator_0": {
+        "vlnv": "xilinx.com:module_ref:tlast_generator:1.0",
+        "ip_revision": "1",
+        "xci_name": "xadc_tlast_generator_0_0",
+        "xci_path": "ip/xadc_tlast_generator_0_0/xadc_tlast_generator_0_0.xci",
+        "inst_hier_path": "tlast_generator_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "tlast_generator",
+          "boundary_crc": "0x0"
+        },
+        "interface_ports": {
+          "m_axis": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TLAST": {
+                "physical_name": "m_axis_tlast",
+                "direction": "O"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "s_axis": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "s_axis_tdata",
+                "direction": "I",
+                "left": "15",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "s_axis_tvalid",
+                "direction": "I"
+              },
+              "TREADY": {
+                "physical_name": "s_axis_tready",
+                "direction": "O"
+              }
+            }
+          }
+        },
+        "ports": {
+          "aclk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_BUSIF": {
+                "value": "m_axis:s_axis",
+                "value_src": "constant"
+              },
+              "ASSOCIATED_RESET": {
+                "value": "aresetn",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "aresetn": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "packet_size_in": {
+            "direction": "I",
+            "left": "15",
+            "right": "0"
+          }
+        }
+      },
+      "axis_broadcaster_0": {
+        "vlnv": "xilinx.com:ip:axis_broadcaster:1.1",
+        "ip_revision": "33",
+        "xci_name": "xadc_axis_broadcaster_0_0",
+        "xci_path": "ip/xadc_axis_broadcaster_0_0/xadc_axis_broadcaster_0_0.xci",
+        "inst_hier_path": "axis_broadcaster_0",
+        "parameters": {
+          "HAS_TKEEP": {
+            "value": "0"
+          },
+          "HAS_TLAST": {
+            "value": "1"
+          },
+          "HAS_TREADY": {
+            "value": "1"
+          },
+          "HAS_TSTRB": {
+            "value": "0"
+          },
+          "M_TDATA_NUM_BYTES": {
+            "value": "2"
+          },
+          "M_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "S_TDATA_NUM_BYTES": {
+            "value": "2"
+          },
+          "S_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "TDEST_WIDTH": {
+            "value": "0"
+          },
+          "TID_WIDTH": {
+            "value": "0"
+          }
+        },
+        "interface_ports": {
+          "S_AXIS": {
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "mode": "Slave",
+            "bridges": [
+              "M00_AXIS",
+              "M01_AXIS"
+            ]
+          }
+        }
+      },
+      "axis_channel_demux_0": {
+        "vlnv": "xilinx.com:module_ref:axis_channel_demux:1.0",
+        "ip_revision": "1",
+        "xci_name": "xadc_axis_channel_demux_0_0",
+        "xci_path": "ip/xadc_axis_channel_demux_0_0/xadc_axis_channel_demux_0_0.xci",
+        "inst_hier_path": "axis_channel_demux_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "axis_channel_demux",
+          "boundary_crc": "0x0"
+        },
+        "interface_ports": {
+          "m_axis": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_tdata",
+                "direction": "O",
+                "left": "15",
+                "right": "0"
+              },
+              "TLAST": {
+                "physical_name": "m_axis_tlast",
+                "direction": "O"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "s_axis": {
+            "mode": "Slave",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "2",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "s_axis_tdata",
+                "direction": "I",
+                "left": "15",
+                "right": "0"
+              },
+              "TLAST": {
+                "physical_name": "s_axis_tlast",
+                "direction": "I"
+              },
+              "TVALID": {
+                "physical_name": "s_axis_tvalid",
+                "direction": "I"
+              },
+              "TREADY": {
+                "physical_name": "s_axis_tready",
+                "direction": "O"
+              }
+            }
+          }
+        },
+        "ports": {
+          "aclk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_BUSIF": {
+                "value": "m_axis:s_axis",
+                "value_src": "constant"
+              },
+              "ASSOCIATED_RESET": {
+                "value": "aresetn",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "100000000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "xadc_processing_system7_0_0_FCLK_CLK0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "aresetn": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "sel_ch": {
+            "direction": "I"
+          }
+        }
+      },
+      "axis_subset_converter_2": {
+        "vlnv": "xilinx.com:ip:axis_subset_converter:1.1",
+        "ip_revision": "34",
+        "xci_name": "xadc_axis_subset_converter_2_0",
+        "xci_path": "ip/xadc_axis_subset_converter_2_0/xadc_axis_subset_converter_2_0.xci",
+        "inst_hier_path": "axis_subset_converter_2",
+        "parameters": {
+          "M_HAS_TKEEP": {
+            "value": "0"
+          },
+          "M_HAS_TLAST": {
+            "value": "1"
+          },
+          "M_HAS_TSTRB": {
+            "value": "0"
+          },
+          "M_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "M_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "M_TID_WIDTH": {
+            "value": "0"
+          },
+          "M_TUSER_WIDTH": {
+            "value": "0"
+          },
+          "S_HAS_TKEEP": {
+            "value": "0"
+          },
+          "S_HAS_TLAST": {
+            "value": "1"
+          },
+          "S_HAS_TSTRB": {
+            "value": "0"
+          },
+          "S_TDATA_NUM_BYTES": {
+            "value": "4"
+          },
+          "S_TDEST_WIDTH": {
+            "value": "0"
+          },
+          "S_TID_WIDTH": {
+            "value": "0"
+          },
+          "S_TUSER_WIDTH": {
+            "value": "0"
+          }
+        },
+        "interface_ports": {
+          "S_AXIS": {
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "mode": "Slave",
+            "bridges": [
+              "M_AXIS"
+            ]
+          }
+        }
+      }
+    },
+    "interface_nets": {
+      "Vaux1_0_1": {
+        "interface_ports": [
+          "Vaux1_0",
+          "xadc_wiz_0/Vaux1"
+        ]
+      },
+      "Vaux9_0_1": {
+        "interface_ports": [
+          "Vaux9_0",
+          "xadc_wiz_0/Vaux9"
+        ]
+      },
+      "Vp_Vn_0_1": {
+        "interface_ports": [
+          "Vp_Vn_0",
+          "xadc_wiz_0/Vp_Vn"
+        ]
+      },
+      "axi_dma_0_M_AXI_S2MM": {
+        "interface_ports": [
+          "axi_smc_1/S00_AXI",
+          "axi_dma_0/M_AXI_S2MM"
+        ]
+      },
+      "axi_dma_1_M_AXI_S2MM": {
+        "interface_ports": [
+          "axi_smc_1/S01_AXI",
+          "axi_dma_1/M_AXI_S2MM"
+        ]
+      },
+      "axi_smc_M00_AXI": {
+        "interface_ports": [
+          "axi_smc_0/M00_AXI",
+          "xadc_wiz_0/s_axi_lite"
+        ]
+      },
+      "axi_smc_M01_AXI": {
+        "interface_ports": [
+          "axi_smc_0/M01_AXI",
+          "axi_dma_0/S_AXI_LITE"
+        ]
+      },
+      "axi_smc_M02_AXI": {
+        "interface_ports": [
+          "axi_smc_0/M02_AXI",
+          "axi_timer_0/S_AXI"
+        ]
+      },
+      "axi_smc_M03_AXI": {
+        "interface_ports": [
+          "axi_smc_0/M03_AXI",
+          "axis_trigger_unit_0/s_axi"
+        ]
+      },
+      "axi_smc_M04_AXI": {
+        "interface_ports": [
+          "axi_smc_0/M04_AXI",
+          "axi_dma_1/S_AXI_LITE"
+        ]
+      },
+      "axis_broadcaster_0_M00_AXIS": {
+        "interface_ports": [
+          "axis_broadcaster_0/M00_AXIS",
+          "axi_dma_0/S_AXIS_S2MM"
+        ]
+      },
+      "axis_broadcaster_0_M01_AXIS": {
+        "interface_ports": [
+          "axis_broadcaster_0/M01_AXIS",
+          "axis_channel_demux_0/s_axis"
+        ]
+      },
+      "axis_channel_demux_0_m_axis": {
+        "interface_ports": [
+          "axis_channel_demux_0/m_axis",
+          "axis_subset_converter_0/S_AXIS"
+        ]
+      },
+      "axis_decimator_0_m_axis": {
+        "interface_ports": [
+          "axis_decimator_0/m_axis",
+          "tlast_generator_0/s_axis"
+        ]
+      },
+      "axis_subset_converter_0_M_AXIS": {
+        "interface_ports": [
+          "axis_subset_converter_0/M_AXIS",
+          "xfft_0/S_AXIS_DATA"
+        ]
+      },
+      "axis_subset_converter_1_M_AXIS": {
+        "interface_ports": [
+          "axis_subset_converter_1/M_AXIS",
+          "axi_dma_1/S_AXIS_S2MM"
+        ]
+      },
+      "axis_subset_converter_2_M_AXIS": {
+        "interface_ports": [
+          "axis_subset_converter_2/M_AXIS",
+          "cordic_0/S_AXIS_CARTESIAN"
+        ]
+      },
+      "axis_trigger_unit_0_m_axis": {
+        "interface_ports": [
+          "axis_trigger_unit_0/m_axis",
+          "axis_decimator_0/s_axis"
+        ]
+      },
+      "cordic_0_M_AXIS_DOUT": {
+        "interface_ports": [
+          "cordic_0/M_AXIS_DOUT",
+          "axis_subset_converter_1/S_AXIS"
+        ]
+      },
+      "processing_system7_0_DDR": {
+        "interface_ports": [
+          "DDR",
+          "processing_system7_0/DDR"
+        ]
+      },
+      "processing_system7_0_FIXED_IO": {
+        "interface_ports": [
+          "FIXED_IO",
+          "processing_system7_0/FIXED_IO"
+        ]
+      },
+      "processing_system7_0_M_AXI_GP0": {
+        "interface_ports": [
+          "processing_system7_0/M_AXI_GP0",
+          "axi_smc_0/S00_AXI"
+        ]
+      },
+      "smartconnect_0_M00_AXI": {
+        "interface_ports": [
+          "axi_smc_1/M00_AXI",
+          "processing_system7_0/S_AXI_HP0"
+        ]
+      },
+      "tlast_generator_0_m_axis": {
+        "interface_ports": [
+          "tlast_generator_0/m_axis",
+          "axis_broadcaster_0/S_AXIS"
+        ]
+      },
+      "xadc_wiz_0_M_AXIS": {
+        "interface_ports": [
+          "xadc_wiz_0/M_AXIS",
+          "axis_trigger_unit_0/s_axis"
+        ]
+      },
+      "xfft_0_M_AXIS_DATA": {
+        "interface_ports": [
+          "xfft_0/M_AXIS_DATA",
+          "axis_subset_converter_2/S_AXIS"
+        ]
+      }
+    },
+    "nets": {
+      "axis_trigger_unit_0_decim_factor_out": {
+        "ports": [
+          "axis_trigger_unit_0/decim_factor_out",
+          "axis_decimator_0/decim_sel"
+        ]
+      },
+      "axis_trigger_unit_0_fft_chan_sel_out": {
+        "ports": [
+          "axis_trigger_unit_0/fft_chan_sel_out",
+          "axis_channel_demux_0/sel_ch"
+        ]
+      },
+      "axis_trigger_unit_0_m_axis_fft_config_tdata": {
+        "ports": [
+          "axis_trigger_unit_0/m_axis_fft_config_tdata",
+          "xfft_0/s_axis_config_tdata"
+        ]
+      },
+      "axis_trigger_unit_0_m_axis_fft_config_tvalid": {
+        "ports": [
+          "axis_trigger_unit_0/m_axis_fft_config_tvalid",
+          "xfft_0/s_axis_config_tvalid"
+        ]
+      },
+      "axis_trigger_unit_0_packet_size_out": {
+        "ports": [
+          "axis_trigger_unit_0/packet_size_out",
+          "tlast_generator_0/packet_size_in"
+        ]
+      },
+      "processing_system7_0_FCLK_CLK0": {
+        "ports": [
+          "processing_system7_0/FCLK_CLK0",
+          "xadc_wiz_0/s_axi_aclk",
+          "axi_dma_0/s_axi_lite_aclk",
+          "axi_dma_0/m_axi_s2mm_aclk",
+          "xadc_wiz_0/s_axis_aclk",
+          "axi_timer_0/s_axi_aclk",
+          "axi_smc_0/aclk",
+          "processing_system7_0/M_AXI_GP0_ACLK",
+          "processing_system7_0/S_AXI_HP0_ACLK",
+          "rst_ps7_0_100M/slowest_sync_clk",
+          "axis_subset_converter_1/aclk",
+          "axis_subset_converter_0/aclk",
+          "xfft_0/aclk",
+          "cordic_0/aclk",
+          "axi_dma_1/s_axi_lite_aclk",
+          "axi_dma_1/m_axi_s2mm_aclk",
+          "axi_smc_1/aclk",
+          "axis_broadcaster_0/aclk",
+          "tlast_generator_0/aclk",
+          "axis_decimator_0/aclk",
+          "axis_trigger_unit_0/aclk",
+          "axis_subset_converter_2/aclk",
+          "axis_channel_demux_0/aclk"
+        ]
+      },
+      "processing_system7_0_FCLK_RESET0_N": {
+        "ports": [
+          "processing_system7_0/FCLK_RESET0_N",
+          "rst_ps7_0_100M/ext_reset_in"
+        ]
+      },
+      "rst_ps7_0_100M_peripheral_aresetn": {
+        "ports": [
+          "rst_ps7_0_100M/peripheral_aresetn",
+          "xadc_wiz_0/s_axi_aresetn",
+          "axi_dma_0/axi_resetn",
+          "axi_timer_0/s_axi_aresetn",
+          "axi_smc_0/aresetn",
+          "axi_dma_1/axi_resetn",
+          "axis_subset_converter_0/aresetn",
+          "axis_subset_converter_1/aresetn",
+          "cordic_0/aresetn",
+          "axi_smc_1/aresetn",
+          "axis_broadcaster_0/aresetn",
+          "tlast_generator_0/aresetn",
+          "axis_decimator_0/aresetn",
+          "axis_trigger_unit_0/aresetn",
+          "axis_subset_converter_2/aresetn",
+          "axis_channel_demux_0/aresetn"
+        ]
+      },
+      "tlast_generator_0_m_axis_tlast": {
+        "ports": [
+          "tlast_generator_0/m_axis_tlast",
+          "axi_dma_0/s_axis_s2mm_tlast",
+          "axi_timer_0/capturetrig0",
+          "axis_trigger_unit_0/frame_done"
+        ]
+      },
+      "xadc_wiz_0_channel_out": {
+        "ports": [
+          "xadc_wiz_0/channel_out",
+          "axis_decimator_0/channel_id",
+          "axis_trigger_unit_0/channel_id"
+        ]
+      },
+      "xfft_0_s_axis_config_tready": {
+        "ports": [
+          "xfft_0/s_axis_config_tready",
+          "axis_trigger_unit_0/m_axis_fft_config_tready"
+        ]
+      }
+    },
+    "addressing": {
+      "/processing_system7_0": {
+        "address_spaces": {
+          "Data": {
+            "segments": {
+              "SEG_axi_dma_0_Reg": {
+                "address_block": "/axi_dma_0/S_AXI_LITE/Reg",
+                "offset": "0x40400000",
+                "range": "64K"
+              },
+              "SEG_axi_dma_1_Reg": {
+                "address_block": "/axi_dma_1/S_AXI_LITE/Reg",
+                "offset": "0x40410000",
+                "range": "64K"
+              },
+              "SEG_axi_timer_0_Reg": {
+                "address_block": "/axi_timer_0/S_AXI/Reg",
+                "offset": "0x42800000",
+                "range": "64K"
+              },
+              "SEG_axis_trigger_unit_0_reg0": {
+                "address_block": "/axis_trigger_unit_0/s_axi/reg0",
+                "offset": "0x43C10000",
+                "range": "64K"
+              },
+              "SEG_xadc_wiz_0_Reg": {
+                "address_block": "/xadc_wiz_0/s_axi_lite/Reg",
+                "offset": "0x43C00000",
+                "range": "64K"
+              }
+            }
+          }
+        }
+      },
+      "/axi_dma_0": {
+        "address_spaces": {
+          "Data_S2MM": {
+            "segments": {
+              "SEG_processing_system7_0_HP0_DDR_LOWOCM": {
+                "address_block": "/processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM",
+                "offset": "0x00000000",
+                "range": "512M"
+              }
+            }
+          }
+        }
+      },
+      "/axi_dma_1": {
+        "address_spaces": {
+          "Data_S2MM": {
+            "segments": {
+              "SEG_processing_system7_0_HP0_DDR_LOWOCM": {
+                "address_block": "/processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM",
+                "offset": "0x00000000",
+                "range": "512M"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+pynq_z2.xdc: (src/con/pynq_z2.xdc)
+
+```xdc
+# ==============================================================================
+# Physical Package Pin Constraints for PYNQ-Z2 Analog Headers
+# ==============================================================================
+# Arduino Header A0 (Vaux1)
+set_property -dict { PACKAGE_PIN E17 } [get_ports Vaux1_0_v_p]
+set_property -dict { PACKAGE_PIN D18 } [get_ports Vaux1_0_v_n]
+# Arduino Header A1 (Vaux9)
+set_property -dict { PACKAGE_PIN E18 } [get_ports Vaux9_0_v_p]
+set_property -dict { PACKAGE_PIN E19 } [get_ports Vaux9_0_v_n]
+```
+
+axis_channel_demux.vhd: (src/hdl/axis_channel_demux.vhd)
+
+```vhd
+-- =============================================================================
+-- File: axis_channel_demux.vhd
+-- Description: AXI4-Stream Channel Demultiplexer & Single-Channel Filter.
+--              Filters interleaved dual-channel stream (A0, A1, A0, A1...) and
+--              emits a pure single-channel continuous stream with concurrent TLAST.
+--              sel_ch: '0' => Emit Channel 1 (A0)
+--                      '1' => Emit Channel 2 (A1)
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity axis_channel_demux is
+    port (
+        aclk          : in  std_logic;
+        aresetn       : in  std_logic;
+
+        -- Channel selector (0 = Channel 1 / A0, 1 = Channel 2 / A1)
+        sel_ch        : in  std_logic;
+
+        -- AXI4-Stream Slave Interface (Interleaved Input from Broadcaster)
+        s_axis_tdata  : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid : in  std_logic;
+        s_axis_tready : out std_logic;
+        s_axis_tlast  : in  std_logic;
+
+        -- AXI4-Stream Master Interface (Filtered Output to Subset Converter / FFT)
+        m_axis_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_tvalid : out std_logic;
+        m_axis_tready : in  std_logic;
+        m_axis_tlast  : out std_logic
+    );
+end axis_channel_demux;
+
+architecture Behavioral of axis_channel_demux is
+
+    type t_state is (ST_WAIT_CH1, ST_EMIT_CH2);
+    signal state       : t_state := ST_WAIT_CH1;
+
+    signal ch1_reg     : std_logic_vector(15 downto 0) := (others => '0');
+    signal tlast_latch : std_logic := '0';
+
+begin
+
+    -- Upstream Handshake:
+    -- Beat 1 (CH1): Ready to capture CH1 sample
+    -- Beat 2 (CH2): Ready only when downstream (FFT) accepts the emitted sample
+    s_axis_tready <= '1' when (state = ST_WAIT_CH1) else m_axis_tready;
+
+    -- Master Outputs:
+    m_axis_tdata  <= ch1_reg when (sel_ch = '0') else s_axis_tdata;
+    m_axis_tlast  <= s_axis_tlast or tlast_latch;
+    m_axis_tvalid <= '1' when (state = ST_EMIT_CH2 and s_axis_tvalid = '1') else '0';
+
+    process(aclk)
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                state       <= ST_WAIT_CH1;
+                ch1_reg     <= (others => '0');
+                tlast_latch <= '0';
+            else
+                case state is
+                    -- Beat 1: Capture CH1 sample ONLY on valid handshake
+                    when ST_WAIT_CH1 =>
+                        if (s_axis_tvalid = '1') then
+                            ch1_reg     <= s_axis_tdata;
+                            tlast_latch <= s_axis_tlast;
+                            state       <= ST_EMIT_CH2;
+                        end if;
+
+                    -- Beat 2: Emit selected channel and advance ONLY when downstream handshakes
+                    when ST_EMIT_CH2 =>
+                        if (s_axis_tvalid = '1' and m_axis_tready = '1') then
+                            tlast_latch <= '0';
+                            state       <= ST_WAIT_CH1;
+                        end if;
+                end case;
+
+                -- Self-healing Frame Sync: Always reset to Beat 1 on packet end
+                if (s_axis_tvalid = '1' and s_axis_tlast = '1' and m_axis_tready = '1') then
+                    state       <= ST_WAIT_CH1;
+                    tlast_latch <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+axis_decimator.vhd: (src/hdl/axis_decimator.vhd)
+
+```vhd
+-- =============================================================================
+-- File: axis_decimator.vhd
+-- Description: Runtime-Configurable Dual-Channel AXI4-Stream Decimator
+--              Supports dynamic switching between:
+--                • "00": M = 1  (Bypass: 500 kSPS Wideband Lab Scope)
+--                • "01": M = 10 (50 kSPS Full Audio)
+--                • "10": M = 20 (25 kSPS Speech / Acoustic)
+--                • "11": M = 50 (10 kSPS Deep Bass Zoom, Δf = 4.88 Hz)
+--              Phase-locked to physical XADC channel_id (0x11 = A0, 0x19 = A1).
+--              Includes synchronous accumulator flush on dynamic decim_sel changes.
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity axis_decimator is
+    port (
+        aclk          : in  std_logic;
+        aresetn       : in  std_logic;
+
+        -- =====================================================================
+        -- Runtime Decimation Selector (from axis_trigger_unit register 0x14)
+        -- =====================================================================
+        decim_sel     : in  std_logic_vector(1 downto 0);
+
+        -- =====================================================================
+        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
+        -- =====================================================================
+        channel_id    : in  std_logic_vector(4 downto 0);
+
+        -- =====================================================================
+        -- AXI4-Stream Slave Interface (Raw 500 kSPS Interleaved Stream)
+        -- =====================================================================
+        s_axis_tdata  : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid : in  std_logic;
+        s_axis_tready : out std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Master Interface (Decimated Interleaved Stream)
+        -- =====================================================================
+        m_axis_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_tvalid : out std_logic;
+        m_axis_tready : in  std_logic
+    );
+end axis_decimator;
+
+architecture Behavioral of axis_decimator is
+
+    -- Constant Channel Addresses in 7-Series XADC
+    constant CH_VAUX1          : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
+    constant CH_VAUX9          : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
+
+    -- Independent 24-bit Accumulators (Prevent overflow for up to M=50 sums)
+    signal acc_ch1             : unsigned(23 downto 0) := (others => '0');
+    signal acc_ch2             : unsigned(23 downto 0) := (others => '0');
+    signal count_ch1           : integer range 0 to 50 := 0;
+    signal count_ch2           : integer range 0 to 50 := 0;
+
+    -- Edge detection for runtime profile switching
+    signal decim_sel_prev      : std_logic_vector(1 downto 0) := "01";
+
+    -- Output Emission Registers
+    signal avg_ch1_reg         : std_logic_vector(15 downto 0) := (others => '0');
+    signal avg_ch2_reg         : std_logic_vector(15 downto 0) := (others => '0');
+
+    -- Output State Machine (Emits decimated Ch1 then Ch2 sequentially)
+    type t_out_state is (ST_ACCUMULATING, ST_EMIT_CH1, ST_EMIT_CH2);
+    signal out_state           : t_out_state := ST_ACCUMULATING;
+
+begin
+
+    s_axis_tready <= '1' when (out_state = ST_ACCUMULATING) else '0';
+
+    m_axis_tdata <= avg_ch1_reg when (out_state = ST_EMIT_CH1) else
+                    avg_ch2_reg when (out_state = ST_EMIT_CH2) else
+                    (others => '0');
+
+    m_axis_tvalid <= '1' when (out_state = ST_EMIT_CH1 or out_state = ST_EMIT_CH2) else '0';
+
+    process(aclk)
+        variable sample_val : unsigned(15 downto 0);
+        variable is_ch1     : boolean;
+        variable is_ch2     : boolean;
+        variable m_target   : integer range 1 to 50;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                acc_ch1        <= (others => '0');
+                acc_ch2        <= (others => '0');
+                count_ch1      <= 0;
+                count_ch2      <= 0;
+                avg_ch1_reg    <= (others => '0');
+                avg_ch2_reg    <= (others => '0');
+                decim_sel_prev <= decim_sel;
+                out_state      <= ST_ACCUMULATING;
+            else
+                decim_sel_prev <= decim_sel;
+
+                -- Synchronous flush on dynamic decimation mode switch
+                if decim_sel /= decim_sel_prev then
+                    acc_ch1     <= (others => '0');
+                    acc_ch2     <= (others => '0');
+                    count_ch1   <= 0;
+                    count_ch2   <= 0;
+                    out_state   <= ST_ACCUMULATING;
+                else
+                    -- Resolve active decimation target factor M
+                    case decim_sel is
+                        when "00"   => m_target := 1;   -- Bypass Mode (500 kSPS)
+                        when "01"   => m_target := 10;  -- Full Audio (50 kSPS)
+                        when "10"   => m_target := 20;  -- Speech / Vocal (25 kSPS)
+                        when "11"   => m_target := 50;  -- Deep Bass Zoom (10 kSPS)
+                        when others => m_target := 10;
+                    end case;
+
+                    case out_state is
+                        -- ---------------------------------------------------------
+                        -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
+                        -- ---------------------------------------------------------
+                        when ST_ACCUMULATING =>
+                            if s_axis_tvalid = '1' then
+                                sample_val := unsigned(s_axis_tdata);
+                                is_ch1     := (channel_id = CH_VAUX1);
+                                is_ch2     := (channel_id = CH_VAUX9);
+
+                                if is_ch1 then
+                                    if count_ch1 < m_target then
+                                        acc_ch1   <= acc_ch1 + sample_val;
+                                        count_ch1 <= count_ch1 + 1;
+                                    end if;
+                                elsif is_ch2 then
+                                    if count_ch2 < m_target then
+                                        acc_ch2   <= acc_ch2 + sample_val;
+                                        count_ch2 <= count_ch2 + 1;
+                                    end if;
+                                end if;
+
+                                -- When both channels reach M samples, normalize and emit
+                                if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
+                                   (count_ch1 = m_target and count_ch2 = m_target) then
+
+                                    case decim_sel is
+                                        when "00" => -- M = 1 (Bypass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
+                                            end if;
+
+                                        when "01" => -- M = 10 (Audio)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
+                                            end if;
+
+                                        when "10" => -- M = 20 (Speech)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
+                                            end if;
+
+                                        when "11" => -- M = 50 (Deep Bass)
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
+                                            if is_ch2 then
+                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
+                                            else
+                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
+                                            end if;
+
+                                        when others =>
+                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
+                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
+                                    end case;
+
+                                    -- Reset accumulators
+                                    acc_ch1     <= (others => '0');
+                                    acc_ch2     <= (others => '0');
+                                    count_ch1   <= 0;
+                                    count_ch2   <= 0;
+
+                                    out_state   <= ST_EMIT_CH1;
+                                end if;
+                            end if;
+
+                        -- ---------------------------------------------------------
+                        -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH1 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_EMIT_CH2;
+                            end if;
+
+                        -- ---------------------------------------------------------
+                        -- 3. EMIT CHANNEL 2 (A1) SECOND
+                        -- ---------------------------------------------------------
+                        when ST_EMIT_CH2 =>
+                            if m_axis_tready = '1' then
+                                out_state <= ST_ACCUMULATING;
+                            end if;
+
+                    end case;
+                end if;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+axis_trigger_unit.vhd: (src/hdl/axis_trigger_unit.vhd)
+
+```vhd
+-- =============================================================================
+-- File: axis_trigger_unit.vhd
+-- Description: Central Acquisition, Edge Trigger & Runtime Configuration Controller.
+--              Hosts AXI4-Lite registers to dynamically control:
+--                • Hardware Edge/Level Triggering (A0 vs A1)
+--                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
+--                • Decimation Ratio (M = 1, 10, 20, 50)
+--                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048 via 16-bit config)
+--                • TLAST Packet Size (512, 1024, 2048)
+--                • Persistent AXI4-Stream Handshake on m_axis_fft_config
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity axis_trigger_unit is
+    generic (
+        C_S_AXI_DATA_WIDTH : integer := 32;
+        C_S_AXI_ADDR_WIDTH : integer := 5
+    );
+    port (
+        aclk                     : in  std_logic;
+        aresetn                  : in  std_logic;
+
+        -- =====================================================================
+        -- AXI4-Lite Slave Interface (Control & Status Registers)
+        -- =====================================================================
+        s_axi_awaddr             : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_awprot             : in  std_logic_vector(2 downto 0);
+        s_axi_awvalid            : in  std_logic;
+        s_axi_awready            : out std_logic;
+        s_axi_wdata              : in  std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_wstrb              : in  std_logic_vector((C_S_AXI_DATA_WIDTH / 8) - 1 downto 0);
+        s_axi_wvalid             : in  std_logic;
+        s_axi_wready             : out std_logic;
+        s_axi_bresp              : out std_logic_vector(1 downto 0);
+        s_axi_bvalid             : out std_logic;
+        s_axi_bready             : in  std_logic;
+        s_axi_araddr             : in  std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
+        s_axi_arprot             : in  std_logic_vector(2 downto 0);
+        s_axi_arvalid            : in  std_logic;
+        s_axi_arready            : out std_logic;
+        s_axi_rdata              : out std_logic_vector(C_S_AXI_DATA_WIDTH - 1 downto 0);
+        s_axi_rresp              : out std_logic_vector(1 downto 0);
+        s_axi_rvalid             : out std_logic;
+        s_axi_rready             : in  std_logic;
+
+        -- =====================================================================
+        -- Hardware Channel Identifier from XADC (0x11 = Vaux1/A0, 0x19 = Vaux9/A1)
+        -- =====================================================================
+        channel_id               : in  std_logic_vector(4 downto 0);
+
+        -- =====================================================================
+        -- AXI4-Stream Slave Interface (Raw Samples from XADC)
+        -- =====================================================================
+        s_axis_tdata             : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid            : in  std_logic;
+        s_axis_tready            : out std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Master Interface (Trigger-Gated Stream to Decimator)
+        -- =====================================================================
+        m_axis_tdata             : out std_logic_vector(15 downto 0);
+        m_axis_tvalid            : out std_logic;
+        m_axis_tready            : in  std_logic;
+
+        -- =====================================================================
+        -- Frame Feedback (Connected to tlast_generator's m_axis_tlast)
+        -- =====================================================================
+        frame_done               : in  std_logic;
+
+        -- =====================================================================
+        -- Runtime Configuration Outputs
+        -- =====================================================================
+        -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
+        decim_factor_out         : out std_logic_vector(1 downto 0);
+
+        -- Runtime FFT Configuration Master Stream to xfft_0 (With TREADY Handshake!)
+        m_axis_fft_config_tdata  : out std_logic_vector(15 downto 0);
+        m_axis_fft_config_tvalid : out std_logic;
+        m_axis_fft_config_tready : in  std_logic;
+
+        -- Programmable packet size to tlast_generator_0
+        packet_size_out          : out std_logic_vector(15 downto 0);
+
+        -- FFT Channel Selector (0 = Route A0/CH1 to FFT, 1 = Route A1/CH2 to FFT)
+        fft_chan_sel_out         : out std_logic
+    );
+end axis_trigger_unit;
+
+architecture Behavioral of axis_trigger_unit is
+
+    -- Constant Channel Addresses in 7-Series XADC
+    constant CH_VAUX1            : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
+    constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
+
+    -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
+    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1)
+    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto + CH1 Trig + CH1 FFT
+    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
+    signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
+    signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
+    signal reg_hysteresis        : std_logic_vector(31 downto 0) := x"00000010"; -- 0x10
+    signal reg_decimation        : std_logic_vector(31 downto 0) := x"00000001"; -- 0x14: Default M=10
+    -- PG109 Format: Byte 0 = NFFT (10 = 0x0A for 1024-pt), Byte 1 = FWD_INV (1 = Forward) -> 0x0000010A
+    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"0000010A"; -- 0x18: Default 1024-pt Forward FFT
+    signal reg_packet_size       : std_logic_vector(31 downto 0) := x"00000800"; -- 0x1C: Default 2048 samples
+
+    -- AXI Handshake Signals
+    signal axi_awready           : std_logic := '0';
+    signal axi_wready            : std_logic := '0';
+    signal axi_bvalid            : std_logic := '0';
+    signal axi_arready           : std_logic := '0';
+    signal axi_rvalid            : std_logic := '0';
+    signal axi_rdata             : std_logic_vector(31 downto 0) := (others => '0');
+
+    -- Persistent Configuration Handshake Flag for xfft_0 (Holds valid high until TREADY arrives)
+    signal fft_cfg_valid_reg     : std_logic := '1';
+
+    -- Trigger FSM State
+    type t_state is (ST_IDLE, ST_ARMED, ST_STREAMING);
+    signal state                 : t_state := ST_IDLE;
+    signal trig_pending          : std_logic := '0';
+
+    -- Sample Histories for Edge Detection
+    signal ch1_prev              : unsigned(15 downto 0) := (others => '0');
+    signal ch2_prev              : unsigned(15 downto 0) := (others => '0');
+
+    signal timeout_cnt           : unsigned(31 downto 0) := (others => '0');
+    signal force_trig_reg        : std_logic := '0';
+
+    -- Control Bit Aliases
+    signal cfg_arm               : std_logic;
+    signal cfg_auto              : std_logic;
+    signal cfg_edge_fall         : std_logic;
+    signal cfg_single            : std_logic;
+    signal cfg_trig_src_ch2      : std_logic;
+
+begin
+
+    -- Output Port Assignments
+    decim_factor_out         <= reg_decimation(1 downto 0);
+    packet_size_out          <= reg_packet_size(15 downto 0);
+    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x010A for N=1024 FWD)
+    m_axis_fft_config_tvalid <= fft_cfg_valid_reg;
+    fft_chan_sel_out         <= reg_ctrl(6);                 -- Bit 6: 0 = Route A0 (CH1) to FFT, 1 = Route A1 (CH2) to FFT
+
+    -- Control aliases
+    cfg_arm          <= reg_ctrl(0);
+    cfg_auto         <= reg_ctrl(1);
+    cfg_edge_fall    <= reg_ctrl(2);
+    cfg_single       <= reg_ctrl(3);
+    cfg_trig_src_ch2 <= reg_ctrl(5); -- Bit 5: 0 = Trigger on A0, 1 = Trigger on A1
+
+    -- Status mapping
+    reg_status(0) <= '1' when (state = ST_ARMED) else '0';
+    reg_status(1) <= '1' when (state = ST_STREAMING) else '0';
+    reg_status(2) <= '1' when (state = ST_STREAMING and s_axis_tvalid = '1') else '0';
+    reg_status(31 downto 3) <= (others => '0');
+
+    -- =========================================================================
+    -- 1. AXI4-Lite Register Interface
+    -- =========================================================================
+    s_axi_awready <= axi_awready;
+    s_axi_wready  <= axi_wready;
+    s_axi_bresp   <= "00";
+    s_axi_bvalid  <= axi_bvalid;
+    s_axi_arready <= axi_arready;
+    s_axi_rdata   <= axi_rdata;
+    s_axi_rresp   <= "00";
+    s_axi_rvalid  <= axi_rvalid;
+
+    process(aclk)
+        variable write_addr : integer;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                axi_awready        <= '0';
+                axi_wready         <= '0';
+                axi_bvalid         <= '0';
+                reg_ctrl           <= x"00000003";
+                reg_threshold      <= x"00000800";
+                reg_timeout        <= std_logic_vector(to_unsigned(5000000, 32));
+                reg_hysteresis     <= x"00000010";
+                reg_decimation     <= x"00000001"; -- Default M=10
+                reg_fft_config     <= x"0000010A"; -- Default N=1024, FWD (PG109)
+                reg_packet_size    <= x"00000800"; -- Default 2048
+                fft_cfg_valid_reg  <= '1';         -- Hold high on startup until xfft_0 is ready!
+                force_trig_reg     <= '0';
+            else
+                force_trig_reg <= '0';
+
+                -- Clear valid when xfft_0 confirms receipt via TREADY handshake
+                if fft_cfg_valid_reg = '1' and m_axis_fft_config_tready = '1' then
+                    fft_cfg_valid_reg <= '0';
+                end if;
+
+                -- Address Handshake
+                if (axi_awready = '0' and s_axi_awvalid = '1' and s_axi_wvalid = '1') then
+                    axi_awready <= '1';
+                    axi_wready  <= '1';
+                else
+                    axi_awready <= '0';
+                    axi_wready  <= '0';
+                end if;
+
+                -- Register Write Handling
+                if (axi_awready = '1' and axi_wready = '1') then
+                    write_addr := to_integer(unsigned(s_axi_awaddr(4 downto 2)));
+                    case write_addr is
+                        when 0 => -- 0x00: CONTROL
+                            reg_ctrl <= s_axi_wdata;
+                            if s_axi_wdata(4) = '1' then
+                                force_trig_reg <= '1';
+                            end if;
+                        when 2 => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
+                        when 3 => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
+                        when 4 => reg_hysteresis  <= s_axi_wdata; -- 0x10: HYSTERESIS
+                        when 5 => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
+                        when 6 => -- 0x18: FFT_CONFIG
+                            reg_fft_config    <= s_axi_wdata;
+                            fft_cfg_valid_reg <= '1';             -- Hold valid high until xfft_0 asserts TREADY!
+                        when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
+                        when others => null;
+                    end case;
+                end if;
+
+                -- Write Response
+                if (axi_awready = '1' and axi_wready = '1' and axi_bvalid = '0') then
+                    axi_bvalid <= '1';
+                elsif (s_axi_bready = '1' and axi_bvalid = '1') then
+                    axi_bvalid <= '0';
+                end if;
+
+                -- Auto-disarm on Single-Shot frame completion
+                if (state = ST_STREAMING and frame_done = '1' and cfg_single = '1') then
+                    reg_ctrl(0) <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- Read Address & Data Handling
+    process(aclk)
+        variable read_addr : integer;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                axi_arready <= '0';
+                axi_rvalid  <= '0';
+                axi_rdata   <= (others => '0');
+            else
+                if (axi_arready = '0' and s_axi_arvalid = '1') then
+                    axi_arready <= '1';
+                    read_addr := to_integer(unsigned(s_axi_araddr(4 downto 2)));
+                    case read_addr is
+                        when 0 => axi_rdata <= reg_ctrl;
+                        when 1 => axi_rdata <= reg_status;
+                        when 2 => axi_rdata <= reg_threshold;
+                        when 3 => axi_rdata <= reg_timeout;
+                        when 4 => axi_rdata <= reg_hysteresis;
+                        when 5 => axi_rdata <= reg_decimation;
+                        when 6 => axi_rdata <= reg_fft_config;
+                        when 7 => axi_rdata <= reg_packet_size;
+                        when others => axi_rdata <= (others => '0');
+                    end case;
+                else
+                    axi_arready <= '0';
+                end if;
+
+                if (axi_arready = '1' and axi_rvalid = '0') then
+                    axi_rvalid <= '1';
+                elsif (s_axi_rready = '1' and axi_rvalid = '1') then
+                    axi_rvalid <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- =========================================================================
+    -- 2. Streaming Pass-Through & Trigger Engine
+    -- =========================================================================
+    m_axis_tdata  <= s_axis_tdata;
+    m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
+    s_axis_tready <= m_axis_tready when (state = ST_STREAMING) else '1';
+
+    process(aclk)
+        variable thresh_val      : unsigned(15 downto 0);
+        variable cur_sample      : unsigned(15 downto 0);
+        variable is_ch1          : boolean;
+        variable is_ch2          : boolean;
+        variable is_trig_channel : boolean;
+        variable prev_val        : unsigned(15 downto 0);
+        variable is_rising       : boolean;
+        variable is_falling      : boolean;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                state          <= ST_IDLE;
+                trig_pending   <= '0';
+                ch1_prev       <= (others => '0');
+                ch2_prev       <= (others => '0');
+                timeout_cnt    <= (others => '0');
+            else
+                thresh_val := unsigned(reg_threshold(15 downto 0));
+                cur_sample := unsigned(s_axis_tdata);
+                is_ch1     := (channel_id = CH_VAUX1);
+                is_ch2     := (channel_id = CH_VAUX9);
+
+                if cfg_trig_src_ch2 = '0' then
+                    is_trig_channel := is_ch1;
+                    prev_val        := ch1_prev;
+                else
+                    is_trig_channel := is_ch2;
+                    prev_val        := ch2_prev;
+                end if;
+
+                if s_axis_tvalid = '1' then
+                    if is_ch1 then
+                        ch1_prev <= cur_sample;
+                    elsif is_ch2 then
+                        ch2_prev <= cur_sample;
+                    end if;
+                end if;
+
+                is_rising  := (prev_val < thresh_val) and (cur_sample >= thresh_val);
+                is_falling := (prev_val > thresh_val) and (cur_sample <= thresh_val);
+
+                case state is
+                    when ST_IDLE =>
+                        timeout_cnt  <= (others => '0');
+                        trig_pending <= '0';
+                        if cfg_arm = '1' then
+                            state <= ST_ARMED;
+                        end if;
+
+                    when ST_ARMED =>
+                        if cfg_arm = '0' then
+                            state <= ST_IDLE;
+                            trig_pending <= '0';
+                        else
+                            -- 1. Software Force Trigger
+                            if force_trig_reg = '1' then
+                                trig_pending <= '1';
+
+                            -- 2. Hardware Edge on selected trigger source
+                            elsif (s_axis_tvalid = '1') and is_trig_channel and (
+                                  (cfg_edge_fall = '0' and is_rising) or
+                                  (cfg_edge_fall = '1' and is_falling)
+                                  ) then
+                                trig_pending <= '1';
+
+                            -- 3. Auto-Timeout Fallback
+                            elsif cfg_auto = '1' then
+                                if timeout_cnt >= unsigned(reg_timeout) then
+                                    trig_pending <= '1';
+                                else
+                                    timeout_cnt <= timeout_cnt + 1;
+                                end if;
+                            end if;
+
+                            -- Always start packet on Channel 1 (A0) for deterministic alignment
+                            if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
+                                timeout_cnt  <= (others => '0');
+                                trig_pending <= '0';
+                                state        <= ST_STREAMING;
+                            end if;
+                        end if;
+
+                    when ST_STREAMING =>
+                        if (frame_done = '1' and s_axis_tvalid = '1' and m_axis_tready = '1') then
+                            if cfg_single = '1' then
+                                state <= ST_IDLE;
+                            elsif cfg_arm = '1' then
+                                state <= ST_ARMED;
+                            else
+                                state <= ST_IDLE;
+                            end if;
+                        end if;
+                end case;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+tlast_generator.vhd: (src/hdl/tlast_generator.vhd)
+
+```vhd
+-- =============================================================================
+-- File: tlast_generator.vhd
+-- Description: Runtime-Programmable AXI4-Stream Packetizer & TLAST Generator.
+--              Asserts TLAST on the final sample of a frame defined by
+--              packet_size_in (driven by axis_trigger_unit register 0x1C).
+-- =============================================================================
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity tlast_generator is
+    generic (
+        DEFAULT_PACKET_SIZE : integer := 2048
+    );
+    port (
+        aclk            : in  std_logic;
+        aresetn         : in  std_logic;
+
+        -- =====================================================================
+        -- Runtime Packet Size Input (from axis_trigger_unit register 0x1C)
+        -- =====================================================================
+        packet_size_in  : in  std_logic_vector(15 downto 0);
+
+        -- =====================================================================
+        -- AXI4-Stream Slave Interface (from Decimator)
+        -- =====================================================================
+        s_axis_tdata    : in  std_logic_vector(15 downto 0);
+        s_axis_tvalid   : in  std_logic;
+        s_axis_tready   : out std_logic;
+
+        -- =====================================================================
+        -- AXI4-Stream Master Interface (to Broadcaster / DMA)
+        -- =====================================================================
+        m_axis_tdata    : out std_logic_vector(15 downto 0);
+        m_axis_tvalid   : out std_logic;
+        m_axis_tready   : in  std_logic;
+        m_axis_tlast    : out std_logic
+    );
+end tlast_generator;
+
+architecture Behavioral of tlast_generator is
+    signal count_reg    : unsigned(15 downto 0) := (others => '0');
+    signal target_limit : unsigned(15 downto 0);
+begin
+    -- Direct pass-through for stream data and handshakes
+    s_axis_tready <= m_axis_tready;
+    m_axis_tdata  <= s_axis_tdata;
+    m_axis_tvalid <= s_axis_tvalid;
+
+    -- Dynamic target boundary calculation (target_limit = packet_size - 1)
+    target_limit <= (unsigned(packet_size_in) - 1) when (unsigned(packet_size_in) > 0) else
+                    to_unsigned(DEFAULT_PACKET_SIZE - 1, 16);
+
+    -- Assert TLAST combinational output on the final sample of the packet
+    m_axis_tlast <= '1' when (count_reg = target_limit) and (s_axis_tvalid = '1') and (m_axis_tready = '1') else '0';
+
+    process(aclk)
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                count_reg <= (others => '0');
+            else
+                if (s_axis_tvalid = '1') and (m_axis_tready = '1') then
+                    if count_reg >= target_limit then
+                        count_reg <= (others => '0');
+                    else
+                        count_reg <= count_reg + 1;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
+```
+
+generate_hw_summary.sh: (context/generate_hw_summary.sh)
+
+```bash
+#!/usr/bin/env bash
+# ==============================================================================
+# Script: context/generate_hw_summary.sh
+# Target: hw-xadc-dma-overlays
+# Purpose: Dump Git history, structure, and exact HW files into context/hw_summary.txt
+# ==============================================================================
+
+# Dynamically locate context directory and repository root
+CONTEXT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${CONTEXT_DIR}/.." && pwd)"
+OUTPUT_FILE="${CONTEXT_DIR}/hw_summary.txt"
+
+echo "Generating concise HW summary into: ${OUTPUT_FILE}..."
+> "${OUTPUT_FILE}"
+
+cd "${REPO_ROOT}" || exit 1
+
+# 1. Header, Branch Status & Git History
+cat << 'EOF' >> "${OUTPUT_FILE}"
+Git Context & Branch Info:
+
+```log
+EOF
+
+if command -v git &> /dev/null && git rev-parse --is-inside-work-tree &> /dev/null; then
+    echo "Current Branch: $(git branch --show-current)" >> "${OUTPUT_FILE}"
+    echo "Branch Tracking Status:" >> "${OUTPUT_FILE}"
+    git branch -vv >> "${OUTPUT_FILE}"
+    echo "" >> "${OUTPUT_FILE}"
+    echo "Git Commit Graph & History:" >> "${OUTPUT_FILE}"
+    git log --graph --pretty=format:"%h %d - %cd : %s (%an)" --date=short -n 15 >> "${OUTPUT_FILE}"
+fi
+
+cat << 'EOF' >> "${OUTPUT_FILE}"
+```
+
+EOF
+
+# 3. Exact list of targeted files and their markdown syntax
+TARGET_FILES=(
+    ".github/workflows/release.yml:yaml"
+    "Top/pynq_z2/hog.conf:conf"
+    "Top/pynq_z2/post-creation.tcl:tcl"
+    "Top/pynq_z2/post-bitstream.tcl:tcl"
+    "Top/pynq_z2/list/ips.src:src"
+    "Top/pynq_z2/list/others.src:src"
+    "Top/pynq_z2/list/xil_defaultlib.src:src"
+    "Top/pynq_z2/list/constrs.src:src"
+    "src/bd/xadc.bd:bd"
+    "src/hdl/tlast_generator.vhd:vhd"
+    "src/hdl/xadc_wrapper.vhd:vhd"
+    "src/hdl/axis_trigger_unit.vhd:vhd"
+    "src/hdl/axis_decimator.vhd:vhd"
+    "src/hdl/axis_channel_demux.vhd:vhd"
+    "src/con/pynq_z2.xdc:xdc"
+    "context/generate_hw_summary.sh:bash"
+)
+
+# 4. Append each file
+for item in "${TARGET_FILES[@]}"; do
+    filepath="${item%%:*}"
+    syntax="${item##*:}"
+    filename=$(basename "$filepath")
+
+    if [ -f "$filepath" ]; then
+        echo "Adding: ${filepath}"
+        {
+            echo "${filename}:"
+            echo ""
+            echo "\`\`\`${syntax}"
+            cat "${filepath}"
+            echo "\`\`\`"
+            echo ""
+        } >> "${OUTPUT_FILE}"
+    else
+        echo "Warning: File not found -> ${filepath}"
+    fi
+done
+
+echo "Done! HW context generated in: ${OUTPUT_FILE}"
+```
