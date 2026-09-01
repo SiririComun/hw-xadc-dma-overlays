@@ -1,7 +1,7 @@
 ==============================================================================
 ⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
 ==============================================================================
-• Repository State    : feat/cordic-32bit-phase-mag @ 17dc664
+• Repository State    : feat/cordic-32bit-phase-mag @ 23d0ae1
 • Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
 • Target FPGA Device  : xc7z020clg400-1
 • Primary HDL Language: VHDL
@@ -13,11 +13,12 @@ Git Context & Branch Topology:
 Current Branch: feat/cordic-32bit-phase-mag | Working Tree: Dirty (7 modified/untracked files)
 
 Branch Tracking & Divergence Status:
-* feat/cordic-32bit-phase-mag                     17dc664 feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through
+* feat/cordic-32bit-phase-mag                     23d0ae1 fix(ci): register Cog submodule URL in .gitmodules for release action
   master                                          dd4b758 [origin/master] chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
   remotes/origin/HEAD                             -> origin/master
   remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
   remotes/origin/feat/cog-integration             e31b64f feat(context): integrate Cog submodule and update hardware summary
+  remotes/origin/feat/cordic-32bit-phase-mag      23d0ae1 fix(ci): register Cog submodule URL in .gitmodules for release action
   remotes/origin/feat/dual-xadc                   51c01bf docs(readme): document v1.3.0 simultaneous dual-channel architecture and pin constraints
   remotes/origin/feat/hw-trigger                  2ae5a3d docs: update README with axis_trigger_unit architecture and v1.1.0 release details
   remotes/origin/feat/pl-audio-decimation         16ecc19 docs: update README with v1.4.0 PL audio decimation architecture and release details
@@ -28,14 +29,18 @@ Branch Tracking & Divergence Status:
   remotes/origin/master                           dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
 
 Repository Tags & Release History:
+v1.5.1-rc1      release(hw): v1.5.1-rc1 pre-release with 32-bit CORDIC polar stream
 v1.6.0-rc3      test(ci): verify release workflow with SHA-256 generation and integrity checks
 v1.6.0          release(hw): v1.6.0 with PL frequency filter, IFFT core, and 3-DMA streaming
 v1.6.0-rc2      build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2
 v1.6.0-rc1      release(hw): v1.6.0-rc1 with PL frequency filter, IFFT engine, and 3-DMA streaming
-v1.5.0          release: v1.5.0 official hardware overlay with simultaneous dual-sampling and clean fft demux
 
 Multi-Branch Git Commit Graph:
-* 17dc664  (HEAD -> feat/cordic-32bit-phase-mag) - 2026-09-01 : feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through (SiririComun)
+* 23d0ae1  (HEAD -> feat/cordic-32bit-phase-mag, tag: v1.5.1-rc1, origin/feat/cordic-32bit-phase-mag) - 2026-09-01 : fix(ci): register Cog submodule URL in .gitmodules for release action (SiririComun)
+* 9017a31  - 2026-09-01 : build(overlay): compile v1.5.1 bitstream with 32-bit CORDIC stream for pynq_z2 (SiririComun)
+* 1297995  - 2026-09-01 : docs(context): update block design SVG/PDF diagrams and hardware summary (SiririComun)
+* c58f823  - 2026-09-01 : feat(bd): configure 32-bit CORDIC polar stream pass-through for axi_dma_1 (SiririComun)
+* 17dc664  - 2026-09-01 : feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through (SiririComun)
 * ea798c6  - 2026-09-01 : Cog added to the repository (SiririComun)
 | *   ac99afc  (refs/stash) - 2026-09-01 : WIP on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
 | |\  
@@ -48,10 +53,6 @@ Multi-Branch Git Commit Graph:
 | * 061ecf1  - 2026-08-26 : ci(workflow): add fast-fail GHDL RTL syntax and elaboration verification (SiririComun)
 | * e31b64f  (origin/feat/cog-integration) - 2026-08-26 : feat(context): integrate Cog submodule and update hardware summary (SiririComun)
 | * 3e44936  (tag: v1.6.0, origin/feat/pl-freq-filter-ifft) - 2026-08-26 : docs(readme): document v1.6.0 PL frequency filter, IFFT core, and 3-DMA architecture (SiririComun)
-| * 7b2a3f0  (tag: v1.6.0-rc2) - 2026-08-26 : build(overlay): recompile bitstream with Hermitian symmetric filtering for pynq_z2 (SiririComun)
-| * 7742815  - 2026-08-26 : fix(hdl): implement Hermitian symmetric filtering k_eff=min(k, N-k) and register write sync reset (SiririComun)
-| * d4e34b6  (tag: v1.6.0-rc1) - 2026-08-25 : build(overlay): compile bitstream with PL IFFT and spectral mask for pynq_z2 (SiririComun)
-| * abf04b6  - 2026-08-25 : docs(context): update block design layout diagrams and hardware summary for PL filter (SiririComun)
 ```
 
 LICENSE: (LICENSE)
@@ -439,7 +440,8 @@ xadc.bd: (src/bd/xadc.bd)
       "tlast_generator_0": "",
       "axis_broadcaster_0": "",
       "axis_channel_demux_0": "",
-      "axis_subset_converter_2": ""
+      "axis_subset_converter_2": "",
+      "xlconstant_0": ""
     },
     "interface_ports": {
       "DDR": {
@@ -2727,6 +2729,13 @@ xadc.bd: (src/bd/xadc.bd)
             ]
           }
         }
+      },
+      "xlconstant_0": {
+        "vlnv": "xilinx.com:ip:xlconstant:1.1",
+        "ip_revision": "9",
+        "xci_name": "xadc_xlconstant_0_0",
+        "xci_path": "ip/xadc_xlconstant_0_0/xadc_xlconstant_0_0.xci",
+        "inst_hier_path": "xlconstant_0"
       }
     },
     "interface_nets": {
@@ -2990,6 +2999,12 @@ xadc.bd: (src/bd/xadc.bd)
         "ports": [
           "xfft_0/s_axis_config_tready",
           "axis_trigger_unit_0/m_axis_fft_config_tready"
+        ]
+      },
+      "xlconstant_0_dout": {
+        "ports": [
+          "xlconstant_0/dout",
+          "xfft_0/m_axis_status_tready"
         ]
       }
     },
