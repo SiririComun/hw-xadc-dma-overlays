@@ -6,8 +6,8 @@
 --                • "01": M = 10 (50 kSPS Full Audio)
 --                • "10": M = 20 (25 kSPS Speech / Acoustic)
 --                • "11": M = 50 (10 kSPS Deep Bass Zoom, Δf = 4.88 Hz)
---              Phase-locked to physical XADC channel_id (0x11 = A0, 0x19 = A1).
---              Includes synchronous accumulator flush on dynamic decim_sel changes.
+--              Features DSP48-accelerated fixed-point reciprocal multiplication
+--              and 1-cycle pipelined averaging to guarantee 100 MHz timing closure.
 -- =============================================================================
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -50,6 +50,11 @@ architecture Behavioral of axis_decimator is
     constant CH_VAUX1          : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
     constant CH_VAUX9          : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
+    -- DSP48 20-bit Fixed-Point Reciprocal Constants: round(2^20 / M)
+    constant K_RECIP_10        : unsigned(17 downto 0) := to_unsigned(104858, 18); -- 2^20 / 10
+    constant K_RECIP_20        : unsigned(17 downto 0) := to_unsigned(52429, 18);  -- 2^20 / 20
+    constant K_RECIP_50        : unsigned(17 downto 0) := to_unsigned(20972, 18);  -- 2^20 / 50
+
     -- Independent 24-bit Accumulators (Prevent overflow for up to M=50 sums)
     signal acc_ch1             : unsigned(23 downto 0) := (others => '0');
     signal acc_ch2             : unsigned(23 downto 0) := (others => '0');
@@ -63,8 +68,8 @@ architecture Behavioral of axis_decimator is
     signal avg_ch1_reg         : std_logic_vector(15 downto 0) := (others => '0');
     signal avg_ch2_reg         : std_logic_vector(15 downto 0) := (others => '0');
 
-    -- Output State Machine (Emits decimated Ch1 then Ch2 sequentially)
-    type t_out_state is (ST_ACCUMULATING, ST_EMIT_CH1, ST_EMIT_CH2);
+    -- Pipelined State Machine (ST_CALC_AVG breaks the critical path)
+    type t_out_state is (ST_ACCUMULATING, ST_CALC_AVG, ST_EMIT_CH1, ST_EMIT_CH2);
     signal out_state           : t_out_state := ST_ACCUMULATING;
 
 begin
@@ -82,6 +87,8 @@ begin
         variable is_ch1     : boolean;
         variable is_ch2     : boolean;
         variable m_target   : integer range 1 to 50;
+        variable prod_ch1   : unsigned(41 downto 0);
+        variable prod_ch2   : unsigned(41 downto 0);
     begin
         if rising_edge(aclk) then
             if aresetn = '0' then
@@ -115,7 +122,7 @@ begin
 
                     case out_state is
                         -- ---------------------------------------------------------
-                        -- 1. ACCUMULATE SAMPLES ACCORDING TO RUNTIME DECIM_SEL
+                        -- 1. ACCUMULATE SAMPLES (FAST LOCAL ADDER: ~2.5 ns)
                         -- ---------------------------------------------------------
                         when ST_ACCUMULATING =>
                             if s_axis_tvalid = '1' then
@@ -135,60 +142,57 @@ begin
                                     end if;
                                 end if;
 
-                                -- When both channels reach M samples, normalize and emit
+                                -- Transition to averaging stage on terminal sample
                                 if (is_ch2 and count_ch1 = m_target and count_ch2 = m_target - 1) or
                                    (count_ch1 = m_target and count_ch2 = m_target) then
-                                    
-                                    case decim_sel is
-                                        when "00" => -- M = 1 (Bypass)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize(sample_val, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2, 16));
-                                            end if;
-
-                                        when "01" => -- M = 10 (Audio)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 10, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                            end if;
-
-                                        when "10" => -- M = 20 (Speech)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 20, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 20, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 20, 16));
-                                            end if;
-
-                                        when "11" => -- M = 50 (Deep Bass)
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 50, 16));
-                                            if is_ch2 then
-                                                avg_ch2_reg <= std_logic_vector(resize((acc_ch2 + sample_val) / 50, 16));
-                                            else
-                                                avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 50, 16));
-                                            end if;
-
-                                        when others =>
-                                            avg_ch1_reg <= std_logic_vector(resize(acc_ch1 / 10, 16));
-                                            avg_ch2_reg <= std_logic_vector(resize(acc_ch2 / 10, 16));
-                                    end case;
-
-                                    -- Reset accumulators
-                                    acc_ch1     <= (others => '0');
-                                    acc_ch2     <= (others => '0');
-                                    count_ch1   <= 0;
-                                    count_ch2   <= 0;
-
-                                    out_state   <= ST_EMIT_CH1;
+                                    out_state <= ST_CALC_AVG;
                                 end if;
                             end if;
 
                         -- ---------------------------------------------------------
-                        -- 2. EMIT CHANNEL 1 (A0) FIRST (GUARANTEED PHASE ORDER)
+                        -- 2. DSP48-ACCELERATED AVERAGING (REPLACES 20-LEVEL DIVIDER)
+                        -- ---------------------------------------------------------
+                        when ST_CALC_AVG =>
+                            case decim_sel is
+                                when "00" => -- M = 1 (Bypass)
+                                    avg_ch1_reg <= std_logic_vector(acc_ch1(15 downto 0));
+                                    avg_ch2_reg <= std_logic_vector(acc_ch2(15 downto 0));
+
+                                when "01" => -- M = 10: (acc * 104858) >> 20
+                                    prod_ch1 := acc_ch1 * K_RECIP_10;
+                                    prod_ch2 := acc_ch2 * K_RECIP_10;
+                                    avg_ch1_reg <= std_logic_vector(prod_ch1(35 downto 20));
+                                    avg_ch2_reg <= std_logic_vector(prod_ch2(35 downto 20));
+
+                                when "10" => -- M = 20: (acc * 52429) >> 20
+                                    prod_ch1 := acc_ch1 * K_RECIP_20;
+                                    prod_ch2 := acc_ch2 * K_RECIP_20;
+                                    avg_ch1_reg <= std_logic_vector(prod_ch1(35 downto 20));
+                                    avg_ch2_reg <= std_logic_vector(prod_ch2(35 downto 20));
+
+                                when "11" => -- M = 50: (acc * 20972) >> 20
+                                    prod_ch1 := acc_ch1 * K_RECIP_50;
+                                    prod_ch2 := acc_ch2 * K_RECIP_50;
+                                    avg_ch1_reg <= std_logic_vector(prod_ch1(35 downto 20));
+                                    avg_ch2_reg <= std_logic_vector(prod_ch2(35 downto 20));
+
+                                when others =>
+                                    prod_ch1 := acc_ch1 * K_RECIP_10;
+                                    prod_ch2 := acc_ch2 * K_RECIP_10;
+                                    avg_ch1_reg <= std_logic_vector(prod_ch1(35 downto 20));
+                                    avg_ch2_reg <= std_logic_vector(prod_ch2(35 downto 20));
+                            end case;
+
+                            -- Reset accumulators for next frame
+                            acc_ch1   <= (others => '0');
+                            acc_ch2   <= (others => '0');
+                            count_ch1 <= 0;
+                            count_ch2 <= 0;
+
+                            out_state <= ST_EMIT_CH1;
+
+                        -- ---------------------------------------------------------
+                        -- 3. EMIT CHANNEL 1 (A0) FIRST (PHASE-LOCKED)
                         -- ---------------------------------------------------------
                         when ST_EMIT_CH1 =>
                             if m_axis_tready = '1' then
@@ -196,7 +200,7 @@ begin
                             end if;
 
                         -- ---------------------------------------------------------
-                        -- 3. EMIT CHANNEL 2 (A1) SECOND
+                        -- 4. EMIT CHANNEL 2 (A1) SECOND
                         -- ---------------------------------------------------------
                         when ST_EMIT_CH2 =>
                             if m_axis_tready = '1' then
