@@ -8,7 +8,7 @@ use UNISIM.VCOMPONENTS.ALL;
 
 entity xadc_wrapper is
   generic (
-    -- Hog-specific versioning generics
+    -- Hog-specific automated versioning generics
     GLOBAL_DATE         : std_logic_vector(31 downto 0) := x"00000000";
     GLOBAL_TIME         : std_logic_vector(31 downto 0) := x"00000000";
     GLOBAL_VER          : std_logic_vector(31 downto 0) := x"00000000";
@@ -59,7 +59,10 @@ entity xadc_wrapper is
     
     -- Dedicated Vp/Vn Header
     Vp_Vn_0_v_n : in STD_LOGIC;
-    Vp_Vn_0_v_p : in STD_LOGIC
+    Vp_Vn_0_v_p : in STD_LOGIC;
+
+    -- Hardware Active Buzzer Pulse Trigger Output (Arduino Pin AR2 / U13)
+    buzzer_pulse_out : out STD_LOGIC
   );
 end xadc_wrapper;
 
@@ -92,7 +95,8 @@ architecture STRUCTURE of xadc_wrapper is
     Vaux9_0_v_n : in STD_LOGIC;
     Vaux9_0_v_p : in STD_LOGIC;
     Vp_Vn_0_v_n : in STD_LOGIC;
-    Vp_Vn_0_v_p : in STD_LOGIC
+    Vp_Vn_0_v_p : in STD_LOGIC;
+    buzzer_pulse_out : out STD_LOGIC
   );
   end component xadc;
 begin
@@ -124,6 +128,7 @@ xadc_i: component xadc
       Vaux9_0_v_n           => Vaux9_0_v_n,
       Vaux9_0_v_p           => Vaux9_0_v_p,
       Vp_Vn_0_v_n           => Vp_Vn_0_v_n,
-      Vp_Vn_0_v_p           => Vp_Vn_0_v_p
+      Vp_Vn_0_v_p           => Vp_Vn_0_v_p,
+      buzzer_pulse_out      => buzzer_pulse_out
     );
 end STRUCTURE;

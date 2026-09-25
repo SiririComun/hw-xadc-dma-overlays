@@ -4,8 +4,9 @@
 --              Hosts AXI4-Lite registers to dynamically control:
 --                • Hardware Edge/Level Triggering (A0 vs A1)
 --                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
+--                • Hardware Active Buzzer Pulse Generation (Pin buzzer_pulse_out)
 --                • Decimation Ratio (M = 1, 10, 20, 50)
---                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048 via 16-bit config)
+--                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048)
 --                • TLAST Packet Size (512, 1024, 2048)
 --                • Persistent AXI4-Stream Handshake on m_axis_fft_config
 -- =============================================================================
@@ -16,7 +17,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity axis_trigger_unit is
     generic (
         C_S_AXI_DATA_WIDTH : integer := 32;
-        C_S_AXI_ADDR_WIDTH : integer := 5
+        C_S_AXI_ADDR_WIDTH : integer := 6   -- Expanded from 5 to 6 bits (addresses 0x00 to 0x3C)
     );
     port (
         aclk                     : in  std_logic;
@@ -70,6 +71,11 @@ entity axis_trigger_unit is
         frame_done               : in  std_logic;
 
         -- =====================================================================
+        -- Hardware Buzzer Pulse Output (Routes to Arduino AR2 / Pin U13)
+        -- =====================================================================
+        buzzer_pulse_out         : out std_logic;
+
+        -- =====================================================================
         -- Runtime Configuration Outputs
         -- =====================================================================
         -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
@@ -94,17 +100,18 @@ architecture Behavioral of axis_trigger_unit is
     constant CH_VAUX1            : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
     constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
-    -- Register Offsets (Byte-addressed via s_axi_awaddr[4:2])
-    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1)
+    -- Register Offsets (Byte-addressed via s_axi_awaddr(5 downto 2))
+    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, 
+    --           [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1), [7]=FIRE_PULSE
     signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto + CH1 Trig + CH1 FFT
-    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
+    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04: [0]=Armed, [1]=Trig, [2]=Stream, [3]=PulseActive
     signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
     signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
     signal reg_hysteresis        : std_logic_vector(31 downto 0) := x"00000010"; -- 0x10
     signal reg_decimation        : std_logic_vector(31 downto 0) := x"00000001"; -- 0x14: Default M=10
-    -- PG109 Format: Byte 0 = NFFT (10 = 0x0A for 1024-pt), Byte 1 = FWD_INV (1 = Forward) -> 0x0000010A
     signal reg_fft_config        : std_logic_vector(31 downto 0) := x"0000010A"; -- 0x18: Default 1024-pt Forward FFT
     signal reg_packet_size       : std_logic_vector(31 downto 0) := x"00000800"; -- 0x1C: Default 2048 samples
+    signal reg_pulse_width       : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(500000, 32)); -- 0x20: Default 5.0ms (500,000 cycles @ 100MHz)
 
     -- AXI Handshake Signals
     signal axi_awready           : std_logic := '0';
@@ -114,7 +121,7 @@ architecture Behavioral of axis_trigger_unit is
     signal axi_rvalid            : std_logic := '0';
     signal axi_rdata             : std_logic_vector(31 downto 0) := (others => '0');
 
-    -- Persistent Configuration Handshake Flag for xfft_0 (Holds valid high until TREADY arrives)
+    -- Persistent Configuration Handshake Flag for xfft_0
     signal fft_cfg_valid_reg     : std_logic := '1';
 
     -- Trigger FSM State
@@ -129,6 +136,11 @@ architecture Behavioral of axis_trigger_unit is
     signal timeout_cnt           : unsigned(31 downto 0) := (others => '0');
     signal force_trig_reg        : std_logic := '0';
 
+    -- Hardware Pulse Generator Signals
+    signal pulse_fire_strobe     : std_logic := '0';
+    signal pulse_active_reg      : std_logic := '0';
+    signal pulse_down_counter    : unsigned(31 downto 0) := (others => '0');
+
     -- Control Bit Aliases
     signal cfg_arm               : std_logic;
     signal cfg_auto              : std_logic;
@@ -141,22 +153,24 @@ begin
     -- Output Port Assignments
     decim_factor_out         <= reg_decimation(1 downto 0);
     packet_size_out          <= reg_packet_size(15 downto 0);
-    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0); -- 16-bit word (0x010A for N=1024 FWD)
+    m_axis_fft_config_tdata  <= reg_fft_config(15 downto 0);
     m_axis_fft_config_tvalid <= fft_cfg_valid_reg;
-    fft_chan_sel_out         <= reg_ctrl(6);                 -- Bit 6: 0 = Route A0 (CH1) to FFT, 1 = Route A1 (CH2) to FFT
+    fft_chan_sel_out         <= reg_ctrl(6);
+    buzzer_pulse_out         <= pulse_active_reg;
 
     -- Control aliases
     cfg_arm          <= reg_ctrl(0);
     cfg_auto         <= reg_ctrl(1);
     cfg_edge_fall    <= reg_ctrl(2);
     cfg_single       <= reg_ctrl(3);
-    cfg_trig_src_ch2 <= reg_ctrl(5); -- Bit 5: 0 = Trigger on A0, 1 = Trigger on A1
+    cfg_trig_src_ch2 <= reg_ctrl(5);
 
     -- Status mapping
     reg_status(0) <= '1' when (state = ST_ARMED) else '0';
     reg_status(1) <= '1' when (state = ST_STREAMING) else '0';
     reg_status(2) <= '1' when (state = ST_STREAMING and s_axis_tvalid = '1') else '0';
-    reg_status(31 downto 3) <= (others => '0');
+    reg_status(3) <= pulse_active_reg;  -- Bit 3: 1 while buzzer pulse is firing HIGH
+    reg_status(31 downto 4) <= (others => '0');
 
     -- =========================================================================
     -- 1. AXI4-Lite Register Interface
@@ -182,13 +196,16 @@ begin
                 reg_threshold      <= x"00000800";
                 reg_timeout        <= std_logic_vector(to_unsigned(5000000, 32));
                 reg_hysteresis     <= x"00000010";
-                reg_decimation     <= x"00000001"; -- Default M=10
-                reg_fft_config     <= x"0000010A"; -- Default N=1024, FWD (PG109)
-                reg_packet_size    <= x"00000800"; -- Default 2048
-                fft_cfg_valid_reg  <= '1';         -- Hold high on startup until xfft_0 is ready!
+                reg_decimation     <= x"00000001";
+                reg_fft_config     <= x"0000010A";
+                reg_packet_size    <= x"00000800";
+                reg_pulse_width    <= std_logic_vector(to_unsigned(500000, 32));
+                fft_cfg_valid_reg  <= '1';
                 force_trig_reg     <= '0';
+                pulse_fire_strobe  <= '0';
             else
-                force_trig_reg <= '0';
+                force_trig_reg    <= '0';
+                pulse_fire_strobe <= '0';
 
                 -- Clear valid when xfft_0 confirms receipt via TREADY handshake
                 if fft_cfg_valid_reg = '1' and m_axis_fft_config_tready = '1' then
@@ -204,14 +221,17 @@ begin
                     axi_wready  <= '0';
                 end if;
 
-                -- Register Write Handling
+                -- Register Write Handling (Decodes 4 bits: s_axi_awaddr(5 downto 2))
                 if (axi_awready = '1' and axi_wready = '1') then
-                    write_addr := to_integer(unsigned(s_axi_awaddr(4 downto 2)));
+                    write_addr := to_integer(unsigned(s_axi_awaddr(5 downto 2)));
                     case write_addr is
-                        when 0 => -- 0x00: CONTROL
+                        when 0 => -- 0x00: CONTROL_REG
                             reg_ctrl <= s_axi_wdata;
                             if s_axi_wdata(4) = '1' then
                                 force_trig_reg <= '1';
+                            end if;
+                            if s_axi_wdata(7) = '1' then
+                                pulse_fire_strobe <= '1';  -- Bit 7: Strobe hardware pulse & sync acquisition
                             end if;
                         when 2 => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
                         when 3 => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
@@ -219,8 +239,9 @@ begin
                         when 5 => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
                         when 6 => -- 0x18: FFT_CONFIG
                             reg_fft_config    <= s_axi_wdata;
-                            fft_cfg_valid_reg <= '1';             -- Hold valid high until xfft_0 asserts TREADY!
+                            fft_cfg_valid_reg <= '1';
                         when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
+                        when 8 => reg_pulse_width <= s_axi_wdata; -- 0x20: PULSE_WIDTH (cycles @ 100MHz)
                         when others => null;
                     end case;
                 end if;
@@ -252,7 +273,7 @@ begin
             else
                 if (axi_arready = '0' and s_axi_arvalid = '1') then
                     axi_arready <= '1';
-                    read_addr := to_integer(unsigned(s_axi_araddr(4 downto 2)));
+                    read_addr := to_integer(unsigned(s_axi_araddr(5 downto 2)));
                     case read_addr is
                         when 0 => axi_rdata <= reg_ctrl;
                         when 1 => axi_rdata <= reg_status;
@@ -262,6 +283,7 @@ begin
                         when 5 => axi_rdata <= reg_decimation;
                         when 6 => axi_rdata <= reg_fft_config;
                         when 7 => axi_rdata <= reg_packet_size;
+                        when 8 => axi_rdata <= reg_pulse_width; -- 0x20: PULSE_WIDTH readback
                         when others => axi_rdata <= (others => '0');
                     end case;
                 else
@@ -278,7 +300,39 @@ begin
     end process;
 
     -- =========================================================================
-    -- 2. Streaming Pass-Through & Trigger Engine
+    -- 2. Hardware Pulse Generator Process (Cycle-Accurate Down-Counter)
+    -- =========================================================================
+    process(aclk)
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                pulse_down_counter <= (others => '0');
+                pulse_active_reg   <= '0';
+            else
+                if pulse_fire_strobe = '1' then
+                    if unsigned(reg_pulse_width) > 0 then
+                        pulse_down_counter <= unsigned(reg_pulse_width);
+                        pulse_active_reg   <= '1';
+                    else
+                        pulse_down_counter <= (others => '0');
+                        pulse_active_reg   <= '0';
+                    end if;
+                elsif pulse_down_counter > 0 then
+                    if pulse_down_counter = 1 then
+                        pulse_down_counter <= (others => '0');
+                        pulse_active_reg   <= '0';
+                    else
+                        pulse_down_counter <= pulse_down_counter - 1;
+                    end if;
+                else
+                    pulse_active_reg <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- =========================================================================
+    -- 3. Streaming Pass-Through & Trigger Engine (With Pulse Synchronization)
     -- =========================================================================
     m_axis_tdata  <= s_axis_tdata;
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
@@ -339,11 +393,11 @@ begin
                             state <= ST_IDLE;
                             trig_pending <= '0';
                         else
-                            -- 1. Software Force Trigger
-                            if force_trig_reg = '1' then
+                            -- 1. Hardware Buzzer Pulse Trigger OR Software Force Strobe
+                            if pulse_fire_strobe = '1' or force_trig_reg = '1' then
                                 trig_pending <= '1';
 
-                            -- 2. Hardware Edge on selected trigger source
+                            -- 2. Hardware Analog Edge on selected trigger source
                             elsif (s_axis_tvalid = '1') and is_trig_channel and (
                                   (cfg_edge_fall = '0' and is_rising) or
                                   (cfg_edge_fall = '1' and is_falling)
@@ -359,7 +413,7 @@ begin
                                 end if;
                             end if;
 
-                            -- Always start packet on Channel 1 (A0) for deterministic alignment
+                            -- Deterministic Phase Alignment: Always start streaming on Channel 1 (A0)
                             if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
                                 timeout_cnt  <= (others => '0');
                                 trig_pending <= '0';
