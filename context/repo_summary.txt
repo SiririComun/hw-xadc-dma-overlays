@@ -1,7 +1,7 @@
 ==============================================================================
 ⚙️  PROJECT ENVIRONMENT & TOOLCHAIN CONSTRAINTS
 ==============================================================================
-• Repository State    : feat/buzzer-pulse-trigger @ 786b810
+• Repository State    : feat/buzzer-pulse-trigger @ bd5611a
 • Vivado Tool Version : 2024.2.2 (STRICT: Target toolchain for TCL/GUI workflows)
 • Target FPGA Device  : xc7z020clg400-1
 • Primary HDL Language: VHDL
@@ -14,12 +14,12 @@ Current Branch: feat/buzzer-pulse-trigger | Working Tree: Dirty (5 modified/untr
 
 Branch Tracking & Divergence Status:
 experimental/v1.6.0-ifft-filter                 dd4b758 [origin/experimental/v1.6.0-ifft-filter] chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
-* feat/buzzer-pulse-trigger                       786b810 [origin/feat/buzzer-pulse-trigger] build(overlay): compile v1.5.2 bitstream with clean timing closure WNS +0.412ns
+* feat/buzzer-pulse-trigger                       bd5611a [origin/feat/buzzer-pulse-trigger] feat(hw): implement PL 100MHz ToA/TDOA cycle engine and self-clearing pulse strobe
   feat/cordic-32bit-phase-mag                     ccc63df chore(context): remove legacy hw summary scripts in favor of Cog
   master                                          ccc63df [origin/master] chore(context): remove legacy hw summary scripts in favor of Cog
   remotes/origin/HEAD                             -> origin/master
   remotes/origin/experimental/v1.6.0-ifft-filter  dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary
-  remotes/origin/feat/buzzer-pulse-trigger        786b810 build(overlay): compile v1.5.2 bitstream with clean timing closure WNS +0.412ns
+  remotes/origin/feat/buzzer-pulse-trigger        bd5611a feat(hw): implement PL 100MHz ToA/TDOA cycle engine and self-clearing pulse strobe
   remotes/origin/feat/ci-fast-fail-lint           cf02545 ci(release): add asset integrity validation gate and SHA-256 checksum generation
   remotes/origin/feat/cog-integration             e31b64f feat(context): integrate Cog submodule and update hardware summary
   remotes/origin/feat/cordic-32bit-phase-mag      ccc63df chore(context): remove legacy hw summary scripts in favor of Cog
@@ -33,14 +33,15 @@ experimental/v1.6.0-ifft-filter                 dd4b758 [origin/experimental/v1.
   remotes/origin/master                           ccc63df chore(context): remove legacy hw summary scripts in favor of Cog
 
 Repository Tags & Release History:
+v1.5.2-rc2      release(hw): v1.5.2-rc2 with PL 100MHz ToA/TDOA hardware counters and self-clearing strobe
 v1.5.2-rc1      release(hw): v1.5.2-rc1 pre-release with active buzzer pulse trigger on AR2 (U13)
 v1.5.2          release(hw): v1.5.2 with hardware buzzer pulse trigger on AR2 (U13) and DSP48 timing closure
 v1.5.1          Release v1.5.1: 32-bit CORDIC polar stream, lock-step dual DMA, and 100 MHz hardware timer
 v1.5.1-rc2      release(hw): v1.5.1-rc2 with FFT status FIFO drain fix
-v1.5.1-rc1      release(hw): v1.5.1-rc1 pre-release with 32-bit CORDIC polar stream
 
 Multi-Branch Git Commit Graph:
-* 786b810  (HEAD -> feat/buzzer-pulse-trigger, tag: v1.5.2-rc1, tag: v1.5.2, origin/feat/buzzer-pulse-trigger) - 2026-09-25 : build(overlay): compile v1.5.2 bitstream with clean timing closure WNS +0.412ns (SiririComun)
+* bd5611a  (HEAD -> feat/buzzer-pulse-trigger, tag: v1.5.2-rc2, origin/feat/buzzer-pulse-trigger) - 2026-09-25 : feat(hw): implement PL 100MHz ToA/TDOA cycle engine and self-clearing pulse strobe (SiririComun)
+* 786b810  (tag: v1.5.2-rc1, tag: v1.5.2) - 2026-09-25 : build(overlay): compile v1.5.2 bitstream with clean timing closure WNS +0.412ns (SiririComun)
 * 0aab59a  - 2026-09-25 : feat(hw): add AR2 buzzer pulse generator and close timing with DSP48 decimator (SiririComun)
 * 23c7364  - 2026-09-25 : chore(context): update hardware summary with buzzer pulse IP (SiririComun)
 * 9324e9f  - 2026-09-25 : feat(hw): add hardware buzzer pulse generator on Arduino pin AR2 (U13) (SiririComun)
@@ -54,8 +55,6 @@ Multi-Branch Git Commit Graph:
 * c58f823  - 2026-09-01 : feat(bd): configure 32-bit CORDIC polar stream pass-through for axi_dma_1 (SiririComun)
 * 17dc664  - 2026-09-01 : feat(bd): configure axis_subset_converter_1 and axi_dma_1 for 32-bit CORDIC phase-magnitude pass-through (SiririComun)
 * ea798c6  - 2026-09-01 : Cog added to the repository (SiririComun)
-| *   ac99afc  (refs/stash) - 2026-09-01 : WIP on master: dd4b758 chore(context): update Cog submodule to v1.0.0 and regenerate hardware summary (SiririComun)
-| |\
 ```
 
 LICENSE: (LICENSE)
