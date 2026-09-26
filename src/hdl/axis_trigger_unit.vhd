@@ -1,10 +1,11 @@
 -- =============================================================================
 -- File: axis_trigger_unit.vhd
--- Description: Central Acquisition, Edge Trigger & Runtime Configuration Controller.
+-- Description: Central Acquisition, Edge Trigger & Hardware ToA/TDOA Controller.
 --              Hosts AXI4-Lite registers to dynamically control:
 --                • Hardware Edge/Level Triggering (A0 vs A1)
 --                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
 --                • Hardware Active Buzzer Pulse Generation (Pin buzzer_pulse_out)
+--                • Hardware-Accelerated 100 MHz ToA / TDOA Cycle-Accurate Counters
 --                • Decimation Ratio (M = 1, 10, 20, 50)
 --                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048)
 --                • TLAST Packet Size (512, 1024, 2048)
@@ -17,7 +18,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity axis_trigger_unit is
     generic (
         C_S_AXI_DATA_WIDTH : integer := 32;
-        C_S_AXI_ADDR_WIDTH : integer := 6   -- Expanded from 5 to 6 bits (addresses 0x00 to 0x3C)
+        C_S_AXI_ADDR_WIDTH : integer := 6   -- Decodes addresses 0x00 to 0x3C
     );
     port (
         aclk                     : in  std_logic;
@@ -78,18 +79,11 @@ entity axis_trigger_unit is
         -- =====================================================================
         -- Runtime Configuration Outputs
         -- =====================================================================
-        -- Decimation factor selector to axis_decimator_0 (00=M=1, 01=M=10, 10=M=20, 11=M=50)
         decim_factor_out         : out std_logic_vector(1 downto 0);
-
-        -- Runtime FFT Configuration Master Stream to xfft_0 (With TREADY Handshake!)
         m_axis_fft_config_tdata  : out std_logic_vector(15 downto 0);
         m_axis_fft_config_tvalid : out std_logic;
         m_axis_fft_config_tready : in  std_logic;
-
-        -- Programmable packet size to tlast_generator_0
         packet_size_out          : out std_logic_vector(15 downto 0);
-
-        -- FFT Channel Selector (0 = Route A0/CH1 to FFT, 1 = Route A1/CH2 to FFT)
         fft_chan_sel_out         : out std_logic
     );
 end axis_trigger_unit;
@@ -100,18 +94,29 @@ architecture Behavioral of axis_trigger_unit is
     constant CH_VAUX1            : std_logic_vector(4 downto 0) := "10001"; -- 0x11 (Channel 1 / A0)
     constant CH_VAUX9            : std_logic_vector(4 downto 0) := "11001"; -- 0x19 (Channel 2 / A1)
 
-    -- Register Offsets (Byte-addressed via s_axi_awaddr(5 downto 2))
-    -- reg_ctrl: [0]=Arm, [1]=Auto, [2]=Falling Edge, [3]=Single Shot, [4]=Force Trig, 
-    --           [5]=Trig Src (0=A0, 1=A1), [6]=FFT Src (0=A0, 1=A1), [7]=FIRE_PULSE
-    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- Default: Armed + Auto + CH1 Trig + CH1 FFT
-    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04: [0]=Armed, [1]=Trig, [2]=Stream, [3]=PulseActive
-    signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08: Default 1.65V
-    signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C: 50ms
+    -- Maximum ToA wait timeout: 5,000,000 cycles @ 100 MHz = 50.0 ms (sound travels ~17.1 meters)
+    constant TOA_TIMEOUT_CYCLES  : unsigned(31 downto 0) := to_unsigned(5000000, 32);
+
+    -- =========================================================================
+    -- AXI4-Lite Internal Registers
+    -- =========================================================================
+    signal reg_ctrl              : std_logic_vector(31 downto 0) := x"00000003"; -- 0x00: Default Armed + Auto
+    signal reg_status            : std_logic_vector(31 downto 0) := (others => '0'); -- 0x04
+    signal reg_threshold         : std_logic_vector(31 downto 0) := x"00000800"; -- 0x08
+    signal reg_timeout           : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(5000000, 32)); -- 0x0C
     signal reg_hysteresis        : std_logic_vector(31 downto 0) := x"00000010"; -- 0x10
     signal reg_decimation        : std_logic_vector(31 downto 0) := x"00000001"; -- 0x14: Default M=10
-    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"0000010A"; -- 0x18: Default 1024-pt Forward FFT
+    signal reg_fft_config        : std_logic_vector(31 downto 0) := x"0000010A"; -- 0x18
     signal reg_packet_size       : std_logic_vector(31 downto 0) := x"00000800"; -- 0x1C: Default 2048 samples
-    signal reg_pulse_width       : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(500000, 32)); -- 0x20: Default 5.0ms (500,000 cycles @ 100MHz)
+    signal reg_pulse_width       : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(500000, 32)); -- 0x20: Default 5.0ms
+
+    -- Hardware-Accelerated ToA / TDOA Registers
+    signal reg_mic1_toa_cycles   : std_logic_vector(31 downto 0) := (others => '0'); -- 0x24: Mic 1 arrival timestamp
+    signal reg_mic2_toa_cycles   : std_logic_vector(31 downto 0) := (others => '0'); -- 0x28: Mic 2 arrival timestamp
+    -- 0x2C: [31:16]=Blanking cycles (30,000 = 0.30 ms), [15:0]=Threshold delta (512 counts ~ 25.8 mV)
+    signal reg_toa_config        : std_logic_vector(31 downto 0) := x"75300200";
+    -- 0x30: [31:16]=Mic 2 DC Ref (0x8000 = 1.65V), [15:0]=Mic 1 DC Ref (0x8000 = 1.65V)
+    signal reg_mic_dc_ref        : std_logic_vector(31 downto 0) := x"80008000";
 
     -- AXI Handshake Signals
     signal axi_awready           : std_logic := '0';
@@ -129,10 +134,9 @@ architecture Behavioral of axis_trigger_unit is
     signal state                 : t_state := ST_IDLE;
     signal trig_pending          : std_logic := '0';
 
-    -- Sample Histories for Edge Detection
+    -- Sample Histories for Analog Edge Detection
     signal ch1_prev              : unsigned(15 downto 0) := (others => '0');
     signal ch2_prev              : unsigned(15 downto 0) := (others => '0');
-
     signal timeout_cnt           : unsigned(31 downto 0) := (others => '0');
     signal force_trig_reg        : std_logic := '0';
 
@@ -140,6 +144,13 @@ architecture Behavioral of axis_trigger_unit is
     signal pulse_fire_strobe     : std_logic := '0';
     signal pulse_active_reg      : std_logic := '0';
     signal pulse_down_counter    : unsigned(31 downto 0) := (others => '0');
+
+    -- Hardware ToA / TDOA Engine Internal Signals
+    signal toa_cycle_counter     : unsigned(31 downto 0) := (others => '0');
+    signal toa_running           : std_logic := '0';
+    signal mic1_locked           : std_logic := '0';
+    signal mic2_locked           : std_logic := '0';
+    signal toa_done_flag         : std_logic := '0';
 
     -- Control Bit Aliases
     signal cfg_arm               : std_logic;
@@ -165,15 +176,18 @@ begin
     cfg_single       <= reg_ctrl(3);
     cfg_trig_src_ch2 <= reg_ctrl(5);
 
-    -- Status mapping
+    -- Status Register Mapping (0x04)
     reg_status(0) <= '1' when (state = ST_ARMED) else '0';
     reg_status(1) <= '1' when (state = ST_STREAMING) else '0';
     reg_status(2) <= '1' when (state = ST_STREAMING and s_axis_tvalid = '1') else '0';
-    reg_status(3) <= pulse_active_reg;  -- Bit 3: 1 while buzzer pulse is firing HIGH
-    reg_status(31 downto 4) <= (others => '0');
+    reg_status(3) <= pulse_active_reg;
+    reg_status(4) <= mic1_locked;        -- Bit 4: Mic 1 Wavefront Locked
+    reg_status(5) <= mic2_locked;        -- Bit 5: Mic 2 Wavefront Locked
+    reg_status(6) <= toa_done_flag;      -- Bit 6: Both locked or timeout reached
+    reg_status(31 downto 7) <= (others => '0');
 
     -- =========================================================================
-    -- 1. AXI4-Lite Register Interface
+    -- 1. AXI4-Lite Register Interface (Read/Write Handling)
     -- =========================================================================
     s_axi_awready <= axi_awready;
     s_axi_wready  <= axi_wready;
@@ -200,12 +214,15 @@ begin
                 reg_fft_config     <= x"0000010A";
                 reg_packet_size    <= x"00000800";
                 reg_pulse_width    <= std_logic_vector(to_unsigned(500000, 32));
+                reg_toa_config     <= x"75300200";
+                reg_mic_dc_ref     <= x"80008000";
                 fft_cfg_valid_reg  <= '1';
                 force_trig_reg     <= '0';
                 pulse_fire_strobe  <= '0';
             else
                 force_trig_reg    <= '0';
                 pulse_fire_strobe <= '0';
+                reg_ctrl(7)       <= '0'; -- Hardware self-clearing strobe: Bit 7 reverts to '0'
 
                 -- Clear valid when xfft_0 confirms receipt via TREADY handshake
                 if fft_cfg_valid_reg = '1' and m_axis_fft_config_tready = '1' then
@@ -226,12 +243,13 @@ begin
                     write_addr := to_integer(unsigned(s_axi_awaddr(5 downto 2)));
                     case write_addr is
                         when 0 => -- 0x00: CONTROL_REG
-                            reg_ctrl <= s_axi_wdata;
+                            reg_ctrl    <= s_axi_wdata;
+                            reg_ctrl(7) <= '0'; -- Ensure bit 7 is NEVER sticky in storage!
                             if s_axi_wdata(4) = '1' then
                                 force_trig_reg <= '1';
                             end if;
                             if s_axi_wdata(7) = '1' then
-                                pulse_fire_strobe <= '1';  -- Bit 7: Strobe hardware pulse & sync acquisition
+                                pulse_fire_strobe <= '1'; -- Strobe pulse launch & reset ToA counter
                             end if;
                         when 2 => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
                         when 3 => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
@@ -241,7 +259,9 @@ begin
                             reg_fft_config    <= s_axi_wdata;
                             fft_cfg_valid_reg <= '1';
                         when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
-                        when 8 => reg_pulse_width <= s_axi_wdata; -- 0x20: PULSE_WIDTH (cycles @ 100MHz)
+                        when 8 => reg_pulse_width <= s_axi_wdata; -- 0x20: PULSE_WIDTH
+                        when 11 => reg_toa_config <= s_axi_wdata; -- 0x2C: TOA_CONFIG (Blanking & Threshold)
+                        when 12 => reg_mic_dc_ref <= s_axi_wdata; -- 0x30: MIC_DC_REF (Mic 1 & 2 DC Baselines)
                         when others => null;
                     end case;
                 end if;
@@ -283,7 +303,12 @@ begin
                         when 5 => axi_rdata <= reg_decimation;
                         when 6 => axi_rdata <= reg_fft_config;
                         when 7 => axi_rdata <= reg_packet_size;
-                        when 8 => axi_rdata <= reg_pulse_width; -- 0x20: PULSE_WIDTH readback
+                        when 8 => axi_rdata <= reg_pulse_width;
+                        -- Hardware-Accelerated ToA / TDOA Readbacks:
+                        when 9  => axi_rdata <= reg_mic1_toa_cycles; -- 0x24: Mic 1 Arrival (10 ns ticks)
+                        when 10 => axi_rdata <= reg_mic2_toa_cycles; -- 0x28: Mic 2 Arrival (10 ns ticks)
+                        when 11 => axi_rdata <= reg_toa_config;      -- 0x2C: ToA Configuration
+                        when 12 => axi_rdata <= reg_mic_dc_ref;      -- 0x30: DC References
                         when others => axi_rdata <= (others => '0');
                     end case;
                 else
@@ -332,7 +357,93 @@ begin
     end process;
 
     -- =========================================================================
-    -- 3. Streaming Pass-Through & Trigger Engine (With Pulse Synchronization)
+    -- 3. Hardware-Accelerated ToA / TDOA Cycle Counter & Comparators (100 MHz)
+    -- =========================================================================
+    process(aclk)
+        variable sample_val   : unsigned(15 downto 0);
+        variable dc_ref_val   : unsigned(15 downto 0);
+        variable thresh_val   : unsigned(15 downto 0);
+        variable blanking_val : unsigned(15 downto 0);
+        variable dev_val      : unsigned(15 downto 0);
+        variable is_ch1       : boolean;
+        variable is_ch2       : boolean;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                toa_cycle_counter   <= (others => '0');
+                toa_running         <= '0';
+                mic1_locked         <= '0';
+                mic2_locked         <= '0';
+                toa_done_flag       <= '0';
+                reg_mic1_toa_cycles <= (others => '0');
+                reg_mic2_toa_cycles <= (others => '0');
+            else
+                -- Synchronous pulse trigger reset
+                if pulse_fire_strobe = '1' then
+                    toa_cycle_counter   <= (others => '0');
+                    toa_running         <= '1';
+                    mic1_locked         <= '0';
+                    mic2_locked         <= '0';
+                    toa_done_flag       <= '0';
+                    reg_mic1_toa_cycles <= (others => '0');
+                    reg_mic2_toa_cycles <= (others => '0');
+
+                elsif toa_running = '1' then
+                    -- Increment 100 MHz cycle counter (10.0 ns resolution)
+                    toa_cycle_counter <= toa_cycle_counter + 1;
+
+                    thresh_val   := unsigned(reg_toa_config(15 downto 0));
+                    blanking_val := unsigned(reg_toa_config(31 downto 16));
+
+                    -- Check incoming ADC samples after blanking window elapses
+                    if (s_axis_tvalid = '1') and (toa_cycle_counter >= blanking_val) then
+                        sample_val := unsigned(s_axis_tdata);
+                        is_ch1     := (channel_id = CH_VAUX1);
+                        is_ch2     := (channel_id = CH_VAUX9);
+
+                        -- Channel 1 (Mic 1 / A0) Comparator
+                        if is_ch1 and (mic1_locked = '0') then
+                            dc_ref_val := unsigned(reg_mic_dc_ref(15 downto 0));
+                            if sample_val >= dc_ref_val then
+                                dev_val := sample_val - dc_ref_val;
+                            else
+                                dev_val := dc_ref_val - sample_val;
+                            end if;
+
+                            if dev_val >= thresh_val then
+                                reg_mic1_toa_cycles <= std_logic_vector(toa_cycle_counter);
+                                mic1_locked         <= '1';
+                            end if;
+                        end if;
+
+                        -- Channel 2 (Mic 2 / A1) Comparator
+                        if is_ch2 and (mic2_locked = '0') then
+                            dc_ref_val := unsigned(reg_mic_dc_ref(31 downto 16));
+                            if sample_val >= dc_ref_val then
+                                dev_val := sample_val - dc_ref_val;
+                            else
+                                dev_val := dc_ref_val - sample_val;
+                            end if;
+
+                            if dev_val >= thresh_val then
+                                reg_mic2_toa_cycles <= std_logic_vector(toa_cycle_counter);
+                                mic2_locked         <= '1';
+                            end if;
+                        end if;
+                    end if;
+
+                    -- Termination condition: both microphones locked or 50 ms timeout reached
+                    if (mic1_locked = '1' and mic2_locked = '1') or (toa_cycle_counter >= TOA_TIMEOUT_CYCLES) then
+                        toa_running   <= '0';
+                        toa_done_flag <= '1';
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- =========================================================================
+    -- 4. Streaming Pass-Through & Trigger Engine
     -- =========================================================================
     m_axis_tdata  <= s_axis_tdata;
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
@@ -393,18 +504,14 @@ begin
                             state <= ST_IDLE;
                             trig_pending <= '0';
                         else
-                            -- 1. Hardware Buzzer Pulse Trigger OR Software Force Strobe
+                            -- Pulse Trigger or Force Strobe
                             if pulse_fire_strobe = '1' or force_trig_reg = '1' then
                                 trig_pending <= '1';
-
-                            -- 2. Hardware Analog Edge on selected trigger source
                             elsif (s_axis_tvalid = '1') and is_trig_channel and (
                                   (cfg_edge_fall = '0' and is_rising) or
                                   (cfg_edge_fall = '1' and is_falling)
                                   ) then
                                 trig_pending <= '1';
-
-                            -- 3. Auto-Timeout Fallback
                             elsif cfg_auto = '1' then
                                 if timeout_cnt >= unsigned(reg_timeout) then
                                     trig_pending <= '1';
@@ -413,7 +520,7 @@ begin
                                 end if;
                             end if;
 
-                            -- Deterministic Phase Alignment: Always start streaming on Channel 1 (A0)
+                            -- Phase Alignment: Always start streaming on Channel 1 (A0)
                             if (trig_pending = '1') and (s_axis_tvalid = '1') and is_ch1 then
                                 timeout_cnt  <= (others => '0');
                                 trig_pending <= '0';
