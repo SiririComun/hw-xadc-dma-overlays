@@ -7,6 +7,7 @@
 --                • Hardware Active Buzzer Pulse Generation (Pin buzzer_pulse_out)
 --                • Hardware-Accelerated 100 MHz ToA / TDOA Cycle-Accurate Counters
 --                • Quasi-Anechoic Direct-Path Energy Accumulation (Registers 0x34, 0x38, 0x3C)
+--                  with 2-Stage Pipeline for DSP Timing Closure (WNS >= 0 ns)
 --                • Decimation Ratio (M = 1, 10, 20, 50)
 --                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048)
 --                • TLAST Packet Size (512, 1024, 2048)
@@ -168,6 +169,14 @@ architecture Behavioral of axis_trigger_unit is
     signal mic2_gate_active      : std_logic := '0';
     signal mic1_gate_done        : std_logic := '0';
     signal mic2_gate_done        : std_logic := '0';
+
+    -- 2-Stage Pipeline Signals (Breaks Multiplier-to-Accumulator Critical Path for WNS >= 0)
+    signal dev_sq_pipe1          : unsigned(23 downto 0) := (others => '0');
+    signal dev_sq_pipe2          : unsigned(23 downto 0) := (others => '0');
+    signal pipe1_valid           : std_logic := '0';
+    signal pipe2_valid           : std_logic := '0';
+    signal pipe1_last            : std_logic := '0';
+    signal pipe2_last            : std_logic := '0';
 
     -- Control Bit Aliases
     signal cfg_arm               : std_logic;
@@ -468,13 +477,14 @@ begin
     end process;
 
     -- =========================================================================
-    -- 4. Quasi-Anechoic Direct-Path Energy Accumulation Process
+    -- 4. Quasi-Anechoic Direct-Path Energy Accumulation (2-Stage Pipelined)
+    --    Stage 1: Sample deviation & squaring (dev * dev)
+    --    Stage 2: 32-bit Energy accumulation & terminal latch
     -- =========================================================================
     process(aclk)
         variable sample_12     : unsigned(11 downto 0);
         variable dc_ref_12     : unsigned(11 downto 0);
         variable dev_12        : unsigned(11 downto 0);
-        variable dev_sq        : unsigned(23 downto 0);
         variable n_gate_target : unsigned(15 downto 0);
         variable is_ch1        : boolean;
         variable is_ch2        : boolean;
@@ -489,6 +499,12 @@ begin
                 mic2_gate_active       <= '0';
                 mic1_gate_done         <= '0';
                 mic2_gate_done         <= '0';
+                dev_sq_pipe1           <= (others => '0');
+                dev_sq_pipe2           <= (others => '0');
+                pipe1_valid            <= '0';
+                pipe2_valid            <= '0';
+                pipe1_last             <= '0';
+                pipe2_last             <= '0';
                 reg_mic1_direct_energy <= (others => '0');
                 reg_mic2_direct_energy <= (others => '0');
             else
@@ -502,6 +518,12 @@ begin
                     mic2_gate_active       <= '0';
                     mic1_gate_done         <= '0';
                     mic2_gate_done         <= '0';
+                    dev_sq_pipe1           <= (others => '0');
+                    dev_sq_pipe2           <= (others => '0');
+                    pipe1_valid            <= '0';
+                    pipe2_valid            <= '0';
+                    pipe1_last             <= '0';
+                    pipe2_last             <= '0';
                     reg_mic1_direct_energy <= (others => '0');
                     reg_mic2_direct_energy <= (others => '0');
                 else
@@ -519,14 +541,19 @@ begin
                         mic2_gate_active <= '1';
                     end if;
 
-                    -- Process incoming stream samples
+                    -- ---------------------------------------------------------
+                    -- PIPELINE STAGE 1: Deviation & Multiplier (Breaks Timing Path)
+                    -- ---------------------------------------------------------
+                    pipe1_valid <= '0';
+                    pipe2_valid <= '0';
+                    pipe1_last  <= '0';
+                    pipe2_last  <= '0';
+
                     if s_axis_tvalid = '1' then
                         is_ch1 := (channel_id = CH_VAUX1);
                         is_ch2 := (channel_id = CH_VAUX9);
 
-                        -- -----------------------------------------------------
-                        -- Channel 1 (Mic 1 / A0) Direct-Path Accumulation
-                        -- -----------------------------------------------------
+                        -- Channel 1 Multiplier Stage
                         if is_ch1 and (mic1_gate_active = '1') and (mic1_gate_done = '0') then
                             sample_12 := unsigned(s_axis_tdata(15 downto 4));
                             dc_ref_12 := unsigned(reg_mic_dc_ref(15 downto 4));
@@ -537,21 +564,18 @@ begin
                                 dev_12 := dc_ref_12 - sample_12;
                             end if;
 
-                            dev_sq      := dev_12 * dev_12;
-                            energy_acc1 <= energy_acc1 + resize(dev_sq, 32);
+                            dev_sq_pipe1 <= dev_12 * dev_12;
+                            pipe1_valid  <= '1';
 
                             if gate_cnt1 >= (n_gate_target - 1) then
-                                reg_mic1_direct_energy <= std_logic_vector(energy_acc1 + resize(dev_sq, 32));
-                                mic1_gate_active       <= '0';
-                                mic1_gate_done         <= '1';
+                                pipe1_last       <= '1';
+                                mic1_gate_active <= '0';
                             else
                                 gate_cnt1 <= gate_cnt1 + 1;
                             end if;
                         end if;
 
-                        -- -----------------------------------------------------
-                        -- Channel 2 (Mic 2 / A1) Direct-Path Accumulation
-                        -- -----------------------------------------------------
+                        -- Channel 2 Multiplier Stage
                         if is_ch2 and (mic2_gate_active = '1') and (mic2_gate_done = '0') then
                             sample_12 := unsigned(s_axis_tdata(15 downto 4));
                             dc_ref_12 := unsigned(reg_mic_dc_ref(31 downto 20));
@@ -562,19 +586,37 @@ begin
                                 dev_12 := dc_ref_12 - sample_12;
                             end if;
 
-                            dev_sq      := dev_12 * dev_12;
-                            energy_acc2 <= energy_acc2 + resize(dev_sq, 32);
+                            dev_sq_pipe2 <= dev_12 * dev_12;
+                            pipe2_valid  <= '1';
 
                             if gate_cnt2 >= (n_gate_target - 1) then
-                                reg_mic2_direct_energy <= std_logic_vector(energy_acc2 + resize(dev_sq, 32));
-                                mic2_gate_active       <= '0';
-                                mic2_gate_done         <= '1';
+                                pipe2_last       <= '1';
+                                mic2_gate_active <= '0';
                             else
                                 gate_cnt2 <= gate_cnt2 + 1;
                             end if;
                         end if;
-
                     end if;
+
+                    -- ---------------------------------------------------------
+                    -- PIPELINE STAGE 2: 32-bit Accumulator & Register Latch
+                    -- ---------------------------------------------------------
+                    if pipe1_valid = '1' then
+                        energy_acc1 <= energy_acc1 + resize(dev_sq_pipe1, 32);
+                        if pipe1_last = '1' then
+                            reg_mic1_direct_energy <= std_logic_vector(energy_acc1 + resize(dev_sq_pipe1, 32));
+                            mic1_gate_done         <= '1';
+                        end if;
+                    end if;
+
+                    if pipe2_valid = '1' then
+                        energy_acc2 <= energy_acc2 + resize(dev_sq_pipe2, 32);
+                        if pipe2_last = '1' then
+                            reg_mic2_direct_energy <= std_logic_vector(energy_acc2 + resize(dev_sq_pipe2, 32));
+                            mic2_gate_done         <= '1';
+                        end if;
+                    end if;
+
                 end if;
             end if;
         end if;
