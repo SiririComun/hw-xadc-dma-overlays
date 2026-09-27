@@ -6,6 +6,7 @@
 --                • FFT Input Channel Stream Selection (A0 vs A1 via Bit 6)
 --                • Hardware Active Buzzer Pulse Generation (Pin buzzer_pulse_out)
 --                • Hardware-Accelerated 100 MHz ToA / TDOA Cycle-Accurate Counters
+--                • Quasi-Anechoic Direct-Path Energy Accumulation (Registers 0x34, 0x38, 0x3C)
 --                • Decimation Ratio (M = 1, 10, 20, 50)
 --                • LogiCORE FFT Transform Length (NFFT = 512, 1024, 2048)
 --                • TLAST Packet Size (512, 1024, 2048)
@@ -118,6 +119,12 @@ architecture Behavioral of axis_trigger_unit is
     -- 0x30: [31:16]=Mic 2 DC Ref (0x8000 = 1.65V), [15:0]=Mic 1 DC Ref (0x8000 = 1.65V)
     signal reg_mic_dc_ref        : std_logic_vector(31 downto 0) := x"80008000";
 
+    -- Hardware Direct-Path Energy Accumulation Registers (Quasi-Anechoic Gate)
+    signal reg_mic1_direct_energy: std_logic_vector(31 downto 0) := (others => '0'); -- 0x34: Mic 1 Direct Energy
+    signal reg_mic2_direct_energy: std_logic_vector(31 downto 0) := (others => '0'); -- 0x38: Mic 2 Direct Energy
+    -- 0x3C: [15:0]=Direct gate length N_gate (Default 576 samples = 0x0240 = 3 cycles @ 2610 Hz)
+    signal reg_gate_config       : std_logic_vector(31 downto 0) := x"00000240";
+
     -- AXI Handshake Signals
     signal axi_awready           : std_logic := '0';
     signal axi_wready            : std_logic := '0';
@@ -152,6 +159,16 @@ architecture Behavioral of axis_trigger_unit is
     signal mic2_locked           : std_logic := '0';
     signal toa_done_flag         : std_logic := '0';
 
+    -- Hardware Direct-Path Energy Gating Internal Signals
+    signal gate_cnt1             : unsigned(15 downto 0) := (others => '0');
+    signal gate_cnt2             : unsigned(15 downto 0) := (others => '0');
+    signal energy_acc1           : unsigned(31 downto 0) := (others => '0');
+    signal energy_acc2           : unsigned(31 downto 0) := (others => '0');
+    signal mic1_gate_active      : std_logic := '0';
+    signal mic2_gate_active      : std_logic := '0';
+    signal mic1_gate_done        : std_logic := '0';
+    signal mic2_gate_done        : std_logic := '0';
+
     -- Control Bit Aliases
     signal cfg_arm               : std_logic;
     signal cfg_auto              : std_logic;
@@ -184,7 +201,9 @@ begin
     reg_status(4) <= mic1_locked;        -- Bit 4: Mic 1 Wavefront Locked
     reg_status(5) <= mic2_locked;        -- Bit 5: Mic 2 Wavefront Locked
     reg_status(6) <= toa_done_flag;      -- Bit 6: Both locked or timeout reached
-    reg_status(31 downto 7) <= (others => '0');
+    reg_status(7) <= mic1_gate_done;     -- Bit 7: Mic 1 Direct Gate Complete
+    reg_status(8) <= mic2_gate_done;     -- Bit 8: Mic 2 Direct Gate Complete
+    reg_status(31 downto 9) <= (others => '0');
 
     -- =========================================================================
     -- 1. AXI4-Lite Register Interface (Read/Write Handling)
@@ -216,6 +235,7 @@ begin
                 reg_pulse_width    <= std_logic_vector(to_unsigned(500000, 32));
                 reg_toa_config     <= x"75300200";
                 reg_mic_dc_ref     <= x"80008000";
+                reg_gate_config    <= x"00000240";
                 fft_cfg_valid_reg  <= '1';
                 force_trig_reg     <= '0';
                 pulse_fire_strobe  <= '0';
@@ -249,19 +269,20 @@ begin
                                 force_trig_reg <= '1';
                             end if;
                             if s_axi_wdata(7) = '1' then
-                                pulse_fire_strobe <= '1'; -- Strobe pulse launch & reset ToA counter
+                                pulse_fire_strobe <= '1'; -- Strobe pulse launch & reset ToA/Energy counters
                             end if;
-                        when 2 => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
-                        when 3 => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
-                        when 4 => reg_hysteresis  <= s_axi_wdata; -- 0x10: HYSTERESIS
-                        when 5 => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
-                        when 6 => -- 0x18: FFT_CONFIG
+                        when 2  => reg_threshold   <= s_axi_wdata; -- 0x08: THRESHOLD
+                        when 3  => reg_timeout     <= s_axi_wdata; -- 0x0C: TIMEOUT
+                        when 4  => reg_hysteresis  <= s_axi_wdata; -- 0x10: HYSTERESIS
+                        when 5  => reg_decimation  <= s_axi_wdata; -- 0x14: DECIMATION
+                        when 6  => -- 0x18: FFT_CONFIG
                             reg_fft_config    <= s_axi_wdata;
                             fft_cfg_valid_reg <= '1';
-                        when 7 => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
-                        when 8 => reg_pulse_width <= s_axi_wdata; -- 0x20: PULSE_WIDTH
-                        when 11 => reg_toa_config <= s_axi_wdata; -- 0x2C: TOA_CONFIG (Blanking & Threshold)
-                        when 12 => reg_mic_dc_ref <= s_axi_wdata; -- 0x30: MIC_DC_REF (Mic 1 & 2 DC Baselines)
+                        when 7  => reg_packet_size <= s_axi_wdata; -- 0x1C: PACKET_SIZE
+                        when 8  => reg_pulse_width <= s_axi_wdata; -- 0x20: PULSE_WIDTH
+                        when 11 => reg_toa_config  <= s_axi_wdata; -- 0x2C: TOA_CONFIG (Blanking & Threshold)
+                        when 12 => reg_mic_dc_ref  <= s_axi_wdata; -- 0x30: MIC_DC_REF (Mic 1 & 2 DC Baselines)
+                        when 15 => reg_gate_config <= s_axi_wdata; -- 0x3C: GATE_CONFIG (Integration length N_gate)
                         when others => null;
                     end case;
                 end if;
@@ -295,20 +316,24 @@ begin
                     axi_arready <= '1';
                     read_addr := to_integer(unsigned(s_axi_araddr(5 downto 2)));
                     case read_addr is
-                        when 0 => axi_rdata <= reg_ctrl;
-                        when 1 => axi_rdata <= reg_status;
-                        when 2 => axi_rdata <= reg_threshold;
-                        when 3 => axi_rdata <= reg_timeout;
-                        when 4 => axi_rdata <= reg_hysteresis;
-                        when 5 => axi_rdata <= reg_decimation;
-                        when 6 => axi_rdata <= reg_fft_config;
-                        when 7 => axi_rdata <= reg_packet_size;
-                        when 8 => axi_rdata <= reg_pulse_width;
+                        when 0  => axi_rdata <= reg_ctrl;
+                        when 1  => axi_rdata <= reg_status;
+                        when 2  => axi_rdata <= reg_threshold;
+                        when 3  => axi_rdata <= reg_timeout;
+                        when 4  => axi_rdata <= reg_hysteresis;
+                        when 5  => axi_rdata <= reg_decimation;
+                        when 6  => axi_rdata <= reg_fft_config;
+                        when 7  => axi_rdata <= reg_packet_size;
+                        when 8  => axi_rdata <= reg_pulse_width;
                         -- Hardware-Accelerated ToA / TDOA Readbacks:
-                        when 9  => axi_rdata <= reg_mic1_toa_cycles; -- 0x24: Mic 1 Arrival (10 ns ticks)
-                        when 10 => axi_rdata <= reg_mic2_toa_cycles; -- 0x28: Mic 2 Arrival (10 ns ticks)
-                        when 11 => axi_rdata <= reg_toa_config;      -- 0x2C: ToA Configuration
-                        when 12 => axi_rdata <= reg_mic_dc_ref;      -- 0x30: DC References
+                        when 9  => axi_rdata <= reg_mic1_toa_cycles;    -- 0x24: Mic 1 Arrival (10 ns ticks)
+                        when 10 => axi_rdata <= reg_mic2_toa_cycles;    -- 0x28: Mic 2 Arrival (10 ns ticks)
+                        when 11 => axi_rdata <= reg_toa_config;         -- 0x2C: ToA Configuration
+                        when 12 => axi_rdata <= reg_mic_dc_ref;         -- 0x30: DC References
+                        -- Quasi-Anechoic Direct-Path Energy Readbacks:
+                        when 13 => axi_rdata <= reg_mic1_direct_energy; -- 0x34: Mic 1 Direct Energy Sum
+                        when 14 => axi_rdata <= reg_mic2_direct_energy; -- 0x38: Mic 2 Direct Energy Sum
+                        when 15 => axi_rdata <= reg_gate_config;        -- 0x3C: Gate Configuration
                         when others => axi_rdata <= (others => '0');
                     end case;
                 else
@@ -443,7 +468,120 @@ begin
     end process;
 
     -- =========================================================================
-    -- 4. Streaming Pass-Through & Trigger Engine
+    -- 4. Quasi-Anechoic Direct-Path Energy Accumulation Process
+    -- =========================================================================
+    process(aclk)
+        variable sample_12     : unsigned(11 downto 0);
+        variable dc_ref_12     : unsigned(11 downto 0);
+        variable dev_12        : unsigned(11 downto 0);
+        variable dev_sq        : unsigned(23 downto 0);
+        variable n_gate_target : unsigned(15 downto 0);
+        variable is_ch1        : boolean;
+        variable is_ch2        : boolean;
+    begin
+        if rising_edge(aclk) then
+            if aresetn = '0' then
+                gate_cnt1              <= (others => '0');
+                gate_cnt2              <= (others => '0');
+                energy_acc1            <= (others => '0');
+                energy_acc2            <= (others => '0');
+                mic1_gate_active       <= '0';
+                mic2_gate_active       <= '0';
+                mic1_gate_done         <= '0';
+                mic2_gate_done         <= '0';
+                reg_mic1_direct_energy <= (others => '0');
+                reg_mic2_direct_energy <= (others => '0');
+            else
+                -- Synchronous reset on pulse fire strobe
+                if pulse_fire_strobe = '1' then
+                    gate_cnt1              <= (others => '0');
+                    gate_cnt2              <= (others => '0');
+                    energy_acc1            <= (others => '0');
+                    energy_acc2            <= (others => '0');
+                    mic1_gate_active       <= '0';
+                    mic2_gate_active       <= '0';
+                    mic1_gate_done         <= '0';
+                    mic2_gate_done         <= '0';
+                    reg_mic1_direct_energy <= (others => '0');
+                    reg_mic2_direct_energy <= (others => '0');
+                else
+                    n_gate_target := unsigned(reg_gate_config(15 downto 0));
+                    if n_gate_target = 0 then
+                        n_gate_target := to_unsigned(576, 16);
+                    end if;
+
+                    -- Trigger gate activation on respective wavefront lock
+                    if mic1_locked = '1' and mic1_gate_done = '0' then
+                        mic1_gate_active <= '1';
+                    end if;
+
+                    if mic2_locked = '1' and mic2_gate_done = '0' then
+                        mic2_gate_active <= '1';
+                    end if;
+
+                    -- Process incoming stream samples
+                    if s_axis_tvalid = '1' then
+                        is_ch1 := (channel_id = CH_VAUX1);
+                        is_ch2 := (channel_id = CH_VAUX9);
+
+                        -- -----------------------------------------------------
+                        -- Channel 1 (Mic 1 / A0) Direct-Path Accumulation
+                        -- -----------------------------------------------------
+                        if is_ch1 and (mic1_gate_active = '1') and (mic1_gate_done = '0') then
+                            sample_12 := unsigned(s_axis_tdata(15 downto 4));
+                            dc_ref_12 := unsigned(reg_mic_dc_ref(15 downto 4));
+
+                            if sample_12 >= dc_ref_12 then
+                                dev_12 := sample_12 - dc_ref_12;
+                            else
+                                dev_12 := dc_ref_12 - sample_12;
+                            end if;
+
+                            dev_sq      := dev_12 * dev_12;
+                            energy_acc1 <= energy_acc1 + resize(dev_sq, 32);
+
+                            if gate_cnt1 >= (n_gate_target - 1) then
+                                reg_mic1_direct_energy <= std_logic_vector(energy_acc1 + resize(dev_sq, 32));
+                                mic1_gate_active       <= '0';
+                                mic1_gate_done         <= '1';
+                            else
+                                gate_cnt1 <= gate_cnt1 + 1;
+                            end if;
+                        end if;
+
+                        -- -----------------------------------------------------
+                        -- Channel 2 (Mic 2 / A1) Direct-Path Accumulation
+                        -- -----------------------------------------------------
+                        if is_ch2 and (mic2_gate_active = '1') and (mic2_gate_done = '0') then
+                            sample_12 := unsigned(s_axis_tdata(15 downto 4));
+                            dc_ref_12 := unsigned(reg_mic_dc_ref(31 downto 20));
+
+                            if sample_12 >= dc_ref_12 then
+                                dev_12 := sample_12 - dc_ref_12;
+                            else
+                                dev_12 := dc_ref_12 - sample_12;
+                            end if;
+
+                            dev_sq      := dev_12 * dev_12;
+                            energy_acc2 <= energy_acc2 + resize(dev_sq, 32);
+
+                            if gate_cnt2 >= (n_gate_target - 1) then
+                                reg_mic2_direct_energy <= std_logic_vector(energy_acc2 + resize(dev_sq, 32));
+                                mic2_gate_active       <= '0';
+                                mic2_gate_done         <= '1';
+                            else
+                                gate_cnt2 <= gate_cnt2 + 1;
+                            end if;
+                        end if;
+
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- =========================================================================
+    -- 5. Streaming Pass-Through & Trigger Engine
     -- =========================================================================
     m_axis_tdata  <= s_axis_tdata;
     m_axis_tvalid <= s_axis_tvalid when (state = ST_STREAMING) else '0';
