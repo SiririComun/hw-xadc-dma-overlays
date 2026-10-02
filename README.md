@@ -3,61 +3,54 @@
 [![Hog Managed](https://img.shields.io/badge/HDL_Management-Hog-blue.svg)](https://cern.ch/hog)
 [![Target Board](https://img.shields.io/badge/Board-PYNQ--Z2-orange.svg)](https://tul.com.tw/ProductsPYNQ-Z2.html)
 [![Vivado Version](https://img.shields.io/badge/Vivado-2024.2.2-green.svg)](https://www.xilinx.com)
-[![Hardware Release](https://img.shields.io/badge/Release-v1.5.0-blue.svg)](https://github.com/SiririComun/hw-xadc-dma-overlays/releases/tag/v1.5.0)
+[![Hardware Release](https://img.shields.io/badge/Release-v1.5.3-blue.svg)](https://github.com/SiririComun/hw-xadc-dma-overlays/releases/tag/v1.5.3)
 
-A multi-regime hardware overlay for the **PYNQ-Z2** (`xc7z020clg400-1`) that captures simultaneous dual-channel analog signals using the XADC continuous sequencer, provides **FPGA-accelerated programmable anti-aliasing decimation ($M \in \{1, 10, 20, 50\}$)**, dynamic packetization, **pure single-channel runtime-reconfigurable FFT ($N \in \{512, 1024, 2048\}$)**, and streams data directly to DDR memory via dual AXI DMA engines.
+A high-performance multi-regime hardware overlay for the **PYNQ-Z2 (`xc7z020clg400-1`)** that provides **true zero-skew simultaneous dual-ADC sampling ($0.00\,\mu\text{s}$ inter-channel skew)**, **FPGA anti-aliasing decimation ($M \in \{1, 10, 20, 50\}$)**, **active buzzer pulse generation on Arduino pin AR2 (`U13`)**, **hardware-accelerated 100 MHz ToA/TDOA cycle counters ($10.0\,\text{ns}$ ticks)**, **quasi-anechoic direct-path energy accumulation**, and concurrent dual AXI DMA streaming to DDR memory.
 
 Managed using **Hog (HDL on Git)** for strict design traceability and automated bitstream versioning.
 
 ---
 
-## 🏛 Hardware Architecture & Memory Map
+## 🏛 Hardware Architecture & Dataflow
 
-The design captures analog data across **Arduino Header A0 (`Vaux1`)** and **A1 (`Vaux9`)** with $0.0\,\mu\text{s}$ simultaneous dual-sampling, gates frames via `axis_trigger_unit` with **selectable trigger source (A0 vs A1)**, applies runtime decimation via `axis_decimator` with synchronous mode-switching flush, packetizes frames with programmable `tlast_generator`, forks the stream via `axis_broadcaster`, demultiplexes a clean single channel via `axis_channel_demux`, computes the real-time Fourier transform via runtime-configurable `xfft` and `cordic`, and transfers both Time and Frequency frames concurrently to DDR memory.
-
-### Block Design Schematic
-![PYNQ-Z2 XADC Multi-Regime Block Design](docs/images/xadc_bd.svg)
-
-### Dataflow Diagram
 ```
                      [ PYNQ-Z2 Header A0 (Vaux1) ]       [ PYNQ-Z2 Header A1 (Vaux9) ]
                                    │                                   │
                                    └───────────────┬───────────────────┘
                                                    ▼
                                   [ XADC Wizard Dual Continuous Sequencer ]
-                                                   │ (1 MSPS Simultaneous Dual Stream)
+                                       (1 MSPS Dual Stream, 0.00 µs Skew)
+                                                   │
                                                    ▼
                                          [ axis_trigger_unit ]
-                                         (Trigger: A0/A1, Phase-Locked to A0)
+                         ├── Generates AR2 (U13) Buzzer Pulses (Reg 0x20, Bit 7)
+                         ├── 100 MHz ToA Counters (Regs 0x24, 0x28, 0x2C, 0x30)
+                         └── 2-Stage Pipelined Direct Energy Accumulator (Regs 0x34, 0x38, 0x3C)
                                                    │ (Gated Stream)
                                                    ▼
                                          [ axis_decimator IP ]
-                               (Programmable M = 1, 10, 20, 50 w/ Sync Reset)
+                               (Programmable M = 1, 10, 20, 50 w/ DSP48 Reciprocal)
                                                    │
                                                    ▼
                                           [ tlast_generator ]
-                               (Programmable Packet Limit via Reg 0x1C)
-                                                   │ (w/ TLAST)
+                                (Programmable Packet Limit via Reg 0x1C)
+                                                   │
                                          [ axis_broadcaster ]
                                   ┌────────────────┴────────────────┐
                          (Time Stream w/ TLAST)            (Interleaved Stream w/ TLAST)
                                   │                                 ▼
                                   │                    [ axis_channel_demux ]
-                                  │                    (Selects Pure A0 or A1 via Reg 0x00[6])
+                                  │                    (Routes A0 vs A1 to FFT via Reg 0x00[6])
                                   │                                 ▼
                                   │                    [ axis_subset_converter_0 ]
-                                  │                    (Signed 32-bit Stream w/ DC Inversion)
                                   │                                 ▼
                                   │                    [ xfft Core (Runtime N FFT) ]
                                   │                    (N = 512, 1024, 2048 w/ TREADY Handshake)
                                   │                                 ▼
-                                  │                    [ axis_subset_converter_2 ]
-                                  │                    (Cartesian Stream Sanitizer)
-                                  │                                 ▼
                                   │                    [ CORDIC IP (Translate Mode) ]
-                                  │                                 │ (16-bit Magnitude)
+                                  │                    (32-bit: Phase [31:16], Magnitude [15:0])
                                   ▼                                 ▼
-                        [ AXI DMA 0 (Time) ]              [ AXI DMA 1 (FFT Mag) ]
+                        [ AXI DMA 0 (Time) ]              [ AXI DMA 1 (Polar FFT) ]
                            (0x40400000)                      (0x40410000)
                                   │                                 │
                                   └────────────────┬────────────────┘
@@ -65,55 +58,40 @@ The design captures analog data across **Arduino Header A0 (`Vaux1`)** and **A1 
                                         [ Processing System DDR ]
 ```
 
-### Physical Pin Constraints (Arduino Header `J1`)
+---
+
+## 🔌 Physical Package Pin Constraints
 
 | Signal Port | Physical Pin | Header Location | Description |
 | :--- | :--- | :--- | :--- |
-| `Vaux1_0_v_p` / `v_n` | `E17` / `D18` | **Header `J1` Pin A0** (Pin 6 - Bottom) | Channel 1 Analog Differential Pair |
-| `Vaux9_0_v_p` / `v_n` | `E18` / `E19` | **Header `J1` Pin A1** (Pin 5 - 2nd from Bottom) | Channel 2 Analog Differential Pair |
-
-### AXI Memory Address Table
-
-| Peripheral Block | Interface | Base Address | Address Range | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| **AXI DMA Time** (`axi_dma_0`) | `S_AXI_LITE` | `0x40400000` | 64K | Time-Domain DMA Controller (Interleaved stereo sample frames) |
-| **AXI DMA FFT** (`axi_dma_1`) | `S_AXI_LITE` | `0x40410000` | 64K | Frequency-Domain Magnitude DMA Controller ($N/2$ bins of selected channel) |
-| **AXI Timer** (`axi_timer_0`) | `S_AXI` | `0x42800000` | 64K | System Timer / Hardware Capture Trigger |
-| **XADC Wizard** (`xadc_wiz_0`) | `s_axi_lite` | `0x43C00000` | 64K | XADC DRP & Continuous Sequencer Configuration |
-| **AXIS Trigger Unit** (`axis_trigger_unit_0`) | `s_axi` | `0x43C10000` | 64K | Trigger, Decimation ($M$), FFT Length ($N$), Channel Route & Packet Limits |
-
-### Register Map (`axis_trigger_unit_0` @ `0x43C10000`)
-* **`0x00: CONTROL_REG`** — `[0]`: Arm, `[1]`: Auto Mode, `[2]`: Falling Edge, `[3]`: Single Shot, `[4]`: Force, `[5]`: Trigger Source (`0=A0, 1=A1`), `[6]`: FFT Channel Route (`0=A0, 1=A1`)
-* **`0x04: STATUS_REG`** — `[0]`: Armed, `[1]`: Triggered, `[2]`: Streaming
-* **`0x08: THRESHOLD_REG`** — `[15:0]`: 12-bit left-aligned comparator threshold ($0.0\,\text{V} - 3.3\,\text{V}$)
-* **`0x0C: TIMEOUT_REG`** — `[31:0]`: Auto-trigger timeout in clock cycles (Default: $5{,}000{,}000 = 50\,\text{ms}$)
-* **`0x10: HYSTERESIS_REG`** — `[15:0]`: Noise rejection band
-* **`0x14: DECIMATION_REG`** — `[1:0]`: `00` $\implies M=1$ (Bypass), `01` $\implies M=10$, `10` $\implies M=20$, `11` $\implies M=50$
-* **`0x18: FFT_CONFIG_REG`** — `[15:0]`: `(NFFT << 8) | FWD_INV` (Persistent handshake to `xfft_0` on write)
-* **`0x1C: PACKET_SIZE_REG`** — `[15:0]`: Programmable sample count per DMA frame ($N$)
-
-### Operating Regimes
-
-| Profile Mode | Decimator ($M$) | Transform ($N$) | Sampling Rate ($f_s$) | Nyquist Bandwidth | Time Window ($T_{\text{win}}$) | Resolution ($\Delta f$) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Wideband Lab Scope** | **$1$** | $2048$ | $500\,\text{kSPS}$ | $0 - 250\,\text{kHz}$ | $2.05\,\text{ms}$ | $244.14\,\text{Hz}$ |
-| **Full-Band Audio** | **$10$** | $2048$ | $50\,\text{kSPS}$ | $0 - 25\,\text{kHz}$ | $40.96\,\text{ms}$ | $24.41\,\text{Hz}$ |
-| **Speech / Vocal** | **$20$** | $2048$ | $25\,\text{kSPS}$ | $0 - 12.5\,\text{kHz}$ | $81.92\,\text{ms}$ | $12.21\,\text{Hz}$ |
-| **Deep Bass Zoom** | **$50$** | $2048$ | $10\,\text{kSPS}$ | $0 - 5\,\text{kHz}$ | $204.80\,\text{ms}$ | **$4.88\,\text{Hz}$** |
+| `Vaux1_0_v_p` / `v_n` | `E17` / `D18` | **Header `J1` Pin A0** (Pin 6) | Channel 1 Analog Differential Pair |
+| `Vaux9_0_v_p` / `v_n` | `E18` / `E19` | **Header `J1` Pin A1** (Pin 5) | Channel 2 Analog Differential Pair ($0.00\,\mu\text{s}$ skew) |
+| `buzzer_pulse_out` | **`U13`** | **Header Digital Pin AR2** (LVCMOS33) | Active Buzzer Hardware Pulse Output to 2N2222A Base |
 
 ---
 
-## 📦 For Software Developers (Consuming this Overlay)
+## 🗃 Complete Register Map (`axis_trigger_unit_0` @ `0x43C10000`)
 
-Specify the `v1.5.0` dependency in your `hardware.json`:
+The AXI4-Lite slave decoder supports full 6-bit byte addressing (`0x00` through `0x3C`):
 
-```json
-{
-  "repo": "SiririComun/hw-xadc-dma-overlays",
-  "version": "v1.5.0",
-  "overlay_name": "pynq_z2"
-}
-```
+| Offset | Register Name | Bits | Description |
+| :---: | :--- | :---: | :--- |
+| **`0x00`** | **`CONTROL_REG`** | `[0]`<br>`[1]`<br>`[2]`<br>`[3]`<br>`[4]`<br>`[5]`<br>`[6]`<br>`[7]` | **Arm** trigger unit<br>**Auto Mode** (1) vs Normal Mode (0)<br>**Slope**: Rising edge (0) vs Falling edge (1)<br>**Single Shot** (1) vs Continuous (0)<br>**Force Trigger** software strobe<br>**Trigger Source**: Channel 1 / A0 (0) vs Channel 2 / A1 (1)<br>**FFT Stream Routing**: Channel 1 / A0 (0) vs Channel 2 / A1 (1)<br>**FIRE_PULSE**: Strobes buzzer pulse on `AR2` & resets ToA/energy counters |
+| **`0x04`** | **`STATUS_REG`** | `[0]`<br>`[1]`<br>`[2]`<br>`[3]`<br>`[4]`<br>`[5]`<br>`[6]`<br>`[7]`<br>`[8]` | **Armed** state<br>**Triggered** flag<br>**Streaming** active<br>**PulseActive** (HIGH while buzzer pin `AR2` is firing)<br>**Mic1ToaLocked** (Channel 1 wavefront arrival latched)<br>**Mic2ToaLocked** (Channel 2 wavefront arrival latched)<br>**ToaDone** (Both channels latched or 50 ms timeout expired)<br>**Mic1GateDone** (Channel 1 direct-path gate complete)<br>**Mic2GateDone** (Channel 2 direct-path gate complete) |
+| **`0x08`** | **`THRESHOLD_REG`** | `[15:0]` | 12-bit left-aligned comparator threshold ($0.0\,\text{V} - 3.3\,\text{V}$) |
+| **`0x0C`** | **`TIMEOUT_REG`** | `[31:0]` | Auto-trigger timeout in 100 MHz clock cycles (Default: $5{,}000{,}000 = 50.0\,\text{ms}$) |
+| **`0x10`** | **`HYSTERESIS_REG`** | `[15:0]` | Noise rejection hysteresis band |
+| **`0x14`** | **`DECIMATION_REG`** | `[1:0]` | `00` $\implies M=1$ (Bypass: $500\,\text{kSPS}$), `01` $\implies M=10$ ($50\,\text{kSPS}$), `10` $\implies M=20$ ($25\,\text{kSPS}$), `11` $\implies M=50$ ($10\,\text{kSPS}$) |
+| **`0x18`** | **`FFT_CONFIG_REG`** | `[15:0]` | `(FWD_INV << 8) | NFFT` (Dynamic LogiCORE FFT handshake on write) |
+| **`0x1C`** | **`PACKET_SIZE_REG`** | `[15:0]` | Programmable sample limit per DMA frame ($N$) |
+| **`0x20`** | **`PULSE_WIDTH_REG`** | `[31:0]` | Hardware buzzer pulse duration in 100 MHz clock cycles ($10\,\text{ns}$ ticks, up to $42.9\,\text{s}$) |
+| **`0x24`** | **`MIC1_TOA_REG`** | `[31:0]` | Mic 1 acoustic arrival timestamp in 100 MHz clock cycles |
+| **`0x28`** | **`MIC2_TOA_REG`** | `[31:0]` | Mic 2 acoustic arrival timestamp in 100 MHz clock cycles |
+| **`0x2C`** | **`TOA_CONFIG_REG`** | `[31:16]`<br>`[15:0]` | **Blanking cycles** (Default: 30,000 cycles = $0.30\,\text{ms}$)<br>**Threshold delta counts** above DC reference baseline |
+| **`0x30`** | **`MIC_DC_REF_REG`** | `[31:16]`<br>`[15:0]` | **Mic 2 DC bias baseline** (Default: `0x8000` = $1.65\,\text{V}$)<br>**Mic 1 DC bias baseline** (Default: `0x8000` = $1.65\,\text{V}$) |
+| **`0x34`** | **`MIC1_ENERGY_REG`** | `[31:0]` | Line-of-sight squared sample sum for Mic 1 ($\sum (v - v_{\text{DC}})^2$) |
+| **`0x38`** | **`MIC2_ENERGY_REG`** | `[31:0]` | Line-of-sight squared sample sum for Mic 2 ($\sum (v - v_{\text{DC}})^2$) |
+| **`0x3C`** | **`GATE_CONFIG_REG`** | `[15:0]` | Direct-gate integration sample count $N_{\text{gate}}$ (Default: $576$ samples = 3 cycles @ $2610\,\text{Hz}$) |
 
 ---
 
