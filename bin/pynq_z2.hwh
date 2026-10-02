@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Sep  1 16:21:57 2026" VIVADOVERSION="2024.2.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Sun Sep 27 10:21:06 2026" VIVADOVERSION="2024.2.2">
 
   <SYSTEMINFO ARCH="zynq" DEVICE="7z020" NAME="xadc" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -137,6 +137,11 @@
     <PORT DIR="I" NAME="Vp_Vn_0_v_p" SIGIS="undef" SIGNAME="xadc_wiz_0_vp_in">
       <CONNECTIONS>
         <CONNECTION INSTANCE="xadc_wiz_0" PORT="vp_in"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="O" NAME="buzzer_pulse_out" SIGIS="undef" SIGNAME="axis_trigger_unit_0_buzzer_pulse_out">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="buzzer_pulse_out"/>
       </CONNECTIONS>
     </PORT>
   </EXTERNALPORTS>
@@ -2902,7 +2907,7 @@
             <CONNECTION INSTANCE="axi_timer_0" PORT="s_axi_wvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="4" NAME="M03_AXI_araddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_araddr">
+        <PORT DIR="O" LEFT="5" NAME="M03_AXI_araddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_araddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="s_axi_araddr"/>
           </CONNECTIONS>
@@ -2922,7 +2927,7 @@
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" LEFT="4" NAME="M03_AXI_awaddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_awaddr">
+        <PORT DIR="O" LEFT="5" NAME="M03_AXI_awaddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_awaddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="s_axi_awaddr"/>
           </CONNECTIONS>
@@ -3508,7 +3513,7 @@
           </PORTMAPS>
         </BUSINTERFACE>
         <BUSINTERFACE BUSNAME="axi_smc_0_M03_AXI" DATAWIDTH="32" NAME="M03_AXI" TYPE="MASTER" VLNV="xilinx.com:interface:aximm:1.0">
-          <PARAMETER NAME="ADDR_WIDTH" VALUE="5"/>
+          <PARAMETER NAME="ADDR_WIDTH" VALUE="6"/>
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
@@ -5403,7 +5408,7 @@
         <ADDRESSBLOCK ACCESS="" INTERFACE="s_axi" NAME="reg0" RANGE="4096" USAGE="register"/>
       </ADDRESSBLOCKS>
       <PARAMETERS>
-        <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="5"/>
+        <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="6"/>
         <PARAMETER NAME="C_S_AXI_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="Component_Name" VALUE="xadc_axis_trigger_unit_0_0"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
@@ -5419,6 +5424,11 @@
         <PORT DIR="I" NAME="aresetn" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="rst_ps7_0_100M_peripheral_aresetn">
           <CONNECTIONS>
             <CONNECTION INSTANCE="rst_ps7_0_100M" PORT="peripheral_aresetn"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="buzzer_pulse_out" SIGIS="undef" SIGNAME="axis_trigger_unit_0_buzzer_pulse_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="External_Ports" PORT="buzzer_pulse_out"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" LEFT="4" NAME="channel_id" RIGHT="0" SIGIS="undef" SIGNAME="xadc_wiz_0_channel_out">
@@ -5476,7 +5486,7 @@
             <CONNECTION INSTANCE="tlast_generator_0" PORT="packet_size_in"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="4" NAME="s_axi_araddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_araddr">
+        <PORT DIR="I" LEFT="5" NAME="s_axi_araddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_araddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_smc_0" PORT="M03_AXI_araddr"/>
           </CONNECTIONS>
@@ -5496,7 +5506,7 @@
             <CONNECTION INSTANCE="axi_smc_0" PORT="M03_AXI_arvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="4" NAME="s_axi_awaddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_awaddr">
+        <PORT DIR="I" LEFT="5" NAME="s_axi_awaddr" RIGHT="0" SIGIS="undef" SIGNAME="axi_smc_0_M03_AXI_awaddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_smc_0" PORT="M03_AXI_awaddr"/>
           </CONNECTIONS>
@@ -5649,7 +5659,7 @@
           </PORTMAPS>
         </BUSINTERFACE>
         <BUSINTERFACE BUSNAME="axi_smc_0_M03_AXI" DATAWIDTH="32" NAME="s_axi" TYPE="SLAVE" VLNV="xilinx.com:interface:aximm:1.0">
-          <PARAMETER NAME="ADDR_WIDTH" VALUE="5"/>
+          <PARAMETER NAME="ADDR_WIDTH" VALUE="6"/>
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
@@ -6912,10 +6922,10 @@
             <CONNECTION INSTANCE="axi_smc_1" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aclk"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aclk"/>
-            <CONNECTION INSTANCE="axis_decimator_0" PORT="aclk"/>
-            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_subset_converter_2" PORT="aclk"/>
             <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_decimator_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -7491,10 +7501,10 @@
             <CONNECTION INSTANCE="axi_smc_1" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_broadcaster_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="tlast_generator_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axis_decimator_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_subset_converter_2" PORT="aresetn"/>
             <CONNECTION INSTANCE="axis_channel_demux_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_decimator_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axis_trigger_unit_0" PORT="aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>

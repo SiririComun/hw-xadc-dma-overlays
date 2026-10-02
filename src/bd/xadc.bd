@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x83FCB832B05D48D7",
+      "boundary_crc": "0x519B5ACF1A89DCD2",
       "device": "xc7z020clg400-1",
       "name": "xadc",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
@@ -243,6 +243,11 @@
             "direction": "I"
           }
         }
+      }
+    },
+    "ports": {
+      "buzzer_pulse_out": {
+        "direction": "O"
       }
     },
     "components": {
@@ -2887,7 +2892,7 @@
                 "value_src": "constant"
               },
               "ADDR_WIDTH": {
-                "value": "5",
+                "value": "6",
                 "value_src": "auto"
               },
               "AWUSER_WIDTH": {
@@ -2992,7 +2997,7 @@
               "AWADDR": {
                 "physical_name": "s_axi_awaddr",
                 "direction": "I",
-                "left": "4",
+                "left": "5",
                 "right": "0"
               },
               "AWPROT": {
@@ -3046,7 +3051,7 @@
               "ARADDR": {
                 "physical_name": "s_axi_araddr",
                 "direction": "I",
-                "left": "4",
+                "left": "5",
                 "right": "0"
               },
               "ARPROT": {
@@ -3126,6 +3131,9 @@
           },
           "frame_done": {
             "direction": "I"
+          },
+          "buzzer_pulse_out": {
+            "direction": "O"
           },
           "decim_factor_out": {
             "direction": "O",
@@ -3976,6 +3984,12 @@
       }
     },
     "nets": {
+      "axis_trigger_unit_0_buzzer_pulse_out": {
+        "ports": [
+          "axis_trigger_unit_0/buzzer_pulse_out",
+          "buzzer_pulse_out"
+        ]
+      },
       "axis_trigger_unit_0_decim_factor_out": {
         "ports": [
           "axis_trigger_unit_0/decim_factor_out",
@@ -4027,10 +4041,10 @@
           "axi_smc_1/aclk",
           "axis_broadcaster_0/aclk",
           "tlast_generator_0/aclk",
-          "axis_decimator_0/aclk",
-          "axis_trigger_unit_0/aclk",
           "axis_subset_converter_2/aclk",
-          "axis_channel_demux_0/aclk"
+          "axis_channel_demux_0/aclk",
+          "axis_decimator_0/aclk",
+          "axis_trigger_unit_0/aclk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -4053,10 +4067,10 @@
           "axi_smc_1/aresetn",
           "axis_broadcaster_0/aresetn",
           "tlast_generator_0/aresetn",
-          "axis_decimator_0/aresetn",
-          "axis_trigger_unit_0/aresetn",
           "axis_subset_converter_2/aresetn",
-          "axis_channel_demux_0/aresetn"
+          "axis_channel_demux_0/aresetn",
+          "axis_decimator_0/aresetn",
+          "axis_trigger_unit_0/aresetn"
         ]
       },
       "tlast_generator_0_m_axis_tlast": {
